@@ -78,57 +78,50 @@ def fresh_fuel(l, data, file):
 	with open(f'out_{file}', 'w') as o:
 		o.writelines(data)
 
-def FA_swap(l, data, file):
-	store1 = store2 = {}
-	temp_store1 = defaultdict(list)
-	temp_store2 = defaultdict(list)
-	swap_num = input('Type numbers of FA to swap: ')
-	convert = list(map(lambda x: int(x), swap_num.split(','))) 
-	matrs = [j for i in convert for j in FAs_num[i-1]]
-	print(matrs)
-	for num in range(0,len(l)):
-		for n,i in enumerate(matrs[:6]):
-			if i == l[num][1]:
-				temp_store1[i] = data[l[num][0]:l[num+1][0]-2]
-
-	for num in range(0,len(l)):
-		for n,i in enumerate(matrs[6:]):
-			if i == l[num][1]:
-				temp_store2[i] = data[l[num][0]:l[num+1][0]-2]
-
-	# store1, store2 = {k1:v2 for k1,v1 in temp_store1.items() for k2,v2 in temp_store2.items()}, {k2:v1 for k1,v1 in temp_store1.items() for k2,v2 in temp_store2.items()}
-	store1, store2 = {k1:v2 for (k1,v1), (k2,v2) in zip(temp_store1.items(),temp_store2.items())}, {k2:v1 for (k1,v1), (k2,v2) in zip(temp_store1.items(),temp_store2.items())}
-	
-	for num in range(0,len(l)):
-		for n,i in enumerate(matrs[:6]):
-			if i == l[num][1]:
-				data[l[num][0]:l[num+1][0]-2] = store1[i]
-				l = q(data)
-	for num in range(0,len(l)):
-		for n,i in enumerate(matrs[6:]):
-			if i == l[num][1]:
-				data[l[num][0]:l[num+1][0]-2] = store2[i]
-				l = q(data)
-	with open(f'out_{file}', 'w') as o:
-		o.writelines(data)
+class Refueling:
+	# def __init__(self):
+	def get_data(self):
+		for file in query:
+			print(f'openning file.... {file}')
+			store = defaultdict(list)
+			with open(file, 'r') as f:
+				self.data = f.readlines()
+			self.l = q(self.data)
+			option = int(input('Type option: 1-average, 2-reset densities, 3-swap fuel: '))
+			if option==1: average_burnup(self.l, self.data, file, store)
+			elif option==2: fresh_fuel(self.l, self.data, file)
+			elif option==3: self.FA_swap(file)
 
 
-def get_data():
-	matrs = []
-	for file in query:
-		print(f'openning file.... {file}')
-		store = defaultdict(list)
-		with open(file, 'r') as f:
-			data = f.readlines()
-		l = q(data)
-		option = int(input('Type option: 1-average, 2-reset densities, 3-swap fuel: '))
-		if option==1: average_burnup(l, data, file, store)
-		elif option==2: fresh_fuel(l, data, file)
-		elif option==3: FA_swap(l, data, file)
+	def loop(self, matrs, store=None, reverse=False):
+		temp_store = {}
+		for num in range(0,len(self.l)):
+			for n,i in enumerate(matrs):
+				if i == self.l[num][1]:
+					if reverse is False:
+						temp_store[i] = self.data[self.l[num][0]:self.l[num+1][0]-2]
+					else:
+						self.data[self.l[num][0]:self.l[num+1][0]-2] = store[i]
+						self.l = q(self.data)
+		return temp_store
+
+	def FA_swap(self,file):
+		swap_num = input('Type numbers of FA to swap: ')
+		convert = list(map(lambda x: int(x), swap_num.split(','))) 
+		first, second = FAs_num[convert[0]-1], FAs_num[convert[1]-1]
+		print(first)
+		store1, store2 = self.loop(first), self.loop(second)
+		swstore1, swstore2 = {k1:v2 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}, {k2:v1 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}
+		self.loop(first, store=swstore1, reverse=True), self.loop(second, store=swstore2, reverse=True)
+		with open(f'out_{file}', 'w') as o:
+			o.writelines(self.data)
+
+
+
 			
 
 if __name__ == '__main__':
-	get_data()
+	Refueling(). get_data()
 		# print(d)
 
 
