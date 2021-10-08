@@ -4,15 +4,12 @@ import time
 import re
 import numpy as np
 import pandas as pd
+import typing
 from collections import defaultdict
 from statistics import mean
 
-pattern = re.compile(r'\.[A-Z]+')
-cwd = os.getcwd()
-name = sys.argv[1] # gets name of file from cmd
-name = name[2:] if name.startswith('.') else name
-print(name)
-query = [i for i in os.listdir(cwd) if re.search(pattern, i) is not None and name in i]
+
+# query = [i for i in os.listdir(cwd) if re.search(pattern, i) is not None and name in i]
 
 FAs_num = [[i, i+20, i+40, i+60, i+80, i+100] for i in range(1,21)] #num of FA
 # print(FAs_num)
@@ -27,11 +24,9 @@ def convert_type(val):
 		print(e)
 		return False
 
-def work_with_store(dic, itr, value):
+def work_with_store(dic=defaultdict(list), itr, value):
 	check = [dic[FAs_num.index(i)+1].append(value) for i in FAs_num for j in i if j==itr]
 
-def q(data):
-	return [(n,convert_type(i.split()[1]))  for n,i in enumerate(data, start=1) if 'MATR' in i and convert_type(i.split()[1]) <= 121]
 
 def drawing(file, average):
 	for i in range(4):
@@ -45,19 +40,7 @@ def drawing(file, average):
 	pd.DataFrame(reshaped).to_excel(f"out_{re.search(r'[a-zA-Z0-9]+', file).group(0)}.xlsx", index=False, header=False)
 		
 
-def average_burnup(l, data, file, store):
-	for num in range(0,len(l)):
-		try:
-			for nd in data[l[num][0]:l[num+1][0]-2]:
-				if 'U235' in nd:
-					work_with_store(store, num+1, convert_type(nd.split()[1]))
-		except IndexError as e:
-			print(e)
-	# aver = [format((1-mean(i)/ind)*100, '.3f') for i in store.values()]
-	aver = [1-mean(i)/ind for i in store.values()]
-	print(aver)
-	drawing(file, aver)
-	print(time.process_time())
+
 
 def fresh_fuel(l, data, file):
 	reset_FA = input('Type numbers of FA to reset: ')
@@ -79,18 +62,40 @@ def fresh_fuel(l, data, file):
 		o.writelines(data)
 
 class Refueling:
-	# def __init__(self):
+	INPUT_PATH = os.path.join(os.getcwd(), 'input')
+	OUTPUT_PATH = os.path.join(os.getcwd(), 'output')
+	PATTERN = re.compile(r'\.[A-Z]+')
+
+	def __init__(self, name, option):
+		self.file_name = name
+		self.option = option
+
+	@property
+	def q(self):
+		return [(n,convert_type(i.split()[1]))  for n,i in enumerate(self.data, start=1) if 'MATR' in i and convert_type(i.split()[1]) <= 121]
+
+	def average_burnup(self):
+	for num in range(0,len(l)):
+		try:
+			for nd in data[l[num][0]:l[num+1][0]-2]:
+				if 'U235' in nd:
+					work_with_store(store, num+1, convert_type(nd.split()[1]))
+		except IndexError as e:
+			print(e)
+	# aver = [format((1-mean(i)/ind)*100, '.3f') for i in store.values()]
+	aver = [1-mean(i)/ind for i in store.values()]
+	print(aver)
+	drawing(file, aver)
+	print(time.process_time())
+
 	def get_data(self):
-		for file in query:
-			print(f'openning file.... {file}')
-			store = defaultdict(list)
-			with open(file, 'r') as f:
-				self.data = f.readlines()
-			self.l = q(self.data)
-			option = int(input('Type option: 1-average, 2-reset densities, 3-swap fuel: '))
-			if option==1: average_burnup(self.l, self.data, file, store)
-			elif option==2: fresh_fuel(self.l, self.data, file)
-			elif option==3: self.FA_swap(file)
+		print(f'openning file.... {self.file_name}')
+		with open(os.path.join(self.INPUT_PATH, self.file_name), 'r') as f:
+			self.data = f	
+		self.query = self.q
+		if option==1: self.average_burnup(self.query, self.data, file, store)
+		# elif option==2: fresh_fuel(self.l, self.data, file)
+		# elif option==3: self.FA_swap(file)
 
 
 	def loop(self, matrs, store=None, reverse=False):
@@ -116,12 +121,12 @@ class Refueling:
 		with open(f'out_{file}', 'w') as o:
 			o.writelines(self.data)
 
-
-
-			
-
 if __name__ == '__main__':
-	Refueling(). get_data()
+	name = sys.argv[1]
+	print(os.path.split(name))
+	option = int(input('Type option: 1-average, 2-reset densities, 3-swap fuel: '))
+	Refueling(name, option).get_data()
+	
 		# print(d)
 
 
