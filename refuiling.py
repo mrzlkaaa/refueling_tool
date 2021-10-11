@@ -26,13 +26,11 @@ class MyLogger:
 def timeit(func):
 	def wrapper(*args, **kwargs):
 		time_before = datetime.datetime.now()
-		func(args, kwargs)
+		func(*args, **kwargs)
 		time_diff = datetime.datetime.now() - time_before
-		return print(f' execution time if {time_diff.total_seconds()}')
-
+		return print(f'execution time of "{func.__name__}" function - {time_diff.total_seconds()}')
 	return wrapper
 
-# query = [i for i in os.listdir(cwd) if re.search(pattern, i) is not None and name in i]
 
 FAs_num: List[List[int]] = [[i, i+20, i+40, i+60, i+80, i+100] for i in range(1,21)] #num of FA
 IND: float = 2.4600E-03 #U235
@@ -90,6 +88,7 @@ class Average(Refueling):
 		print(arr)
 		return pd.DataFrame(arr).to_excel(f'out_{self.file_name}.xlsx')
 		 
+	@timeit
 	def average_burnup(self, FA_dic = defaultdict(list)):
 		U5 = self.U5_densities
 		for num, u5 in enumerate(U5, start=1):
@@ -108,7 +107,6 @@ class Fresh(Refueling):
 
 	def replace_save(self, matrs):
 		query = self.q
-		print(query)
 		try:
 			for n in range(len(query)):
 				for j in matrs:
@@ -119,6 +117,7 @@ class Fresh(Refueling):
 			print(e)
 		return self.save()
 
+	@timeit
 	def refueling(self):
 		fresh_FA = input('Type numbers of FA to refuel: ')
 		try:
@@ -133,11 +132,9 @@ class Fresh(Refueling):
 class Swap(Refueling):
 	def __init__(self, name):
 		super().__init__(name)
-
-	# @timeit
+	
 	def loop(self, matrs, store=None, reverse=False):
 		query = self.q
-		print(query)
 		temp_store = {}
 		for num in range(len(query)):
 			for n,i in enumerate(matrs):
@@ -149,11 +146,11 @@ class Swap(Refueling):
 						query = self.q
 		return temp_store
 
+	@timeit
 	def swap(self):
 		swap_num = input('Type numbers of FA to swap: ')
-		convert = list(map(lambda x: int(x), swap_num.split(','))) 
+		convert = list(map(lambda x: int(x), self.swap_num.split(','))) 
 		first, second = FAs_num[convert[0]-1], FAs_num[convert[1]-1]
-		print(first)
 		store1, store2 = self.loop(first), self.loop(second)
 		swstore1, swstore2 = {k1:v2 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}, {k2:v1 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}
 		self.loop(first, store=swstore1, reverse=True), self.loop(second, store=swstore2, reverse=True)
