@@ -10,6 +10,7 @@ openpyxl = "*"
 mypy = "*"
 flask = "*"
 cython = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 

@@ -8,22 +8,22 @@ import typing
 import logging
 from collections import defaultdict
 from statistics import mean
-from typing import List, Any
+from typing import List, Any, Union, Optional, Callable
 
 
 class MyLogger:
-	def __init__(self, name, text):
+	def __init__(self, name: str, text: str) -> None:
 		self.name = name
 		self.text = text
 		self.logger = logging.getLogger(self.name)
 
-	def stream(self):
+	def stream(self) -> None:
 		stream = logging.StreamHandler()
 		self.logger.addHandler(stream)
 		self.logger.setLevel(logging.INFO)
 		return self.logger.info(self.text)
 
-def timeit(func):
+def timeit(func): #* use generics
 	def wrapper(*args, **kwargs):
 		time_before = datetime.datetime.now()
 		func(*args, **kwargs)
@@ -36,10 +36,9 @@ FAs_num: List[List[int]] = [[i, i+20, i+40, i+60, i+80, i+100] for i in range(1,
 IND: float = 2.4600E-03 #U235
 
 
-def convert_type(val: str) -> float:
+def convert_type(val: str) -> Union[float, bool]:
 	try:
-		val = float(val)
-		return val
+		return float(val)
 	except Exception as e:
 		print(e)
 		return False		
@@ -50,7 +49,7 @@ class Refueling:
 	OUTPUT_PATH = os.path.join(CWD, 'output')
 	PATTERN = re.compile(r'\.[A-Z]+')
 
-	def __init__(self, name):
+	def __init__(self, name: str) -> None:
 		self.file_name = name
 		self.data = self.get_data
 
@@ -80,12 +79,15 @@ class Average(Refueling):
 
 	def insert_nulls(self, lst, indexes):
 		for i in indexes:
-			lst.insert(i, None)
+			lst.insert(i, 0)
 		return lst
 
 	def matrix_and_save(self, obj):
 		arr = np.array(obj).reshape((6,4))
 		print(arr)
+		bts = arr.tobytes() #* convert to bytes
+		print(len(bts))
+		print(np.frombuffer(bts, dtype=arr.dtype).reshape((6,4)))
 		return pd.DataFrame(arr).to_excel(f'out_{self.file_name}.xlsx')
 		 
 	@timeit
@@ -96,7 +98,7 @@ class Average(Refueling):
 				for matr in FA:
 					if matr==num:
 						FA_dic[N].append(u5)
-		average = self.insert_nulls([1 - mean(i)/IND for n, i in FA_dic.items()], [9,10,13,14])
+		average = self.insert_nulls([np.around((1 - mean(i)/IND)*100, decimals = 2) for n, i in FA_dic.items()], [9,10,13,14])
 		return self.matrix_and_save(average)
 
 class Fresh(Refueling):
