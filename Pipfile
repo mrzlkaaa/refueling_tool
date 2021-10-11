@@ -11,6 +11,8 @@ mypy = "*"
 flask = "*"
 cython = "*"
 sqlalchemy = "*"
+python-dotenv = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
