@@ -1,19 +1,41 @@
 import os
 import sys
-import time
+import time, datetime
 import re
 import numpy as np
 import pandas as pd
 import typing
+import logging
 from collections import defaultdict
 from statistics import mean
 from typing import List, Any
 
 
+class MyLogger:
+	def __init__(self, name, text):
+		self.name = name
+		self.text = text
+		self.logger = logging.getLogger(self.name)
+
+	def stream(self):
+		stream = logging.StreamHandler()
+		self.logger.addHandler(stream)
+		self.logger.setLevel(logging.INFO)
+		return self.logger.info(self.text)
+
+def timeit(func):
+	def wrapper(*args, **kwargs):
+		time_before = datetime.datetime.now()
+		func(args, kwargs)
+		time_diff = datetime.datetime.now() - time_before
+		return print(f' execution time if {time_diff.total_seconds()}')
+
+	return wrapper
+
 # query = [i for i in os.listdir(cwd) if re.search(pattern, i) is not None and name in i]
 
 FAs_num: List[List[int]] = [[i, i+20, i+40, i+60, i+80, i+100] for i in range(1,21)] #num of FA
-ind: float = 2.4600E-03 #U235
+IND: float = 2.4600E-03 #U235
 
 
 def convert_type(val: str) -> float:
@@ -75,7 +97,7 @@ class Average(Refueling):
 				for matr in FA:
 					if matr==num:
 						FA_dic[N].append(u5)
-		average = self.insert_nulls([mean(i) for n, i in FA_dic.items()], [9,10,13,14])
+		average = self.insert_nulls([1 - mean(i)/IND for n, i in FA_dic.items()], [9,10,13,14])
 		return self.matrix_and_save(average)
 
 class Fresh(Refueling):
@@ -106,14 +128,16 @@ class Fresh(Refueling):
 		except ValueError as VE:
 			convert = list(map(lambda x: int(x), fresh_FA.split(','))) 
 			matrs = [j for i in convert for j in FAs_num[i-1]]
-		return self.data_replacing(matrs)
+		return self.replace_save(matrs)
 
 class Swap(Refueling):
 	def __init__(self, name):
 		super().__init__(name)
 
+	# @timeit
 	def loop(self, matrs, store=None, reverse=False):
 		query = self.q
+		print(query)
 		temp_store = {}
 		for num in range(len(query)):
 			for n,i in enumerate(matrs):
@@ -133,7 +157,7 @@ class Swap(Refueling):
 		store1, store2 = self.loop(first), self.loop(second)
 		swstore1, swstore2 = {k1:v2 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}, {k2:v1 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}
 		self.loop(first, store=swstore1, reverse=True), self.loop(second, store=swstore2, reverse=True)
-		return self.save()			)
+		return self.save()
 
 if __name__ == '__main__':
 	*args, extracted_name = os.path.split(sys.argv[1])
