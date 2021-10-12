@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import typing
 import logging
+from db import Refueling
 from collections import defaultdict
 from statistics import mean
 from typing import List, Any, Union, Optional, Callable
@@ -86,8 +87,8 @@ class Average(Refueling):
 		arr = np.array(obj).reshape((6,4))
 		print(arr)
 		bts = arr.tobytes() #* convert to bytes
-		print(len(bts))
-		print(np.frombuffer(bts, dtype=arr.dtype).reshape((6,4)))
+		print(arr.dtype)
+		# print(np.frombuffer(bts, dtype=arr.dtype).reshape((6,4)))
 		return pd.DataFrame(arr).to_excel(f'out_{self.file_name}.xlsx')
 		 
 	@timeit
