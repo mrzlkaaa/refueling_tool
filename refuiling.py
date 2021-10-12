@@ -1,12 +1,12 @@
 import os
 import sys
-import time, datetime
+import time
 import re
 import numpy as np
 import pandas as pd
 import typing
 import logging
-from db import Refueling
+from db import *
 from collections import defaultdict
 from statistics import mean
 from typing import List, Any, Union, Optional, Callable
@@ -26,9 +26,9 @@ class MyLogger:
 
 def timeit(func): #* use generics
 	def wrapper(*args, **kwargs):
-		time_before = datetime.datetime.now()
+		time_before = datetime.now()
 		func(*args, **kwargs)
-		time_diff = datetime.datetime.now() - time_before
+		time_diff = datetime.now() - time_before
 		return print(f'execution time of "{func.__name__}" function - {time_diff.total_seconds()}')
 	return wrapper
 
@@ -52,7 +52,6 @@ class Refueling:
 
 	def __init__(self, name: str) -> None:
 		self.file_name = name
-		self.data = self.get_data
 
 	@property
 	def get_data(self):
@@ -65,13 +64,19 @@ class Refueling:
 		return [(n,convert_type(i.split()[1])) for n,i in enumerate(self.data, start=1) if 'MATR' in i and convert_type(i.split()[1]) <= 121]
 
 	def save(self):
-		with open(f'out_{self.file_name}', 'w') as out:
+		with open(f'input/out_{self.file_name}', 'w') as out:
 			return out.writelines(self.data)
 
 
 class Average(Refueling):
-	def __init__(self, name):
+	def __init__(self, name, data=None, to_db = False):
 		super().__init__(name)
+		if isinstance(data, list):
+			print('true')
+			self.data = data
+		else:
+			self.data = self.get_data
+		self.db = to_db
 
 	@property
 	def U5_densities(self):
@@ -88,8 +93,15 @@ class Average(Refueling):
 		print(arr)
 		bts = arr.tobytes() #* convert to bytes
 		print(arr.dtype)
+		if self.db:
+			oper_name = 'refueling #120'
+			desc = 'refueled two 8-tube FA in cells 7-6, 6-6'
+			date = datetime.now()
+			data = bts
+			return RefuelingDB(name=oper_name, description=desc, date=date, data=data).add()
+
 		# print(np.frombuffer(bts, dtype=arr.dtype).reshape((6,4)))
-		return pd.DataFrame(arr).to_excel(f'out_{self.file_name}.xlsx')
+		# return pd.DataFrame(arr).to_excel(f'out_{self.file_name}.xlsx')
 		 
 	@timeit
 	def average_burnup(self, FA_dic = defaultdict(list)):
@@ -107,6 +119,7 @@ class Fresh(Refueling):
 	
 	def __init__(self, name):
 		super().__init__(name)
+		self.data = self.get_data
 
 	def replace_save(self, matrs):
 		query = self.q
@@ -118,7 +131,11 @@ class Fresh(Refueling):
 						query = self.q		
 		except Exception as e:
 			print(e)
-		return self.save()
+		option = input('Would you like add new core configuration to db? ')
+		if option.upper() == 'Y': 
+			self.save()
+			return Average(f'out_{self.file_name}', to_db=True).average_burnup()  # ---> ref to average with following db instance
+		else: return self.save()
 
 	@timeit
 	def refueling(self):
