@@ -64,19 +64,25 @@ class Refueling:
 		return [(n,convert_type(i.split()[1])) for n,i in enumerate(self.data, start=1) if 'MATR' in i and convert_type(i.split()[1]) <= 121]
 
 	def save(self):
-		with open(f'input/out_{self.file_name}', 'w') as out:
+		self.save_path = os.path.join(self.OUTPUT_PATH, f'out_{self.file_name}')
+		with open(self.save_path, 'w') as out:
 			return out.writelines(self.data)
 
 
 class Average(Refueling):
-	def __init__(self, name, data=None, to_db = False):
+	def __init__(self, name, to_db = False):
 		super().__init__(name)
-		if isinstance(data, list):
-			print('true')
-			self.data = data
+		self.db = to_db
+		if self.db:
+			self.data = self.get_output_data
 		else:
 			self.data = self.get_data
-		self.db = to_db
+		
+	@property
+	def get_output_data(self):
+		print(f'openning output file.... {self.file_name}')
+		with open(self.file_name, 'r') as f:
+			return f.readlines()
 
 	@property
 	def U5_densities(self):
@@ -91,17 +97,15 @@ class Average(Refueling):
 	def matrix_and_save(self, obj):
 		arr = np.array(obj).reshape((6,4))
 		print(arr)
-		bts = arr.tobytes() #* convert to bytes
-		print(arr.dtype)
 		if self.db:
-			oper_name = 'refueling #120'
+			oper_name = 'refueling #125'
 			desc = 'refueled two 8-tube FA in cells 7-6, 6-6'
 			date = datetime.now()
-			data = bts
+			data = arr.tobytes() #* convert to bytes
 			return RefuelingDB(name=oper_name, description=desc, date=date, data=data).add()
-
-		# print(np.frombuffer(bts, dtype=arr.dtype).reshape((6,4)))
-		# return pd.DataFrame(arr).to_excel(f'out_{self.file_name}.xlsx')
+		else:
+			self.save_path = os.path.join(self.OUTPUT_PATH, f'out_{self.file_name}.xlsx')
+			return pd.DataFrame(arr).to_excel(self.save_path)
 		 
 	@timeit
 	def average_burnup(self, FA_dic = defaultdict(list)):
@@ -134,7 +138,7 @@ class Fresh(Refueling):
 		option = input('Would you like add new core configuration to db? ')
 		if option.upper() == 'Y': 
 			self.save()
-			return Average(f'out_{self.file_name}', to_db=True).average_burnup()  # ---> ref to average with following db instance
+			return Average(self.save_path, to_db=True).average_burnup()  # ---> ref to average with following db instance
 		else: return self.save()
 
 	@timeit
