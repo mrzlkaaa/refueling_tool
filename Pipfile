@@ -13,6 +13,7 @@ cython = "*"
 sqlalchemy = "*"
 python-dotenv = "*"
 psycopg2-binary = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 
