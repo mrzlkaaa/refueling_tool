@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
+	<title>Document</title>
+</head>
+<body>
+	
+	<form action="/home", method="POST", enctype="multipart/form-data"> 
+		<div id='box'>
+			<div>
+				<table>
+					<tr>
+						<th> <div class = 'square_content'> None </div> </th>
+						<th> <div class = 'square_content'> None </div> </th>
+						<th> <div class = 'square_content'> None </div> </th>
+						<th> <div class = 'square_content'> None </div> </th>
+					</tr>
+					{% for i in burnup %}
+					<tr>
+						{% for j in i %}
+						<td>{{j}}</td>
+						{% endfor %}
+						<td> None </td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
+			<label for="name"> Type name of refueling operation:</label><br>
+			<input type="text" name="name" class='text_inputs'> <br>
+			<label for="description"> Some details:</label><br>
+			<textarea name="description" class='text_inputs'></textarea>  <br>
+			<label for="date"> Date:</label><br>
+			<input type="datetime-local" name="date" class='text_inputs'> <br> <br>
+			<input type="submit" name="submitting" class='text_inputs'> <br> 
+		</div>
+	</form>
+</body>
+</html>

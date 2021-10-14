@@ -7,14 +7,11 @@
 	<title>Document</title>
 </head>
 <body>
-	<form action="/", method="POST"> 
-		<div id='box'> 
-			<label for="name"> Type name of refueling operation:</label><br>
-			<input type="text" name="name" class='text_inputs'> <br>
-			<label for="description"> Some details:</label><br>
-			<textarea name="description" class='text_inputs'></textarea>  <br>
-			<label for="date"> Date:</label><br>
-			<input type="datetime-local" name="date" class='text_inputs'> <br> <br>
+	
+	<form action='/home', method="POST", enctype="multipart/form-data"> 
+		<div id='box'>
+			<label for="uploaded"> Choose file </label><br>
+			<input type="file" name="uploaded" class='text_inputs'> <br> <br>
 			<input type="submit" name="submitting" class='text_inputs'> <br> 
 		</div>
 	</form>

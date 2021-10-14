@@ -2,15 +2,40 @@ body {
     background-color: grey;
 }
 
-#box{
-    width: 50%;
-    height: 200px;
+table {
+    width: 70%;
+    margin: auto;
+}
+
+table, th, td {
+    border: 1px dotted black;
+    border-collapse: collapse;
+}
+th{
+    text-align: center;
+    width: 20%;
+    position: relative;
+}
+
+th:after {
+    content: '';
+    display: block;
+    margin:auto;
+}
+td {
+    text-align: center;
+}
+
+
+#box {
+    width: 30%;
+    height: auto;
     border: 2px solid;
     margin: auto;
     padding: 10px;
 }
 
-.text_inputs{
+.text_inputs {
     width: 30%;
     height: auto;
 }
