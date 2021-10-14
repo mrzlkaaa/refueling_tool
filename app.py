@@ -28,7 +28,6 @@ def home():
 
 @app.route('/proc/<file_name>', methods=['GET', 'POST'])
 def reading_file(file_name):
-    arr = ''
     arr = Average(file_name).average_burnup()
     print(arr)
     if request.method == 'POST':
