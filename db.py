@@ -4,6 +4,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 import psycopg2
 
 load_dotenv()
@@ -16,6 +17,7 @@ database = os.environ['DB']
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{user}:{pwd}@{host}:{port}/{database}'
+app.config['SECRET_KEY'] = 'dev'
 db = SQLAlchemy(app)
 
 
@@ -24,7 +26,7 @@ class RefuelingDB(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	refueling_name = db.Column(db.String(100))
 	description = db.Column(db.String(300))
-	date = db.Column(db.DateTime())
+	date = db.Column(db.DateTime(), default=func.now())
 	burnup_data = db.Column(db.LargeBinary(length=500))
 	
 

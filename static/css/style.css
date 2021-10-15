@@ -2,6 +2,9 @@ body {
     background-color: grey;
 }
 
+table {
+    height: 100%;
+}
 
 table, th, td {
     border: 1px dotted black;
@@ -31,7 +34,7 @@ td {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
-    height: 300px;
+    height: auto;
     align-items: stretch;
 }
 

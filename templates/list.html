@@ -9,7 +9,7 @@
 <body>
 	{% if list %}
 		{% for i in list %}
-			<p> {{i.refueling_name}} </p>
+			<p> <a href="{{url_for('detail', name=i.refueling_name)}}"> {{i.refueling_name}} </p> </a>
 		{% endfor %}
 	{% endif %}
 </body>
