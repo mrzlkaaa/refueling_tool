@@ -47,7 +47,7 @@ def core_refueling():
     new_core = np.array(session.get('new_core'))
     if request.method == 'POST':
         name = request.form.get('name')
-        desc = request.form.get('desc')
+        desc = request.form.get('description')
         if len(request.form.get('date')) > 0: date = request.form.get('date')
         else: date = datetime.now()
         data = new_core.tobytes() #* convert to bytes

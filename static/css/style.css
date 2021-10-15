@@ -1,9 +1,15 @@
 body {
-    background-color: grey;
+    background-color: none;
 }
 
 table {
     height: 100%;
+}
+
+label {
+    margin: auto;
+    text-align: center;
+    display: block;
 }
 
 table, th, td {
