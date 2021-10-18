@@ -51,7 +51,8 @@ def core_refueling():
         if len(request.form.get('date')) > 0: date = request.form.get('date')
         else: date = datetime.now()
         data = new_core.tobytes() #* convert to bytes
-        inst = RefuelingDB(name=name, description=desc, date=date, data=data)
+        # inst = RefuelingDB(name=name, description=desc, date=date, data=data)
+        inst = RefuelingDB(name=name, date=date)
         db.session.add(inst)
         db.session.commit()
         return redirect(url_for('list'))
@@ -60,6 +61,9 @@ def core_refueling():
 @app.route('/list')
 def list():
     refueling_list = RefuelingDB.query.order_by(RefuelingDB.date).all()
+    nms = RefuelList()
+    print(nms.names)
+    print(RefuelingDB.query.all())
     return render_template('list.html', list=refueling_list)
 
 @app.route('/detail/<name>', methods=['GET','POST'])

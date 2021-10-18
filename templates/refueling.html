@@ -42,6 +42,11 @@
 				</div>
 			</div>
 			<br>
+			<select name='options' class="text-inputs-refuel form-select" id="floatingSelect" aria-label="Floating label select example" style='margin-bottom:20px'>
+				<option value='None' selected> Choose option </option>
+				<option value='new'> Add new refueling </option>
+				<option value='add'> Add to existing </option>
+			  </select>
 			<div class="text-inputs-refuel form-floating mb-3">
 				<input name="name" type="text" class="form-control" id="floatingInput" placeholder="Typing...">
 				<label for="floatingInput">Name of refueling</label>
@@ -66,4 +71,20 @@
 			<input type="submit" name="submitting" class='text_inputs'> <br>  -->
 		</div>
 	</form>
+
+	<script>
+		$(document).ready(function(){
+			const select = document.getElementById('floatingSelect')
+			console.log(select.options[select.selectedIndex].value)
+			$("select").click(function() {
+				var nm = $(this).val()
+				if (nm == 'new') {
+				console.log('revealing new input...')
+				}
+			})
+			
+		})
+		
+
+	</script>
 	{% endblock %}

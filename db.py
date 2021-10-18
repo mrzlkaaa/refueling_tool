@@ -4,6 +4,8 @@ from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from wtforms import SelectField
 from sqlalchemy.sql import func
 import psycopg2
 
@@ -33,7 +35,7 @@ class RefuelingDB(db.Model):
 		self.date = kwargs['date']
 
 	def __repr__(self):
-		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, date={self.date}, data={self.burnup_data})'
+		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, date={self.date})'
 
 class RefuelingActs(db.Model):
 	__tablename__ = 'refuel_acts'
@@ -45,6 +47,11 @@ class RefuelingActs(db.Model):
 	def __init__(self, *args, **kwargs):
 		self.description = kwargs['description']
 		self.burnup_data = kwargs['data']
+
+
+class RefuelList(FlaskForm):
+    	names = SelectField('dbnames', choices=[(data.id, data.refueling_name) for data in RefuelingDB.query.all()])
+		# names = SelectField('dbnames', choices=[('LA', 'California')])
 
 
 if __name__ == '__main__':
