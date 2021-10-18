@@ -45,24 +45,34 @@ def reading_file(file_name):
 def core_refueling():
     old_core = np.array(session.get('old_core'))
     new_core = np.array(session.get('new_core'))
+    all_refuels = RefuelingDB.query.all()
+    form = RefuelList()
+    print(form.add_existing)
     if request.method == 'POST':
-        name = request.form.get('name')
-        desc = request.form.get('description')
-        if len(request.form.get('date')) > 0: date = request.form.get('date')
-        else: date = datetime.now()
+        name = request.form.get('new_refuel')
         data = new_core.tobytes() #* convert to bytes
+        desc = request.form.get('description')
+        if len(name) == 0:
+            name = request.form['add_existing']
+            print(name)
+            query_refueling = RefuelingDB.query.filter_by(refueling_name=name).first()
+            date = query_refueling.date
+            add_activity = RefuelingActs(description=desc, data=data, refuel=query_refueling)
+            print(add_activity)
+        else:
+            if len(request.form.get('date')) > 0: date = request.form.get('date')
+            else: date = datetime.now()
+        print(name, date)
         # inst = RefuelingDB(name=name, description=desc, date=date, data=data)
         inst = RefuelingDB(name=name, date=date)
         db.session.add(inst)
         db.session.commit()
-        return redirect(url_for('list'))
-    return render_template('refueling.html', old_core=old_core, new_core=new_core)
+        # return redirect(url_for('list'))
+    return render_template('refueling.html', old_core=old_core, new_core=new_core, form=form)
 
 @app.route('/list')
 def list():
     refueling_list = RefuelingDB.query.order_by(RefuelingDB.date).all()
-    nms = RefuelList()
-    print(nms.names)
     print(RefuelingDB.query.all())
     return render_template('list.html', list=refueling_list)
 

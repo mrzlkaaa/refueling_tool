@@ -10,7 +10,7 @@ from sqlalchemy.sql import func
 import psycopg2
 
 load_dotenv()
-#credentials
+#credentials 
 user = os.environ['PSQL_USER']
 pwd = os.environ['PSWD']
 port = os.environ['PORT']
@@ -47,13 +47,20 @@ class RefuelingActs(db.Model):
 	def __init__(self, *args, **kwargs):
 		self.description = kwargs['description']
 		self.burnup_data = kwargs['data']
+		self.refuel_id = kwargs['refuel']
+
+	def __repr__(self):
+		return f'{self.__class__.__name__}(id={self.id}, description={self.description}, burnup_data={self.burnup_}, refuel_id={self.refuel_id})'
 
 
 class RefuelList(FlaskForm):
-    	names = SelectField('dbnames', choices=[(data.id, data.refueling_name) for data in RefuelingDB.query.all()])
 		# names = SelectField('dbnames', choices=[('LA', 'California')])
+	def __init__(self, existing_refuels):
+		super().__init__()
+		self.refuels_list = existing_refuels
+	add_existing = SelectField('dbnames', choices=[(data.refueling_name, data.refueling_name) for data in self.refuels_list])
 
 
 if __name__ == '__main__':
 	db.create_all()
-
+	# print(RefuelList().names)

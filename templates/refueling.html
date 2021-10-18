@@ -47,8 +47,9 @@
 				<option value='new'> Add new refueling </option>
 				<option value='add'> Add to existing </option>
 			  </select>
+			{{ form.add_existing(class='text-inputs-refuel form-select', id='refuel-names-select', style="display: none; margin-bottom:20px") }}
 			<div class="text-inputs-refuel form-floating mb-3">
-				<input name="name" type="text" class="form-control" id="floatingInput" placeholder="Typing...">
+				<input name="new_refuel" type="text" id='new-refuel', class="form-control" id="floatingInput" placeholder="Typing...", style="display: none">
 				<label for="floatingInput">Name of refueling</label>
 			</div>
 			<div class="text-inputs-refuel form-floating mb-3">
@@ -77,9 +78,15 @@
 			const select = document.getElementById('floatingSelect')
 			console.log(select.options[select.selectedIndex].value)
 			$("select").click(function() {
-				var nm = $(this).val()
-				if (nm == 'new') {
-				console.log('revealing new input...')
+				var option = $(this).val()
+				if (option == 'new') {
+					$('#new-refuel').css('display', 'block')
+					$('#refuel-names-select').css('display', 'none')
+					console.log('revealing new input...')
+				}
+				else if (option == 'add') {
+					$('#new-refuel').css('display', 'none')
+					$('#refuel-names-select').css('display', 'block')
 				}
 			})
 			
