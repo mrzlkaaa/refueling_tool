@@ -68,7 +68,7 @@ def detail(name):
     refueling_data = RefuelingDB.query.filter_by(refueling_name=name).first()
     core_configuration = np.frombuffer(refueling_data.burnup_data).reshape((6,4))
     print(refueling_data)
-    return render_template('detail.html', data=refueling_data, core_configuration=core_configuration )
+    return render_template('detail.html', data=refueling_data, burnup=core_configuration )
 
 
 if __name__ == '__main__':

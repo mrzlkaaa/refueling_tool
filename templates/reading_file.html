@@ -1,47 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
-	<title>Document</title>
-</head>
-<body>
-	
-	<form method="POST", enctype="multipart/form-data"> 
-		<div id='box'>
-			<div class='container'>
-				<div class='container_item'>
-					<table class='burnup_data'>
-						<tr>
-							<th> <div> None </div> </th>
-							<th> <div> None </div> </th>
-							<th> <div> None </div> </th>
-							<th> <div> None </div> </th>
-						</tr>
-						{% for i in burnup %}
-						<tr>
-							{% for j in i %}
-							<td>{{j}}</td>
+{% extends 'base.html' %}
+	{% block title %}
+	<title> Reading File Page</title>
+	{% endblock %}
+	{% block content %}
+		<form method="POST", enctype="multipart/form-data"> 
+			<div id='box'>
+				<div class='container'>
+					<div class='container_item'>
+						<table class='burnup_data'>
+							<tr>
+								<th> 7 </th>
+								<th> 6 </th>
+								<th> 5 </th>
+								<th> 4 </th>
+							</tr>
+							{% for i in burnup %}
+							<tr>
+								{% for j in i %}
+								<td>{{j}}</td>
+								{% endfor %}
+							</tr>
 							{% endfor %}
-							<td> None </td>
-						</tr>
-						{% endfor %}
-					</table>
+						</table>
+					</div>
+				</div>
+				<br>
+				<div class='inputs'> 
+					<div class="text_inputs form-floating">
+					  <select name='options' class="form-select" id="floatingSelect" aria-label="Floating label select example">
+					    <option value='fresh'> Fresh fuel </option>
+						<option value='swap'> Swap </option>
+					  </select>
+					  <label for="floatingSelect">Choose option</label>
+					</div> <br>
+					<div class="text_inputs form-floating mb-3">
+					  <input type="text" name="numbers" class="form-control" id="floatingInput" placeholder="Typing...">
+					  <label for="floatingInput">FA numbers</label>
+					</div>
+					<input type="submit" class="text_inputs btn btn-primary">
 				</div>
 			</div>
-			<br>
-			<div class='inputs'> 
-				<label for="options" class='text_inputs'> Choose option:</label><br>
-				<select name="options" class='text_inputs'> 
-					<option value='fresh'> Fresh fuel </option>
-					<option value='swap'> Swap </option>
-				</select> <br>
-				<label for="numbers" class='text_inputs'> Type number(s) of FA:</label><br>
-				<input type="text" name="numbers" class='text_inputs'> <br> <br>
-				<input type="submit" name="submitting" class='text_inputs'> <br> 
-			</div>
-		</div>
-	</form>
-</body>
-</html>
+		</form>
+	{% endblock %}

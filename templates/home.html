@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
+	{% block title %}
+	<title> Home Page </title>
+	{% endblock %}
 	{% block content %}
-		<form action='/home', method="POST", enctype="multipart/form-data"> 
-			<div class="card text-center">
-			  <div class="card-header">
-			    Upload your .PDC file
-			  </div>
-			  <div class="card-body">
-			    <h5 class="card-title">Special title treatment</h5>
-			    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-				<input class="form-control" type="file" id="formFile"><br> <br>
-			    <input type="submit" class="btn btn-primary">
-			  </div>
+		<form method="POST", enctype="multipart/form-data"> 
+			<div id='box'>
+				<div class="card text-center">
+				  <div class="card-header">
+				    Upload your .PDC file
+				  </div>
+				  <div class="card-body">
+				    <h5 class="card-title">Special title treatment</h5>
+				    <p class="card-text">With supporting text below as a natural lead-in to additional content </p>
+					<div class="input-group mb-3">
+					  <input type="file" name='uploaded' class="text_inputs form-control" >
+					  <label class="input-group-text" for="inputGroupFile02">Upload</label>
+					</div>
+				    <input type="submit" class="btn btn-primary">
+				  </div>
+				</div>
 			</div>
-
-			<!-- <div id='box'>
-				<label for="uploaded"> Choose file </label><br>
-				<input type="file" name="uploaded" class='text_inputs'> <br> <br>
-				<input type="submit" name="submitting" class='text_inputs btn btn-primary'> <br> 
-			</div> -->
 		</form>
 	{% endblock %}

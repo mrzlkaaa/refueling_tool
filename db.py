@@ -22,40 +22,31 @@ db = SQLAlchemy(app)
 
 
 class RefuelingDB(db.Model):
-	__tablename__ = 'core_configuration'
+	__tablename__ = 'reactor_refuel'
 	id = db.Column(db.Integer, primary_key=True)
-	refueling_name = db.Column(db.String(100))
-	description = db.Column(db.String(300))
-	date = db.Column(db.DateTime(), default=func.now())
-	burnup_data = db.Column(db.LargeBinary(length=500))
+	refueling_name = db.Column(db.String(100)) 
+	date = db.Column(db.DateTime(), default=func.now()) # the same data for every reactor refueling
+	activities = db.relationship('RefuelingActs', backref='refuel')
 	
-
 	def __init__(self, *args, **kwargs):
 		self.refueling_name = kwargs['name']
-		self.description = kwargs['description']
 		self.date = kwargs['date']
-		self.burnup_data = kwargs['data']
-		# self.burnup_data = bytes(data, 'utf-8')
-		# self.session = MySession()
 
 	def __repr__(self):
 		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, date={self.date}, data={self.burnup_data})'
 
+class RefuelingActs(db.Model):
+	__tablename__ = 'refuel_acts'
+	id = db.Column(db.Integer, primary_key=True)
+	description = db.Column(db.String(300))
+	burnup_data = db.Column(db.LargeBinary(length=500))
+	refuel_id = db.Column(db.Integer, db.ForeignKey('reactor_refuel.id'))
 
-# def query(): #* query testing 
-# 	session = MySession()
-# 	response = session.query(RefuelingDB.id).all()
-# 	print(response)
-# 	response = session.query(RefuelingDB).filter(RefuelingDB.id == 3).all()
-# 	print(response)
-# 	for i in response:
-# 		configuration = i.burnup_data
-# 		print(i.description)
-# 		arr = np.frombuffer(configuration)
-# 		arr = arr.reshape((6,4))
-# 		print(arr)
-# 	return 
+	def __init__(self, *args, **kwargs):
+		self.description = kwargs['description']
+		self.burnup_data = kwargs['data']
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+	db.create_all()
 

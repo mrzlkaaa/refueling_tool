@@ -13,7 +13,7 @@ label {
 }
 
 table, th, td {
-    border: 1px dotted black;
+    border: 1px solid black;
     border-collapse: collapse;
 }
 th{
@@ -29,7 +29,6 @@ td {
 #box {
     width: 50%;
     height: auto;
-    border: 2px solid;
     margin: auto;
     padding: 10px;
 }
@@ -40,13 +39,13 @@ td {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
-    height: auto;
+    height: 350px;
     align-items: stretch;
 }
 
 .container_item {
     width: 40%;
-    height: 100%;
+    height: auto;
 }
 
 .burnup_data {
@@ -56,13 +55,24 @@ td {
 }
 
 .inputs {
-    width: 50%;
+    width: 100%;
     margin: auto;
 }
 
 .text_inputs {
+    width: 30%;
+    margin: auto;
+    display: block;
+    height: auto;
+}
+
+.text-inputs-refuel {
     width: 50%;
     margin: auto;
     display: block;
     height: auto;
+}
+
+.catalog {
+    text-align: center;
 }

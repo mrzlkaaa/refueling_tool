@@ -1,36 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
-	<title>Document</title>
-</head>
-<body>
+{% extends 'base.html' %}
+	{% block title %}
+	<title> Refueling Page</title>
+	{% endblock %}
+	{% block content %}
 	<div id='box'>
-		<div class='container'>
-			<div class='container_item'>
-				<p> {{data.refueling_name}} </p>
-				<table class='burnup_data'>
-					<tr>
-						<th> <div> None </div> </th>
-						<th> <div> None </div> </th>
-						<th> <div> None </div> </th>
-						<th> <div> None </div> </th>
-					</tr>
-					{% for i in core_configuration %}
-					<tr>
-						{% for j in i %}
-						<td>{{j}}</td>
+		<div class="card text-center">
+		  <div class="card-header">
+		  	 {{data.refueling_name}}
+		  </div>
+		  <div class="card-body">
+		  	<div class='container'>
+				<div class='container_item'>
+					<table class='burnup_data'>
+						<tr>
+							<th> 7 </th>
+							<th> 6 </th>
+							<th> 5 </th>
+							<th> 4 </th>
+						</tr>
+						{% for i in burnup %}
+						<tr>
+							{% for j in i %}
+							<td>{{j}}</td>
+							{% endfor %}
+						</tr>
 						{% endfor %}
-						<td> None </td>
-					</tr>
-					{% endfor %}
-				</table>
-				<p> {{data.date}} </p>
-				<p> {{data.description}} </p>
+					</table>
+				</div>
 			</div>
+			<br>
+		    <h5 class="card-title"> {{data.description}} </h5>
+		    <br>
+		    <a href="#" class="btn btn-primary"> Go somewhere </a>
+		  </div>
+		  <div class="card-footer text-muted">
+		   	{{data.date}}
+		  </div>
 		</div>
+		
 	</div>
-</body>
-</html>
+	{% endblock %}
