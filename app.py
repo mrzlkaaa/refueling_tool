@@ -45,8 +45,8 @@ def reading_file(file_name):
 def core_refueling():
     old_core = np.array(session.get('old_core'))
     new_core = np.array(session.get('new_core'))
-    all_refuels = RefuelingDB.query.all()
     form = RefuelList()
+    form.add_existing.choices = [(data.refueling_name, data.refueling_name) for data in RefuelingDB.query.all()]
     print(form.add_existing)
     if request.method == 'POST':
         name = request.form.get('new_refuel')
@@ -56,17 +56,24 @@ def core_refueling():
             name = request.form['add_existing']
             print(name)
             query_refueling = RefuelingDB.query.filter_by(refueling_name=name).first()
+            print(type(query_refueling))
             date = query_refueling.date
             add_activity = RefuelingActs(description=desc, data=data, refuel=query_refueling)
             print(add_activity)
+            # query_refueling = RefuelingDB.query.filter_by(refueling_name=name).first()
+            # print(query_refueling.activities)
+            # inst = RefuelingDB(name=name, date=date)
+            db.session.add(add_activity)
+            db.session.commit()
         else:
             if len(request.form.get('date')) > 0: date = request.form.get('date')
             else: date = datetime.now()
+            inst = RefuelingDB(name=name, date=date)
+            db.session.add(inst)
+            db.session.commit()
         print(name, date)
         # inst = RefuelingDB(name=name, description=desc, date=date, data=data)
-        inst = RefuelingDB(name=name, date=date)
-        db.session.add(inst)
-        db.session.commit()
+        
         # return redirect(url_for('list'))
     return render_template('refueling.html', old_core=old_core, new_core=new_core, form=form)
 

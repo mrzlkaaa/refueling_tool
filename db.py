@@ -43,6 +43,7 @@ class RefuelingActs(db.Model):
 	description = db.Column(db.String(300))
 	burnup_data = db.Column(db.LargeBinary(length=500))
 	refuel_id = db.Column(db.Integer, db.ForeignKey('reactor_refuel.id'))
+	reactor_refuel = db.relationship(RefuelingDB)
 
 	def __init__(self, *args, **kwargs):
 		self.description = kwargs['description']
@@ -50,15 +51,16 @@ class RefuelingActs(db.Model):
 		self.refuel_id = kwargs['refuel']
 
 	def __repr__(self):
-		return f'{self.__class__.__name__}(id={self.id}, description={self.description}, burnup_data={self.burnup_}, refuel_id={self.refuel_id})'
+		return f'{self.__class__.__name__}(id={self.id}, description={self.description}, burnup_data={self.burnup_data}, refuel_id={self.refuel_id})'
 
 
 class RefuelList(FlaskForm):
 		# names = SelectField('dbnames', choices=[('LA', 'California')])
-	def __init__(self, existing_refuels):
-		super().__init__()
-		self.refuels_list = existing_refuels
-	add_existing = SelectField('dbnames', choices=[(data.refueling_name, data.refueling_name) for data in self.refuels_list])
+	# def __init__(self, existing_refuels):
+	# 	super().__init__()
+	# 	self.refuels_list = existing_refuels
+	# (data.refueling_name, data.refueling_name) for data in self.refuels_list]
+	add_existing = SelectField('dbnames', choices=[])
 
 
 if __name__ == '__main__':
