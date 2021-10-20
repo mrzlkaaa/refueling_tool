@@ -50,8 +50,9 @@ class Refueling:
 	OUTPUT_PATH = os.path.join(CWD, 'output')
 	PATTERN = re.compile(r'\.[A-Z]+')
 
-	def __init__(self, name: str) -> None:
+	def __init__(self, name: str, data=None, *args, **kwargs) -> None:
 		self.file_name = name
+		self.data = data
 
 	@property
 	def get_data(self):
@@ -64,29 +65,28 @@ class Refueling:
 		return [(n,convert_type(i.split()[1])) for n,i in enumerate(self.data, start=1) if 'MATR' in i and convert_type(i.split()[1]) <= 121]
 
 	def save(self):
-		self.file_name =  f'out_{self.file_name}'
+		self.file_name =  f'{self.__class__.__name__}_{self.file_name}'
 		print(self.file_name)
-    	# self.file_name = f'out_{self.file_name}'
-		self.save_path = os.path.join(self.OUTPUT_PATH, self.file_name)
-		print(self.save_path)
+		self.save_path = os.path.join(self.INPUT_PATH, self.file_name)
 		with open(self.save_path, 'w') as out:
 			return out.writelines(self.data)
 
+	@property
+	def for_download(self):
+		with open(os.path.join(self.OUTPUT_PATH, self.file_name), 'w') as out:
+			return out.write(self.data)
+
 
 class Average(Refueling):
-	def __init__(self, name, to_db = False):
-		super().__init__(name)
-		self.db = to_db
-		if self.db:
-			self.data = self.get_output_data
-		else:
-			self.data = self.get_data
+	def __init__(self, name, *args, **kwargs):
+		super().__init__(name, *args, **kwargs)
+		self.data = self.get_data
 		
-	@property
-	def get_output_data(self):
-		print(f'openning output file.... {self.file_name}')
-		with open(os.path.join(self.OUTPUT_PATH, self.file_name), 'r') as f:
-			return f.readlines()
+	# @property
+	# def get_output_data(self):
+	# 	print(f'openning output file.... {self.file_name}')
+	# 	with open(os.path.join(self.OUTPUT_PATH, self.file_name), 'r') as f:
+	# 		return f.readlines()
 
 	@property
 	def U5_densities(self):
@@ -101,7 +101,7 @@ class Average(Refueling):
 	def matrix_and_save(self, obj):
 		arr = np.array(obj).reshape((6,4))
 		# print(arr)
-		return arr
+		return arr, self.file_name
 		 
 	# @timeit
 	def average_burnup(self, FA_dic = defaultdict(list)):
@@ -119,8 +119,8 @@ class Average(Refueling):
 class Fresh(Refueling):
 	FRESH_FUEL: str = "U235 2.4600E-03\nAL   5.3180E-02\nU238 2.4600E-04\nU234 2.7330E-05\nO16  5.4660E-03\n" #* what to write
 	
-	def __init__(self, name, fresh_FA):
-		super().__init__(name)
+	def __init__(self, name, fresh_FA, *args, **kwargs):
+		super().__init__(name, *args, **kwargs)
 		self.data = self.get_data
 		self.fresh_FA = fresh_FA
 
@@ -137,7 +137,7 @@ class Fresh(Refueling):
 		# option = input('Would you like add new core configuration to db? ')
 		# if option.upper() == 'Y': 
 		self.save()
-		return Average(self.file_name, to_db=True).average_burnup()  # ---> ref to average with following db instance
+		return Average(self.file_name).average_burnup()  # ---> ref to average with following db instance
 		# else: return self.save()
 
 	# @timeit
@@ -154,8 +154,8 @@ class Fresh(Refueling):
 		return self.replace_save(matrs)
 
 class Swap(Refueling):
-	def __init__(self, name, swap_FA):
-		super().__init__(name)
+	def __init__(self, name, swap_FA, *args, **kwargs):
+		super().__init__(name, *args, **kwargs)
 		self.swap_FA = swap_FA
 		self.data = self.get_data
 	
@@ -181,7 +181,7 @@ class Swap(Refueling):
 		swstore1, swstore2 = {k1:v2 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}, {k2:v1 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}
 		self.loop(first, store=swstore1, reverse=True), self.loop(second, store=swstore2, reverse=True)
 		self.save()
-		return Average(self.file_name, to_db=True).average_burnup()
+		return Average(self.file_name).average_burnup()
 
 if __name__ == '__main__':
 	*args, extracted_name = os.path.split(sys.argv[1])

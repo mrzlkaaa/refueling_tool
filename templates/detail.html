@@ -3,39 +3,42 @@
 	<title> Refueling Page</title>
 	{% endblock %}
 	{% block content %}
-	<div id='box'>
+	<div id='box-detail'>
 		<div class="card text-center">
-		  <div class="card-header">
-		  	 {{data.refueling_name}}
-		  </div>
+		  <div class="card-header"> {{ refueling.refueling_name }} from {{ refueling.date }} </div>
 		  <div class="card-body">
 		  	<div class='container'>
-				<div class='container_item'>
-					<table class='burnup_data'>
-						<tr>
-							<th> 7 </th>
-							<th> 6 </th>
-							<th> 5 </th>
-							<th> 4 </th>
-						</tr>
-						{% for i in burnup %}
-						<tr>
-							{% for j in i %}
-							<td>{{j}}</td>
+				{% for refuel in refuel_seq %}
+					<div class='container_item-detail'>
+						<p> {{refuel.description}} </p>
+						<table class='burnup_data'>
+							<tr>
+								<th> 7 </th>
+								<th> 6 </th>
+								<th> 5 </th>
+								<th> 4 </th>
+							</tr>
+							{% for i in refuel.burnup_data %}
+							<tr>
+								{% for j in i %}
+								<td>{{j}}%</td>
+								{% endfor %}
+							</tr>
 							{% endfor %}
-						</tr>
-						{% endfor %}
-					</table>
-				</div>
+						</table>
+						<div>
+							<a href="{{url_for('download', refueling_name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Download .PDC </a>
+							<a href="#" class="btn btn-primary"> Update </a>
+						</div>
+					</div>
+				{% endfor %}
 			</div>
 			<br>
-		    <h5 class="card-title"> {{data.description}} </h5>
+		    <h5 class="card-title"> </h5>
 		    <br>
-		    <a href="#" class="btn btn-primary"> Go somewhere </a>
+		    
 		  </div>
-		  <div class="card-footer text-muted">
-		   	{{data.date}}
-		  </div>
+		  <div class="card-footer text-muted"> Download <a href='#'> document </a>  </div>
 		</div>
 		
 	</div>

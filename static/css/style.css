@@ -33,25 +33,39 @@ td {
     padding: 10px;
 }
 
+#box-detail {
+    width: 70%;
+    height: auto;
+    margin: auto;
+    padding: 10px;
+}
+
 .container{
     width: 100%;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
-    height: 350px;
+    height: 100%;
     align-items: stretch;
 }
 
 .container_item {
     width: 40%;
+    height: 300px;
+}
+
+.container_item-detail {
+    width: 40%;
     height: auto;
+    margin-bottom: 50px;
 }
 
 .burnup_data {
     width: 100%;
-    height: 100%;
+    height: 80%;
     margin: auto;
+    margin-bottom: 20px;
 }
 
 .inputs {

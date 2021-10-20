@@ -26,40 +26,27 @@ db = SQLAlchemy(app)
 class RefuelingDB(db.Model):
 	__tablename__ = 'reactor_refuel'
 	id = db.Column(db.Integer, primary_key=True)
-	refueling_name = db.Column(db.String(100)) 
+	refueling_name = db.Column(db.String(100))
+	initial_configuration = db.Column(db.LargeBinary())
 	date = db.Column(db.DateTime(), default=func.now()) # the same data for every reactor refueling
-	activities = db.relationship('RefuelingActs', backref='refuel')
-	
-	def __init__(self, *args, **kwargs):
-		self.refueling_name = kwargs['name']
-		self.date = kwargs['date']
+	acts = db.relationship('RefuelingActs', backref='refuel')
 
 	def __repr__(self):
-		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, date={self.date})'
+		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, initial_burnup={self.initial_configuration[:10]}, date={self.date}, acts={self.acts})'
 
 class RefuelingActs(db.Model):
 	__tablename__ = 'refuel_acts'
 	id = db.Column(db.Integer, primary_key=True)
 	description = db.Column(db.String(300))
+	current_configuration = db.Column(db.LargeBinary())
 	burnup_data = db.Column(db.LargeBinary(length=500))
 	refuel_id = db.Column(db.Integer, db.ForeignKey('reactor_refuel.id'))
-	reactor_refuel = db.relationship(RefuelingDB)
-
-	def __init__(self, *args, **kwargs):
-		self.description = kwargs['description']
-		self.burnup_data = kwargs['data']
-		self.refuel_id = kwargs['refuel']
 
 	def __repr__(self):
-		return f'{self.__class__.__name__}(id={self.id}, description={self.description}, burnup_data={self.burnup_data}, refuel_id={self.refuel_id})'
+		return f'{self.__class__.__name__}(id={self.id}, description={self.description}, current_configuration={self.current_configuration[:10]}, burnup_data={self.burnup_data[:10]}, refuel_id={self.refuel_id})'
 
 
 class RefuelList(FlaskForm):
-		# names = SelectField('dbnames', choices=[('LA', 'California')])
-	# def __init__(self, existing_refuels):
-	# 	super().__init__()
-	# 	self.refuels_list = existing_refuels
-	# (data.refueling_name, data.refueling_name) for data in self.refuels_list]
 	add_existing = SelectField('dbnames', choices=[])
 
 

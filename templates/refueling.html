@@ -17,7 +17,7 @@
 						{% for i in old_core %}
 						<tr>
 							{% for j in i %}
-							<td>{{j}}</td>
+							<td>{{j}}%</td>
 							{% endfor %}
 						</tr>
 						{% endfor %}
@@ -34,14 +34,13 @@
 						{% for i in new_core %}
 						<tr>
 							{% for j in i %}
-							<td>{{j}}</td>
+							<td>{{j}}%</td>
 							{% endfor %}
 						</tr>
 						{% endfor %}
 					</table>
 				</div>
 			</div>
-			<br>
 			<select name='options' class="text-inputs-refuel form-select" id="floatingSelect" aria-label="Floating label select example" style='margin-bottom:20px'>
 				<option value='None' selected> Choose option </option>
 				<option value='new'> Add new refueling </option>
@@ -49,12 +48,12 @@
 			  </select>
 			{{ form.add_existing(class='text-inputs-refuel form-select', id='refuel-names-select', style="display: none; margin-bottom:20px") }}
 			<div class="text-inputs-refuel form-floating mb-3">
-				<input name="new_refuel" type="text" id='new-refuel', class="form-control" id="floatingInput" placeholder="Typing...", style="display: none">
-				<label for="floatingInput">Name of refueling</label>
+				<input name="new_refuel" type="text" id='new-refuel', class="form-control" placeholder="Typing...", style="display: none">
+				<label for="new_refuel">Name of refueling</label>
 			</div>
 			<div class="text-inputs-refuel form-floating mb-3">
-				<input name="date" type="datetime-local" class="form-control" id="floatingInput" placeholder="Date...">
-				<label for="floatingInput">Choose date</label>
+				<input name="date" type="datetime-local" id='date' class="form-control"  placeholder="Date...">
+				<label for="date">Choose date</label>
 			</div>
 			<div class="text-inputs-refuel form-floating">
 			  <textarea name="description" class="form-control" placeholder="Details..." id="floatingTextarea" style="height: 80px"></textarea>
@@ -80,13 +79,15 @@
 			$("select").click(function() {
 				var option = $(this).val()
 				if (option == 'new') {
-					$('#new-refuel').css('display', 'block')
-					$('#refuel-names-select').css('display', 'none')
-					console.log('revealing new input...')
+					$('#new-refuel').css('display', 'block');
+					$('#refuel-names-select').css('display', 'none');
+					$('#date').css('display', 'block');
+					console.log('revealing new input...');
 				}
 				else if (option == 'add') {
-					$('#new-refuel').css('display', 'none')
-					$('#refuel-names-select').css('display', 'block')
+					$('#new-refuel').css('display', 'none');
+					$('#refuel-names-select').css('display', 'block');
+					$('#date').css('display', 'none');
 				}
 			})
 			
