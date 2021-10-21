@@ -55,7 +55,8 @@ def core_refueling():
     form.add_existing.choices = [(data.refueling_name, data.refueling_name) for data in RefuelingDB.query.all()]
     if request.method == 'POST':
         name = request.form.get('new_refuel')
-        data = new_core.tobytes() #* convert to bytes
+        new_core_b = new_core.tobytes() #* convert to bytes
+        old_core_b = old_core.tobytes() #* convert to bytes
         desc = request.form.get('description')
         if len(name) == 0:
             name = request.form['add_existing']
@@ -63,14 +64,14 @@ def core_refueling():
             query_refueling = RefuelingDB.query.filter_by(refueling_name=name).first()
             print(type(query_refueling))
             date = query_refueling.date
-            add_act = RefuelingActs(description=desc, current_configuration=pdc_data_new, burnup_data=data, refuel=query_refueling)
+            add_act = RefuelingActs(description=desc, current_configuration=pdc_data_new, burnup_data=new_core_b, refuel=query_refueling)
             db.session.add(add_act)
             db.session.commit()
         else:
             if len(request.form.get('date')) > 0: date = request.form.get('date')
             else: date = datetime.now()
-            new_refuel = RefuelingDB(refueling_name=name, initial_configuration=pdc_data, date=date)
-            add_act = RefuelingActs(description=desc, current_configuration=pdc_data_new, burnup_data=data, refuel=new_refuel)
+            new_refuel = RefuelingDB(refueling_name=name, initial_configuration=pdc_data, initial_burnup_data=old_core_b, date=date)
+            add_act = RefuelingActs(description=desc, current_configuration=pdc_data_new, burnup_data=new_core_b, refuel=new_refuel)
             db.session.add_all([new_refuel, add_act])
             db.session.commit()
         return redirect(url_for('list'))
@@ -85,7 +86,9 @@ def list():
 @app.route('/detail/<name>', methods=['GET','POST'])
 def detail(name):
     refuiel_data = RefuelingDB.query.filter_by(refueling_name=name).first()
+    print(refuiel_data)
     refuel_seq = refuiel_data.acts
+    refuiel_data.initial_burnup_data = np.frombuffer(refuiel_data.initial_burnup_data).reshape((6,4))
     processed_refuel_seq = ({'id': i.id, 'description': i.description, 'burnup_data':np.frombuffer(i.burnup_data).reshape((6,4))} for i in refuel_seq )
     print(sys.getsizeof(refuel_seq))
     # print(refuel_seq)

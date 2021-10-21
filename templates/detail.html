@@ -8,6 +8,28 @@
 		  <div class="card-header"> {{ refueling.refueling_name }} from {{ refueling.date }} </div>
 		  <div class="card-body">
 		  	<div class='container'>
+				<div class='container_item-detail'>
+					<p> Initial core </p>
+					<table class='burnup_data'>
+						<tr>
+							<th> 7 </th>
+							<th> 6 </th>
+							<th> 5 </th>
+							<th> 4 </th>
+						</tr>
+						{% for i in refueling.initial_burnup_data %}
+						<tr>
+							{% for j in i %}
+							<td>{{j}}%</td>
+							{% endfor %}
+						</tr>
+						{% endfor %}
+					</table>
+					<div>
+						
+						<a href="#" class="btn btn-primary"> Update </a>
+					</div>
+				</div>
 				{% for refuel in refuel_seq %}
 					<div class='container_item-detail'>
 						<p> {{refuel.description}} </p>

@@ -28,11 +28,12 @@ class RefuelingDB(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	refueling_name = db.Column(db.String(100))
 	initial_configuration = db.Column(db.LargeBinary())
+	initial_burnup_data = db.Column(db.LargeBinary(length=500))
 	date = db.Column(db.DateTime(), default=func.now()) # the same data for every reactor refueling
 	acts = db.relationship('RefuelingActs', backref='refuel')
 
 	def __repr__(self):
-		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, initial_burnup={self.initial_configuration[:10]}, date={self.date}, acts={self.acts})'
+		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, initial_configuration={self.initial_configuration[:10]}, burnup_data={self.initial_burnup_data[:10]}, date={self.date}, acts={self.acts})'
 
 class RefuelingActs(db.Model):
 	__tablename__ = 'refuel_acts'
