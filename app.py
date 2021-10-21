@@ -111,8 +111,7 @@ def download(refueling_name, seq):
         print(f'Takes from child where id is {matched[0]}')
         pdc =  matched[1].decode('utf-8')
         print(type(pdc))
-    except Exception as e:
-        print(e)
+    except:
         print(f'Takes from parent where id is {refuiel_data.id}')
     Refueling(file_name, data=pdc).for_download
     return send_file(os.path.join(app.config['DOWNLOAD_FOLDER'], file_name), as_attachment=True)

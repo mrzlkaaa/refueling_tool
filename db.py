@@ -33,7 +33,7 @@ class RefuelingDB(db.Model):
 	acts = db.relationship('RefuelingActs', backref='refuel')
 
 	def __repr__(self):
-		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, initial_configuration={self.initial_configuration[:10]}, burnup_data={self.initial_burnup_data[:10]}, date={self.date}, acts={self.acts})'
+		return f'{self.__class__.__name__}(id={self.id}, name={self.refueling_name}, initial_configuration={self.initial_configuration[:10]}, initial_burnup_data={self.initial_burnup_data[:10]}, date={self.date}, acts={self.acts})'
 
 class RefuelingActs(db.Model):
 	__tablename__ = 'refuel_acts'
