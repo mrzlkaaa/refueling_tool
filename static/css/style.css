@@ -58,7 +58,9 @@ td {
 .container_item-detail {
     width: 40%;
     height: auto;
+    margin: 10px;
     margin-bottom: 50px;
+    flex: 0 0 250px;
 }
 
 .burnup_data {

@@ -91,10 +91,6 @@ def detail(name):
     refuiel_data.initial_burnup_data = np.frombuffer(refuiel_data.initial_burnup_data).reshape((6,4))
     processed_refuel_seq = ({'id': i.id, 'description': i.description, 'burnup_data':np.frombuffer(i.burnup_data).reshape((6,4))} for i in refuel_seq )
     print(sys.getsizeof(refuel_seq))
-    # print(refuel_seq)
-    # print(next(processed_refuel_seq))
-    # refule_seq = np.frombuffer(refueling_data.burnup_data).reshape((6,4))
-    # print(refueling_data)
     return render_template('detail.html', refueling=refuiel_data, refuel_seq=processed_refuel_seq)
 
 @app.route('/download/<refueling_name>_<seq>', methods=['GET','POST'])
