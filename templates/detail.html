@@ -26,8 +26,7 @@
 						{% endfor %}
 					</table>
 					<div>
-						<a href="{{url_for('download', refueling_name=refueling.refueling_name, seq=0)}}" class="btn btn-primary"> Download .PDC </a>
-						<a href="#" class="btn btn-primary"> Update </a>
+						<a href="{{url_for('download', name=refueling.refueling_name, seq=0)}}" class="btn btn-primary"> Download .PDC </a>
 					</div>
 				</div>
 				{% for refuel in refuel_seq %}
@@ -49,8 +48,8 @@
 							{% endfor %}
 						</table>
 						<div>
-							<a href="{{url_for('download', refueling_name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Download .PDC </a>
-							<a href="#" class="btn btn-primary"> Update </a>
+							<a href="{{url_for('download', name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Download .PDC </a>
+							<a href="{{url_for('update', name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Update </a>
 						</div>
 					</div>
 				{% endfor %}

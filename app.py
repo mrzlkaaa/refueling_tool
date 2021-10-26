@@ -24,17 +24,17 @@ def home():
 
 @app.route('/proc/<file_name>', methods=['GET', 'POST'])
 def reading_file(file_name):
-    arr, pdc_name = Average(file_name).average_burnup()
-    print(pdc_name)
+    arr, pdc_name, _ = Average(file_name).average_burnup()
+    # print(pdc_name)
     if request.method == 'POST':
         print('detected_POST')
         option = request.form['options']
         numbers = request.form['numbers']
         if option == 'fresh':
-            new, pdc_name_new = Fresh(file_name, numbers).refueling()
+            new, pdc_name_new, _ = Fresh(file_name, numbers, save=True).refueling()
             print(new)
         elif option == 'swap':
-            new, pdc_name_new = Swap(file_name, numbers).swap()
+            new, pdc_name_new, _ = Swap(file_name, numbers, save=True).swap()
             print(new)
         session['old_core'] = (arr.tolist(), pdc_name)
         session['new_core'] = (new.tolist(), pdc_name_new)
@@ -49,8 +49,8 @@ tobytes = lambda x: bytes(''.join(x), 'UTF-8')
 
 @app.route('/refueling', methods=['GET', 'POST'])
 def core_refueling():
-    old_core, pdc_data = np.array(session.get('old_core')[0]), tobytes(Refueling(session.get('old_core')[1]).get_data)
-    new_core, pdc_data_new = np.array(session.get('new_core')[0]), tobytes(Refueling(session.get('new_core')[1]).get_data)
+    old_core, pdc_data = np.array(session.get('old_core')[0]), tobytes(Refueling(session.get('old_core')[1]).load_data)
+    new_core, pdc_data_new = np.array(session.get('new_core')[0]), tobytes(Refueling(session.get('new_core')[1]).load_data)
     form = RefuelList()
     form.add_existing.choices = [(data.refueling_name, data.refueling_name) for data in RefuelingDB.query.all()]
     if request.method == 'POST':
@@ -74,13 +74,14 @@ def core_refueling():
             add_act = RefuelingActs(description=desc, current_configuration=pdc_data_new, burnup_data=new_core_b, refuel=new_refuel)
             db.session.add_all([new_refuel, add_act])
             db.session.commit()
-        return redirect(url_for('list'))
+        return redirect(url_for('display_list'))
     return render_template('refueling.html', old_core=old_core, new_core=new_core, form=form)
 
 @app.route('/list')
-def list():
+def display_list():
     refueling_list = RefuelingDB.query.order_by(RefuelingDB.date).all()
     print(RefuelingDB.query.all())
+
     return render_template('list.html', list=refueling_list)
 
 @app.route('/detail/<name>', methods=['GET','POST'])
@@ -89,20 +90,19 @@ def detail(name):
     print(refuiel_data)
     refuel_seq = refuiel_data.acts
     refuiel_data.initial_burnup_data = np.frombuffer(refuiel_data.initial_burnup_data).reshape((6,4))
-    processed_refuel_seq = ({'id': i.id, 'description': i.description, 'burnup_data':np.frombuffer(i.burnup_data).reshape((6,4))} for i in refuel_seq )
+    processed_refuel_seq = sorted([{'id': i.id, 'description': i.description, 'burnup_data':np.frombuffer(i.burnup_data).reshape((6,4))} for i in refuel_seq], key=lambda x: x['id'])
     print(sys.getsizeof(refuel_seq))
     return render_template('detail.html', refueling=refuiel_data, refuel_seq=processed_refuel_seq)
 
-@app.route('/download/<refueling_name>_<seq>', methods=['GET','POST'])
-def download(refueling_name, seq):
-    file_name = f'{refueling_name}_{seq}.PDC'
+@app.route('/download/<name>-<seq>', methods=['GET','POST'])
+def download(name, seq):
+    file_name = f'{name}_{seq}.PDC'
     pdc = ''
     seq = int(seq)
-    # seq=3
-    refuiel_data = RefuelingDB.query.filter_by(refueling_name=refueling_name).first()
+    refuiel_data = RefuelingDB.query.filter_by(refueling_name=name).first()
     refuel_seq = refuiel_data.acts
     try:
-        gets_id = ((i.id, i.current_configuration) for i in refuel_seq if i.id==seq)
+        gets_id = ((i.id, i.current_configuration) for i in refuel_seq if i.id==seq) #TODO rewrite it like sql query
         matched = next(gets_id)
         print(f'Takes from child where id is {matched[0]}')
         pdc =  matched[1].decode('utf-8')
@@ -111,6 +111,37 @@ def download(refueling_name, seq):
         print(f'Takes from parent where id is {refuiel_data.id}')
     Refueling(file_name, data=pdc).for_download
     return send_file(os.path.join(app.config['DOWNLOAD_FOLDER'], file_name), as_attachment=True)
+
+@app.route('/update/<name>-<seq>', methods=['POST', 'GET'])
+def update(name, seq):
+    seq = int(seq)
+    refuiel_data = RefuelingActs.query.filter(RefuelingActs.id<=seq).order_by(RefuelingActs.id.desc()).all()
+    if len(refuiel_data) < 2:
+        initial_data = RefuelingDB.query.filter_by(refueling_name=name).first()
+        old_core, pdc = np.frombuffer(initial_data.initial_burnup_data).reshape((6,4)), iter(initial_data.initial_configuration.decode("utf-8").split("\n"))
+        new_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
+    else:
+        old_core, pdc = np.frombuffer(refuiel_data[1].burnup_data).reshape((6,4)), iter(refuiel_data[1].current_configuration.decode("utf-8").split("\n"))
+        new_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
+    if request.method == "POST":
+        file_name = f'{name}_{seq}.PDC'
+        option = request.form['options']
+        numbers = request.form['numbers']
+        description = request.form['description']
+        if option == 'fresh':
+            print(sys.getsizeof(pdc))
+            new_core, pdc_name_new, pdc = Fresh(file_name, numbers, pdc=pdc).refueling()
+            new_core_b = new_core.tobytes() #* convert to bytes
+            print(new_core)
+        elif option == 'swap':
+            new_core, pdc_name_new, pdc = Swap(file_name, numbers, pdc=pdc).swap()
+            new_core_b = new_core.tobytes() #* convert to bytes
+            print(new_core)
+        db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description})
+        db.session.commit()
+        return redirect(url_for('display_list'))
+    return render_template('update.html', old_core=old_core, new_core=new_core, description=description)
+
 
 
 if __name__ == '__main__':

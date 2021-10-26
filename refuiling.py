@@ -50,12 +50,13 @@ class Refueling:
 	OUTPUT_PATH = os.path.join(CWD, 'output')
 	PATTERN = re.compile(r'\.[A-Z]+')
 
-	def __init__(self, name: str, data=None, *args, **kwargs) -> None:
+	def __init__(self, name: str, data=None, save=False, *args, **kwargs) -> None:
 		self.file_name = name
+		self.onsave = save
 		self.data = data
 
 	@property
-	def get_data(self):
+	def load_data(self):
 		print(f'openning file.... {self.file_name}')
 		with open(os.path.join(self.INPUT_PATH, self.file_name), 'r') as f:
 			return f.readlines()
@@ -65,7 +66,6 @@ class Refueling:
 		return [(n,convert_type(i.split()[1])) for n,i in enumerate(self.data, start=1) if 'MATR' in i and convert_type(i.split()[1]) <= 121]
 
 	def save(self):
-		self.file_name =  f'{self.__class__.__name__}_{self.file_name}'
 		print(self.file_name)
 		self.save_path = os.path.join(self.INPUT_PATH, self.file_name)
 		with open(self.save_path, 'w') as out:
@@ -80,13 +80,10 @@ class Refueling:
 class Average(Refueling):
 	def __init__(self, name, *args, **kwargs):
 		super().__init__(name, *args, **kwargs)
-		self.data = self.get_data
-		
-	# @property
-	# def get_output_data(self):
-	# 	print(f'openning output file.... {self.file_name}')
-	# 	with open(os.path.join(self.OUTPUT_PATH, self.file_name), 'r') as f:
-	# 		return f.readlines()
+		try:
+			self.data = kwargs['pdc']
+		except Exception as e:
+			self.data = self.load_data
 
 	@property
 	def U5_densities(self):
@@ -100,8 +97,7 @@ class Average(Refueling):
 
 	def matrix_and_save(self, obj):
 		arr = np.array(obj).reshape((6,4))
-		# print(arr)
-		return arr, self.file_name
+		return arr, self.file_name, iter(self.data)
 		 
 	# @timeit
 	def average_burnup(self, FA_dic = defaultdict(list)):
@@ -113,16 +109,21 @@ class Average(Refueling):
 					if matr==num:
 						FA_dic[N].append(u5)
 		average = self.insert_nulls([np.around((1 - mean(i)/IND)*100, decimals = 2) for n, i in FA_dic.items()], [9,10,13,14])
-		# FA_dic.clear()
+		FA_dic.clear()
 		return self.matrix_and_save(average)
 
 class Fresh(Refueling):
-	FRESH_FUEL: str = "U235 2.4600E-03\nAL   5.3180E-02\nU238 2.4600E-04\nU234 2.7330E-05\nO16  5.4660E-03\n" #* what to write
+	FRESH_FUEL: str = "U235 2.4600E-03\n--AL   5.3180E-02\n--U238 2.4600E-04\n--U234 2.7330E-05\n--O16  5.4660E-03\n" #* what to write
 	
 	def __init__(self, name, fresh_FA, *args, **kwargs):
 		super().__init__(name, *args, **kwargs)
-		self.data = self.get_data
-		self.fresh_FA = fresh_FA
+		try:
+			self.data = list(kwargs["pdc"])
+			self.fresh_FA = fresh_FA
+		except Exception as e:
+			print(e)
+			self.data = self.load_data
+			self.fresh_FA = fresh_FA
 
 	def replace_save(self, matrs):
 		query = self.q
@@ -130,14 +131,17 @@ class Fresh(Refueling):
 			for n in range(len(query)):
 				for j in matrs:
 					if j==query[n][1]:
-						self.data[query[n][0]:query[n+1][0]-2] = self.FRESH_FUEL
+						# print(type(self.data[query[n][0]:query[n+1][0]-2]))
+						self.data[query[n][0]:query[n+1][0]-2] = self.FRESH_FUEL.split("--")
 						query = self.q		
 		except Exception as e:
-			print(e)
-		# option = input('Would you like add new core configuration to db? ')
-		# if option.upper() == 'Y': 
-		self.save()
-		return Average(self.file_name).average_burnup()  # ---> ref to average with following db instance
+			print(e) 
+		print(self.data[:50])
+		if self.onsave:
+			print("saving on local machine...")
+			self.save()
+		# return Average(self.file_name).average_burnup()
+		return Average(self.file_name, pdc=self.data).average_burnup()  # ---> ref to average
 		# else: return self.save()
 
 	# @timeit
@@ -156,8 +160,12 @@ class Fresh(Refueling):
 class Swap(Refueling):
 	def __init__(self, name, swap_FA, *args, **kwargs):
 		super().__init__(name, *args, **kwargs)
-		self.swap_FA = swap_FA
-		self.data = self.get_data
+		try:
+			self.data = kwargs["pdc"]
+			self.swap_FA = swap_FA
+		except Exception as e:
+			self.data = self.get_data
+			self.swap_FA = swap_FA
 	
 	def loop(self, matrs, store=None, reverse=False):
 		query = self.q
@@ -180,8 +188,10 @@ class Swap(Refueling):
 		store1, store2 = self.loop(first), self.loop(second)
 		swstore1, swstore2 = {k1:v2 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}, {k2:v1 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}
 		self.loop(first, store=swstore1, reverse=True), self.loop(second, store=swstore2, reverse=True)
-		self.save()
-		return Average(self.file_name).average_burnup()
+		if self.onsave:
+			print("saving on local machine...")
+			self.save()
+		return Average(self.file_name, pdc=self.data).average_burnup()  # ---> ref to average
 
 if __name__ == '__main__':
 	*args, extracted_name = os.path.split(sys.argv[1])
