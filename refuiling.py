@@ -42,7 +42,8 @@ def convert_type(val: str) -> Union[float, bool]:
 		return float(val)
 	except Exception as e:
 		print(e)
-		return False		
+		return False
+	return
 
 class Refueling:
 	CWD = os.getcwd()
@@ -53,7 +54,8 @@ class Refueling:
 	def __init__(self, name: str, data=None, save=False, *args, **kwargs) -> None:
 		self.file_name = name
 		self.onsave = save
-		self.data = data
+		if not data is None:
+			self.data = data
 
 	@property
 	def load_data(self):
@@ -131,7 +133,6 @@ class Fresh(Refueling):
 			for n in range(len(query)):
 				for j in matrs:
 					if j==query[n][1]:
-						# print(type(self.data[query[n][0]:query[n+1][0]-2]))
 						self.data[query[n][0]:query[n+1][0]-2] = self.FRESH_FUEL.split("--")
 						query = self.q		
 		except Exception as e:
@@ -140,13 +141,10 @@ class Fresh(Refueling):
 		if self.onsave:
 			print("saving on local machine...")
 			self.save()
-		# return Average(self.file_name).average_burnup()
 		return Average(self.file_name, pdc=self.data).average_burnup()  # ---> ref to average
-		# else: return self.save()
 
 	# @timeit
 	def refueling(self):
-		# fresh_FA = input('Type numbers of FA to refuel: ')
 		try:
 			convert = int(self.fresh_FA)
 			matrs = FAs_num[convert-1]
@@ -182,7 +180,6 @@ class Swap(Refueling):
 
 	# @timeit
 	def swap(self):
-		# swap_num = input('Type numbers of FA to swap: ')
 		convert = list(map(lambda x: int(x), self.swap_FA.split(','))) 
 		first, second = FAs_num[convert[0]-1], FAs_num[convert[1]-1]
 		store1, store2 = self.loop(first), self.loop(second)
@@ -193,14 +190,5 @@ class Swap(Refueling):
 			self.save()
 		return Average(self.file_name, pdc=self.data).average_burnup()  # ---> ref to average
 
-if __name__ == '__main__':
-	*args, extracted_name = os.path.split(sys.argv[1])
-	# extracted_name = sys.argv[1]
-	option = int(input('Type option: 1-average burnup, 2-refueling, 3-swap fuel: '))
-	if option==1: Average(extracted_name).average_burnup()
-	elif option==2: Fresh(extracted_name).refueling()
-	elif option==3: Swap(extracted_name).swap()
-	
-		# print(d)
 
 

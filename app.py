@@ -1,4 +1,5 @@
 import os, sys
+import time
 from datetime import datetime
 from flask import render_template, request, redirect, url_for, session, send_file
 import numpy as np
@@ -25,7 +26,6 @@ def home():
 @app.route('/proc/<file_name>', methods=['GET', 'POST'])
 def reading_file(file_name):
     arr, pdc_name, _ = Average(file_name).average_burnup()
-    # print(pdc_name)
     if request.method == 'POST':
         print('detected_POST')
         option = request.form['options']
@@ -79,15 +79,16 @@ def core_refueling():
 
 @app.route('/list')
 def display_list():
+    time_before = time.time()
     refueling_list = RefuelingDB.query.order_by(RefuelingDB.date).all()
-    print(RefuelingDB.query.all())
+    print(time.time() - time_before)
+    # print(RefuelingDB.query.all())
 
     return render_template('list.html', list=refueling_list)
 
 @app.route('/detail/<name>', methods=['GET','POST'])
 def detail(name):
     refuiel_data = RefuelingDB.query.filter_by(refueling_name=name).first()
-    print(refuiel_data)
     refuel_seq = refuiel_data.acts
     refuiel_data.initial_burnup_data = np.frombuffer(refuiel_data.initial_burnup_data).reshape((6,4))
     processed_refuel_seq = sorted([{'id': i.id, 'description': i.description, 'burnup_data':np.frombuffer(i.burnup_data).reshape((6,4))} for i in refuel_seq], key=lambda x: x['id'])
@@ -129,14 +130,12 @@ def update(name, seq):
         numbers = request.form['numbers']
         description = request.form['description']
         if option == 'fresh':
-            print(sys.getsizeof(pdc))
             new_core, pdc_name_new, pdc = Fresh(file_name, numbers, pdc=pdc).refueling()
             new_core_b = new_core.tobytes() #* convert to bytes
             print(new_core)
         elif option == 'swap':
             new_core, pdc_name_new, pdc = Swap(file_name, numbers, pdc=pdc).swap()
             new_core_b = new_core.tobytes() #* convert to bytes
-            print(new_core)
         db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description})
         db.session.commit()
         return redirect(url_for('display_list'))
