@@ -122,12 +122,8 @@ class Fresh(Refueling):
 	def __init__(self, name, fresh_FA, *args, **kwargs):
 		super().__init__(name, *args, **kwargs)
 		try:
-			self.data = kwargs["pdc"]
-			
-				# decoded = d.readlines()
-			# print(decoded[:10])
+			self.data = list(kwargs["pdc"])
 		except Exception as e:
-			# print(e)
 			self.data = self.load_data
 		self.fresh_FA = fresh_FA
 

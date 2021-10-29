@@ -66,15 +66,15 @@ def core_refueling():
             print(type(query_refueling))
             date = query_refueling.date
             add_act = RefuelingActs(description=desc, current_configuration=pdc_data_new, burnup_data=new_core_b, refuel=query_refueling)
-            # db.session.add(add_act)
+            db.session.add(add_act)
         else:
             if len(request.form.get('date')) > 0: date = request.form.get('date')
             else: date = datetime.now()
             new_refuel = RefuelingDB(refueling_name=name, initial_configuration=pdc_data, initial_burnup_data=old_core_b, date=date)
             add_act = RefuelingActs(description=desc, current_configuration=pdc_data_new, burnup_data=new_core_b, refuel=new_refuel)
-        #     db.session.add_all([new_refuel, add_act])
-    #     db.session.commit()
-        # return redirect(url_for('display_list'))
+            db.session.add_all([new_refuel, add_act])
+        db.session.commit()
+        return redirect(url_for('display_list'))
     return render_template('refueling.html', old_core=old_core, new_core=new_core, form=form)
 
 @app.route('/list')
@@ -83,8 +83,6 @@ def display_list():
     refueling_list = db.session.query(RefuelingDB).options(load_only(RefuelingDB.date, RefuelingDB.refueling_name)).order_by(RefuelingDB.date).all()
     print(time.time() - time_before)
     print(sys.getsizeof(refueling_list))
-    # json_style = jsonify(refueling_list)
-    # print(json_style)
     return render_template('list.html', list=refueling_list)
 
 @app.route('/detail/<name>', methods=['GET','POST'])
@@ -101,22 +99,19 @@ def detail(name):
 @app.route('/update/<name>-<seq>', methods=['POST', 'GET'])
 def update(name, seq):
     seq = int(seq)
-    # refuiel_data = RefuelingActs.query.filter(RefuelingActs.id<=seq).order_by(RefuelingActs.id.desc()).all()
     refuiel_data = db.session.query(RefuelingDB).join(RefuelingActs, RefuelingDB.refueling_name==name).filter(RefuelingActs.id<=seq).first().acts
     print(refuiel_data)
-    print(type(refuiel_data[len(refuiel_data)-2].current_configuration))
-    reading = io.IOBase(refuiel_data[len(refuiel_data)-2].current_configuration)
-    print(reading.readable())
-    # with open(refuiel_data[len(refuiel_data)-2].current_configuration, "r") as mybytes: mybytes.readlines()
-    # decoded_pdc = refuiel_data[len(refuiel_data)-2].current_configuration.decode("utf-8")
+    bytes_pdc = refuiel_data[len(refuiel_data)-2].current_configuration
+    splitted = bytes_pdc.decode().split("\n")
+    added_newline = list(map(lambda x: x+"\n", splitted))
     if len(refuiel_data) < 2:
         print('preparing to load initial core config and following step...')
         initial_data = RefuelingDB.query.filter_by(refueling_name=name).first()
-        old_core, pdc = np.frombuffer(initial_data.initial_burnup_data).reshape((6,4)), iter(initial_data.initial_configuration.decode("utf-8").split("\n"))
+        old_core, pdc = np.frombuffer(initial_data.initial_burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[len(refuiel_data)-2].current_configuration.decode("utf-8").split("\n"))
         new_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
     else:
         print('preparing to load two latter steps...')
-        old_core, pdc = np.frombuffer(refuiel_data[len(refuiel_data)-2].burnup_data).reshape((6,4)), refuiel_data[len(refuiel_data)-2].current_configuration
+        old_core, pdc = np.frombuffer(refuiel_data[len(refuiel_data)-2].burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[len(refuiel_data)-2].current_configuration.decode("utf-8").split("\n"))
         new_core, description = np.frombuffer(refuiel_data[len(refuiel_data)-1].burnup_data).reshape((6,4)), refuiel_data[len(refuiel_data)-1].description
     if request.method == "POST":
         file_name = f'{name}_{seq}.PDC'
@@ -130,9 +125,9 @@ def update(name, seq):
         elif option == 'swap':
             new_core, pdc_name_new, pdc_new = Swap(file_name, numbers, pdc=pdc).swap()
             new_core_b = new_core.tobytes() #* convert to bytes
-        # db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description, RefuelingActs.current_configuration:tobytes(pdc_new)})
-        # db.session.commit()
-        # return redirect(url_for('display_list'))
+        db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description, RefuelingActs.current_configuration:tobytes(pdc_new)})
+        db.session.commit()
+        return redirect(url_for('display_list'))
     return render_template('update.html', old_core=old_core, new_core=new_core, description=description)
 
 @app.route('/download/<name>-<seq>', methods=['GET','POST'])
