@@ -3,7 +3,6 @@ import sys
 import time
 import re
 import numpy as np
-import pandas as pd
 import typing
 import logging
 from db import *
@@ -54,7 +53,7 @@ class Refueling:
 	def __init__(self, name: str, data=None, save=False, *args, **kwargs) -> None:
 		self.file_name = name
 		self.onsave = save
-		if not data is None:
+		if data is not None:
 			self.data = data
 
 	@property
@@ -76,16 +75,19 @@ class Refueling:
 	@property
 	def for_download(self):
 		with open(os.path.join(self.OUTPUT_PATH, self.file_name), 'w') as out:
-			return out.write(self.data)
+			# for i in self.data:
+			# 	out.write(i)
+			return out.writelines(self.data)
 
 
 class Average(Refueling):
 	def __init__(self, name, *args, **kwargs):
 		super().__init__(name, *args, **kwargs)
 		try:
-			self.data = kwargs['pdc']
+			self.data = kwargs['pdc'] # takes a list
 		except Exception as e:
 			self.data = self.load_data
+			print(self.data[:50])
 
 	@property
 	def U5_densities(self):
@@ -120,12 +122,14 @@ class Fresh(Refueling):
 	def __init__(self, name, fresh_FA, *args, **kwargs):
 		super().__init__(name, *args, **kwargs)
 		try:
-			self.data = list(kwargs["pdc"])
-			self.fresh_FA = fresh_FA
+			self.data = kwargs["pdc"]
+			
+				# decoded = d.readlines()
+			# print(decoded[:10])
 		except Exception as e:
-			print(e)
+			# print(e)
 			self.data = self.load_data
-			self.fresh_FA = fresh_FA
+		self.fresh_FA = fresh_FA
 
 	def replace_save(self, matrs):
 		query = self.q
@@ -136,8 +140,7 @@ class Fresh(Refueling):
 						self.data[query[n][0]:query[n+1][0]-2] = self.FRESH_FUEL.split("--")
 						query = self.q		
 		except Exception as e:
-			print(e) 
-		print(self.data[:50])
+			print(e)
 		if self.onsave:
 			print("saving on local machine...")
 			self.save()
@@ -148,7 +151,6 @@ class Fresh(Refueling):
 		try:
 			convert = int(self.fresh_FA)
 			matrs = FAs_num[convert-1]
-			
 		except ValueError as VE:
 			convert = list(map(lambda x: int(x), self.fresh_FA.split(','))) 
 			matrs = [j for i in convert for j in FAs_num[i-1]]
@@ -159,11 +161,10 @@ class Swap(Refueling):
 	def __init__(self, name, swap_FA, *args, **kwargs):
 		super().__init__(name, *args, **kwargs)
 		try:
-			self.data = kwargs["pdc"]
-			self.swap_FA = swap_FA
+			self.data = list(kwargs["pdc"])
 		except Exception as e:
-			self.data = self.get_data
-			self.swap_FA = swap_FA
+			self.data = self.load_data
+		self.swap_FA = swap_FA
 	
 	def loop(self, matrs, store=None, reverse=False):
 		query = self.q

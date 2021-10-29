@@ -8,7 +8,6 @@ numpy = "*"
 pandas = "*"
 openpyxl = "*"
 mypy = "*"
-flask = "*"
 cython = "*"
 sqlalchemy = "*"
 python-dotenv = "*"
@@ -21,3 +20,6 @@ flask-wtf = "*"
 
 [requires]
 python_version = "3.8"
+
+[packages.flask]
+extras = [ "async",]
