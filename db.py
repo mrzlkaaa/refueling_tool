@@ -8,6 +8,7 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField
 from sqlalchemy.sql import func
 from sqlalchemy.orm import load_only
+from functools import wraps
 import psycopg2
 
 load_dotenv()

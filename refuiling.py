@@ -11,6 +11,7 @@ from statistics import mean
 from typing import List, Any, Union, Optional, Callable
 
 
+
 # class MyLogger:
 # 	def __init__(self, name: str, text: str) -> None:
 # 		self.name = name
@@ -24,11 +25,11 @@ from typing import List, Any, Union, Optional, Callable
 # 		return self.logger.info(self.text)
 
 # def timeit(func): #* use generics
+# 	@wraps(func)
 # 	def wrapper(*args, **kwargs):
-# 		time_before = datetime.now()
-# 		func(*args, **kwargs)
-# 		time_diff = datetime.now() - time_before
-# 		return print(f'execution time of "{func.__name__}" function - {time_diff.total_seconds()}')
+# 		time = current_time()
+# 		return func(*args, **kwargs)
+# 		# return print(f'execution time of "{func.__name__}" function - {time_diff.total_seconds()}')
 # 	return wrapper
 
 

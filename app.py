@@ -13,10 +13,11 @@ UPLOAD_FOLDER = 'input/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['DOWNLOAD_FOLDER'] = 'output/'
 
+tobytes = lambda x: bytes(''.join(x), 'UTF-8')
+
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
-        # name = request.form['name']
         uploaded = request.files['uploaded']
         uploaded.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded.filename))
         print(url_for('reading_file', file_name = uploaded.filename))
@@ -40,13 +41,7 @@ def reading_file(file_name):
         session['old_core'] = (arr.tolist(), pdc_name)
         session['new_core'] = (new.tolist(), pdc_name_new)
         return redirect(url_for('core_refueling'))
-        # print(option, numbers)
-
-        # return redirect(url_for('refueling', file_name = uploaded.filename))
-
     return render_template('reading_file.html', burnup = arr)
-
-tobytes = lambda x: bytes(''.join(x), 'UTF-8')
 
 @app.route('/refueling', methods=['GET', 'POST'])
 def core_refueling():
@@ -82,15 +77,14 @@ def display_list():
     time_before = time.time()
     refueling_list = db.session.query(RefuelingDB).options(load_only(RefuelingDB.date, RefuelingDB.refueling_name)).order_by(RefuelingDB.date).all()
     print(time.time() - time_before)
-    print(sys.getsizeof(refueling_list))
     return render_template('list.html', list=refueling_list)
 
 @app.route('/detail/<name>', methods=['GET','POST'])
-def detail(name):
+def detail(name):  #! required button to delete instance
     time_before = time.time()
+    # refuel_data = db.session.query(RefuelingDB).filter(RefuelingDB.refueling_name==name).options(load_only(RefuelingDB.date, RefuelingDB.refueling_name)).order_by(RefuelingDB.date).all()
     refuiel_data = RefuelingDB.query.filter_by(refueling_name=name).first() #TODO add load_only method to avoiding querying and loading of pdc file
     print(time.time() - time_before)
-    print(refuiel_data)
     refuel_seq = refuiel_data.acts
     refuiel_data.initial_burnup_data = np.frombuffer(refuiel_data.initial_burnup_data).reshape((6,4))
     processed_refuel_seq = sorted([{'id': i.id, 'description': i.description, 'burnup_data':np.frombuffer(i.burnup_data).reshape((6,4))} for i in refuel_seq], key=lambda x: x['id'])
@@ -99,20 +93,17 @@ def detail(name):
 @app.route('/update/<name>-<seq>', methods=['POST', 'GET'])
 def update(name, seq):
     seq = int(seq)
-    refuiel_data = db.session.query(RefuelingDB).join(RefuelingActs, RefuelingDB.refueling_name==name).filter(RefuelingActs.id<=seq).first().acts
-    print(refuiel_data)
-    bytes_pdc = refuiel_data[len(refuiel_data)-2].current_configuration
-    splitted = bytes_pdc.decode().split("\n")
-    added_newline = list(map(lambda x: x+"\n", splitted))
+    # refuiel_data = db.session.query(RefuelingDB).join(RefuelingActs, RefuelingDB.refueling_name==name).filter(RefuelingActs.id<=seq).first().acts
+    refuiel_data = db.session.query(RefuelingActs).join(RefuelingDB).filter(RefuelingDB.refueling_name==name).filter(RefuelingActs.id<=seq).order_by(RefuelingActs.id.desc()).all()
+    print([(i.id, i.description, i.refuel.refueling_name) for i in refuiel_data])
     if len(refuiel_data) < 2:
         print('preparing to load initial core config and following step...')
-        initial_data = RefuelingDB.query.filter_by(refueling_name=name).first()
-        old_core, pdc = np.frombuffer(initial_data.initial_burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[len(refuiel_data)-2].current_configuration.decode("utf-8").split("\n"))
+        old_core, pdc = np.frombuffer(refuiel_data[0].refuel.initial_burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[0].refuel.initial_configuration.decode("utf-8").split("\n"))
         new_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
     else:
         print('preparing to load two latter steps...')
-        old_core, pdc = np.frombuffer(refuiel_data[len(refuiel_data)-2].burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[len(refuiel_data)-2].current_configuration.decode("utf-8").split("\n"))
-        new_core, description = np.frombuffer(refuiel_data[len(refuiel_data)-1].burnup_data).reshape((6,4)), refuiel_data[len(refuiel_data)-1].description
+        old_core, pdc = np.frombuffer(refuiel_data[1].burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[1].current_configuration.decode("utf-8").split("\n"))
+        new_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
     if request.method == "POST":
         file_name = f'{name}_{seq}.PDC'
         option = request.form['options']
