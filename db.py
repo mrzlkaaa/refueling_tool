@@ -9,7 +9,6 @@ from wtforms import SelectField
 from sqlalchemy.sql import func
 from sqlalchemy.orm import load_only
 from functools import wraps
-import psycopg2
 
 load_dotenv()
 #credentials 
@@ -20,7 +19,7 @@ host = os.environ['HOST']
 database = os.environ['DB']
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{user}:{pwd}@{host}:{port}/{database}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@{host}:{port}/{database}'
 app.config['SECRET_KEY'] = 'dev'
 db = SQLAlchemy(app)
 

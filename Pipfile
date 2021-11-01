@@ -4,22 +4,24 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-numpy = "*"
-pandas = "*"
 openpyxl = "*"
 mypy = "*"
-cython = "*"
-sqlalchemy = "*"
+Cython = "*"
+SQLAlchemy = "*"
 python-dotenv = "*"
-psycopg2-binary = "*"
-flask-sqlalchemy = "*"
-"flask.wtf" = "*"
-flask-wtf = "*"
+Flask-SQLAlchemy = "*"
+Flask-WTF = "*"
+pg8000 = "*"
+numpy = "*"
+pip = "==9.0.3"
+wheel = "*"
+p5py = "*"
+pep517 = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
 
-[packages.flask]
+[packages.Flask]
 extras = [ "async",]
