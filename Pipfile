@@ -17,6 +17,9 @@ pip = "==9.0.3"
 wheel = "*"
 p5py = "*"
 pep517 = "*"
+flask = "*"
+flask-migrate = "*"
+flask-script = "*"
 
 [dev-packages]
 

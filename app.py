@@ -2,7 +2,7 @@ import os, sys
 import io
 import time
 from datetime import datetime
-from flask import render_template, request, redirect, url_for, session, send_file, jsonify
+from flask import render_template, request, redirect, url_for, session, send_file
 import numpy as np
 from werkzeug.utils import send_from_directory
 from db import *

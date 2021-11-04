@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import SelectField
@@ -19,9 +20,13 @@ host = os.environ['HOST']
 database = os.environ['DB']
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@{host}:{port}/{database}'
+# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@{host}:{port}/{database}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@db/{database}'
 app.config['SECRET_KEY'] = 'dev'
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+
 
 
 class RefuelingDB(db.Model):
@@ -53,5 +58,5 @@ class RefuelList(FlaskForm):
 
 
 if __name__ == '__main__':
-	db.create_all()
-	# print(RefuelList().names)
+	# db.create_all()
+	manager.run()

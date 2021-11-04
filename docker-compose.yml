@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  python-main:
+    container_name: py-main
+    image: mrzlkaaa/irt-t-refuel:v0.2.1
+    # build: .
+    ports: 
+      - "8888:5000"
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    image: postgres:12
+    restart: always
+    environment:
+      - POSTGRES_DB=irt_refueling
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports: 
+      - "5433:5432"
+
+
