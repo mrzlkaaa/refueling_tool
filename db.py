@@ -1,4 +1,5 @@
 import os
+import redis
 import numpy as np
 from datetime import datetime
 from dotenv import load_dotenv
@@ -20,14 +21,13 @@ host = os.environ['HOST']
 database = os.environ['DB']
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@{host}:{port}/{database}'
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@db/{database}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@{host}:{port}/{database}'
+# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@db/{database}'
 app.config['SECRET_KEY'] = 'dev'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-
-
+r= redis.Redis(host="localhost", port = "6379", db=0)
 
 class RefuelingDB(db.Model):
 	__tablename__ = 'reactor_refuel'
@@ -57,6 +57,5 @@ class RefuelList(FlaskForm):
 	add_existing = SelectField('dbnames', choices=[])
 
 
-if __name__ == '__main__':
-	# db.create_all()
-	manager.run()
+# if __name__ == '__main__':
+# 	# db.create_all()

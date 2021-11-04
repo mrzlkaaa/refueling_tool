@@ -20,6 +20,7 @@ pep517 = "*"
 flask = "*"
 flask-migrate = "*"
 flask-script = "*"
+redis = "*"
 
 [dev-packages]
 

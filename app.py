@@ -27,7 +27,7 @@ def home():
 
 @app.route('/proc/<file_name>', methods=['GET', 'POST'])
 def reading_file(file_name):
-    arr, pdc_name, _ = Average(file_name).average_burnup()
+    current, pdc_name, _ = Average(file_name).average_burnup()
     if request.method == 'POST':
         print('detected_POST')
         option = request.form['options']
@@ -38,13 +38,15 @@ def reading_file(file_name):
         elif option == 'swap':
             new, pdc_name_new, _ = Swap(file_name, numbers, save=True).swap()
             print(new)
-        session['old_core'] = (arr.tolist(), pdc_name)
+        r.set('current', 'this is my data embedded to redis')
+        session['old_core'] = (current.tolist(), pdc_name)
         session['new_core'] = (new.tolist(), pdc_name_new)
         return redirect(url_for('core_refueling'))
-    return render_template('reading_file.html', burnup = arr)
+    return render_template('reading_file.html', burnup = current)
 
 @app.route('/refueling', methods=['GET', 'POST'])
 def core_refueling():
+    print(r.get("current"))
     old_core, pdc_data = np.array(session.get('old_core')[0]), tobytes(Refueling(session.get('old_core')[1]).load_data) # seems like loading of pdc file on this stage is useless (just memory consuming)
     new_core, pdc_data_new = np.array(session.get('new_core')[0]), tobytes(Refueling(session.get('new_core')[1]).load_data)
     form = RefuelList()
@@ -98,28 +100,29 @@ def update(name, seq):
     print([(i.id, i.description, i.refuel.refueling_name) for i in refuiel_data])
     if len(refuiel_data) < 2:
         print('preparing to load initial core config and following step...')
-        old_core, pdc = np.frombuffer(refuiel_data[0].refuel.initial_burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[0].refuel.initial_configuration.decode("utf-8").split("\n"))
-        new_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
+        old_core, pdc_data = np.frombuffer(refuiel_data[0].refuel.initial_burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[0].refuel.initial_configuration.decode("utf-8").split("\n"))
+        # print(old_core)
+        current_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
     else:
         print('preparing to load two latter steps...')
-        old_core, pdc = np.frombuffer(refuiel_data[1].burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[1].current_configuration.decode("utf-8").split("\n"))
-        new_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
+        old_core, pdc_data = np.frombuffer(refuiel_data[1].burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[1].current_configuration.decode("utf-8").split("\n"))
+        current_core, description = np.frombuffer(refuiel_data[0].burnup_data).reshape((6,4)), refuiel_data[0].description
     if request.method == "POST":
         file_name = f'{name}_{seq}.PDC'
         option = request.form['options']
         numbers = request.form['numbers']
         description = request.form['description']
         if option == 'fresh':
-            new_core, pdc_name_new, pdc_new = Fresh(file_name, numbers, pdc=pdc).refueling()
+            new_core, pdc_name_new, pdc_new = Fresh(file_name, numbers, pdc=pdc_data).refueling()
             new_core_b = new_core.tobytes() #* convert to bytes
             print(new_core)
         elif option == 'swap':
-            new_core, pdc_name_new, pdc_new = Swap(file_name, numbers, pdc=pdc).swap()
+            new_core, pdc_name_new, pdc_new = Swap(file_name, numbers, pdc=pdc_data).swap()
             new_core_b = new_core.tobytes() #* convert to bytes
-        db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description, RefuelingActs.current_configuration:tobytes(pdc_new)})
-        db.session.commit()
+        # db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description, RefuelingActs.current_configuration:tobytes(pdc_new)})
+        # db.session.commit()
         return redirect(url_for('display_list'))
-    return render_template('update.html', old_core=old_core, new_core=new_core, description=description)
+    return render_template('update.html', old_core=old_core, new_core=current_core, description=description)
 
 @app.route('/download/<name>-<seq>', methods=['GET','POST'])
 def download(name, seq):
@@ -136,6 +139,7 @@ def download(name, seq):
         print(type(pdc))
     except:
         print(f'Takes from parent where id is {refuiel_data.id}')
+        pdc = refuiel_data.initial_configuration.decode('utf-8')
     Refueling(file_name, data=pdc).for_download
     return send_file(os.path.join(app.config['DOWNLOAD_FOLDER'], file_name), as_attachment=True)
 
