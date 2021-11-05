@@ -27,7 +27,7 @@ app.config['SECRET_KEY'] = 'dev'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-r= redis.Redis(host="localhost", port = "6379", db=0)
+r = redis.Redis(host="localhost", port = "6379", db=0)
 
 class RefuelingDB(db.Model):
 	__tablename__ = 'reactor_refuel'

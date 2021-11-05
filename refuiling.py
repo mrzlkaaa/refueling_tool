@@ -155,8 +155,8 @@ class Fresh(Refueling):
 		return self.replace_save(matrs)
 
 class Swap(Refueling):
-	def __init__(self, name, swap_FA, *args, **kwargs):
-		super().__init__(name, *args, **kwargs)
+	def __init__(self, swap_FA, *args, **kwargs):
+		super().__init__(*args, **kwargs)
 		try:
 			self.data = list(kwargs["pdc"])
 		except Exception as e:
@@ -183,10 +183,10 @@ class Swap(Refueling):
 		store1, store2 = self.loop(first), self.loop(second)
 		swstore1, swstore2 = {k1:v2 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}, {k2:v1 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}
 		self.loop(first, store=swstore1, reverse=True), self.loop(second, store=swstore2, reverse=True)
-		if self.onsave:
-			print("saving on local machine...")
-			self.save()
-		return Average(self.file_name, pdc=self.data).average_burnup()  # ---> ref to average
+		# if self.onsave:
+		# 	print("saving on local machine...")
+		# 	self.save()
+		return Average(pdc=self.data).average_burnup()  # ---> ref to average
 
 
 

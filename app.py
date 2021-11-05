@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from flask import render_template, request, redirect, url_for, session, send_file
 import numpy as np
+from sqlalchemy.orm import subqueryload
 from werkzeug.utils import send_from_directory
 from db import *
 from refuiling import *
@@ -29,9 +30,9 @@ def home():
 
 @app.route('/proc/<file_name>', methods=['GET', 'POST'])
 def reading_file(file_name):
-    pdc = list(map(lambda x: x+"\n", r.hget("PDC_DATA, current_pdc").decode("utf-8").split("\n")))
+    pdc = list(map(lambda x: x+"\n", r.hget("PDC_DATA", "current_pdc").decode("utf-8").split("\n")))
     current, initial_config = Average(pdc=pdc).average_burnup()
-    r.hset('PDC_DATA, current_core', current.tobytes())
+    r.hset('PDC_DATA', 'current_core', current.tobytes())
     if request.method == 'POST':
         print('detected_POST')
         option = request.form['options']
@@ -43,21 +44,21 @@ def reading_file(file_name):
             new, new_config = Swap(numbers, pdc=pdc).swap()
             print(new)
         r.hset("PDC_DATA", 'new_pdc', tobytes(new_config))
-        r.hset("PDC_DATA", 'new_core', tobytes(new.tobytes()))
+        r.hset("PDC_DATA", 'new_core', new.tobytes())
         return redirect(url_for('core_refueling'))
     return render_template('reading_file.html', burnup = current)
 
 @app.route('/refueling', methods=['GET', 'POST'])
 def core_refueling():
-    print(r.get("current"))
-    old_core, pdc_data = np.array(r.hget("PDC_DATA", 'new_pdc')),  r.hget("PDC_DATA", 'new_pdc')
-    new_core, pdc_data_new = np.array(session.get('new_core')[0]), tobytes(Refueling(session.get('new_core')[1]).load_data)
+    time_before = time.time()
+    old_core, pdc_data = np.frombuffer(r.hget("PDC_DATA", 'current_core')).reshape((6,4)), r.hget("PDC_DATA", 'current_pdc')
+    new_core, pdc_data_new = np.frombuffer(r.hget("PDC_DATA", 'new_core')).reshape((6,4)), r.hget("PDC_DATA", 'new_pdc')
     form = RefuelList()
-    form.add_existing.choices = [(data.refueling_name, data.refueling_name) for data in RefuelingDB.query.all()]
+    form.add_existing.choices = [(data.refueling_name, data.refueling_name) for data in RefuelingDB.query.all()] #! the longest query!
     if request.method == 'POST':
         name = request.form.get('new_refuel')
-        new_core_b = new_core.tobytes() #* convert to bytes
-        old_core_b = old_core.tobytes() #* convert to bytes
+        new_core_b = r.hget("PDC_DATA", 'new_core')
+        old_core_b = r.hget("PDC_DATA", 'current_core')
         desc = request.form.get('description')
         if len(name) == 0:
             name = request.form['add_existing']
@@ -75,6 +76,7 @@ def core_refueling():
             db.session.add_all([new_refuel, add_act])
         db.session.commit()
         return redirect(url_for('display_list'))
+    print(time.time() - time_before)
     return render_template('refueling.html', old_core=old_core, new_core=new_core, form=form)
 
 @app.route('/list')
@@ -87,8 +89,7 @@ def display_list():
 @app.route('/detail/<name>', methods=['GET','POST'])
 def detail(name):  #! required button to delete instance
     time_before = time.time()
-    # refuel_data = db.session.query(RefuelingDB).filter(RefuelingDB.refueling_name==name).options(load_only(RefuelingDB.date, RefuelingDB.refueling_name)).order_by(RefuelingDB.date).all()
-    refuiel_data = RefuelingDB.query.filter_by(refueling_name=name).first() #TODO add load_only method to avoiding querying and loading of pdc file
+    refuiel_data = db.session.query(RefuelingDB).filter(RefuelingDB.refueling_name==name).options(load_only("refueling_name", "initial_burnup_data", "date"), subqueryload("acts").load_only("id", "description", "burnup_data")).first()
     print(time.time() - time_before)
     refuel_seq = refuiel_data.acts
     refuiel_data.initial_burnup_data = np.frombuffer(refuiel_data.initial_burnup_data).reshape((6,4))
@@ -99,7 +100,7 @@ def detail(name):  #! required button to delete instance
 def update(name, seq):
     seq = int(seq)
     # refuiel_data = db.session.query(RefuelingDB).join(RefuelingActs, RefuelingDB.refueling_name==name).filter(RefuelingActs.id<=seq).first().acts
-    refuiel_data = db.session.query(RefuelingActs).join(RefuelingDB).filter(RefuelingDB.refueling_name==name).filter(RefuelingActs.id<=seq).order_by(RefuelingActs.id.desc()).all()
+    refuiel_data = db.session.query(RefuelingActs).join(RefuelingDB).filter(RefuelingDB.refueling_name==name, RefuelingActs.id<=seq).order_by(RefuelingActs.id.desc()).all()
     print([(i.id, i.description, i.refuel.refueling_name) for i in refuiel_data])
     if len(refuiel_data) < 2:
         print('preparing to load initial core config and following step...')
@@ -116,23 +117,29 @@ def update(name, seq):
         numbers = request.form['numbers']
         description = request.form['description']
         if option == 'fresh':
-            new_core, pdc_name_new, pdc_new = Fresh(file_name, numbers, pdc=pdc_data).refueling()
+            new_core, pdc_new = Fresh(numbers, pdc=pdc_data).refueling()
             new_core_b = new_core.tobytes() #* convert to bytes
             print(new_core)
         elif option == 'swap':
-            new_core, pdc_name_new, pdc_new = Swap(file_name, numbers, pdc=pdc_data).swap()
+            new_core, pdc_new = Swap(numbers, pdc=pdc_data).swap()
             new_core_b = new_core.tobytes() #* convert to bytes
-        # db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description, RefuelingActs.current_configuration:tobytes(pdc_new)})
-        # db.session.commit()
-        return redirect(url_for('display_list'))
+        db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description, RefuelingActs.current_configuration:tobytes(pdc_new)})
+        db.session.commit()
+        return redirect(url_for('detail', name=name))
     return render_template('update.html', old_core=old_core, new_core=current_core, description=description)
+
+# @app.route("/delete/<name>-<seq>", methods = ["GET", "POST"])
+# def delete(name, seq):
+
 
 @app.route('/download/<name>-<seq>', methods=['GET','POST'])
 def download(name, seq):
     file_name = f'{name}_{seq}.PDC'
     pdc = ''
     seq = int(seq)
-    refuiel_data = RefuelingDB.query.filter_by(refueling_name=name).first()
+    refuiel_data = db.session.query(RefuelingActs).join(RefuelingDB).filter(RefuelingDB.refueling_name==name, RefuelingActs.id==seq).first()
+    print(refuiel_data.id)
+    refuiel_data = db.session.query(RefuelingDB).filter(RefuelingDB.refueling_name==name).first()
     refuel_seq = refuiel_data.acts
     try:
         gets_id = ((i.id, i.current_configuration) for i in refuel_seq if i.id==seq) #TODO rewrite it like sql query
