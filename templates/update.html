@@ -3,7 +3,6 @@
 	<title> Update Page</title>
 	{% endblock %}
 	{% block content %}
-	<form method="POST", enctype="multipart/form-data"> 
 		<div id='box'>
 			<div class='container'>
 				<div class='container_item'>
@@ -41,35 +40,52 @@
 					</table>
 				</div>
 			</div>
-			<div class="text-inputs-refuel form-floating mb-3">
-				<select name='options' class="form-select" id="floatingSelect" aria-label="Floating label select example">
-				  <option value='fresh'> Fresh fuel </option>
-				  <option value='swap'> Swap </option>
-				</select>
-				<label for="floatingSelect">Choose option</label>
-			</div>
-			<div class="text-inputs-refuel form-floating mb-3">
-				<input type="text" name="numbers" class="form-control" id="floatingInput" placeholder="Typing...">
-				<label for="floatingInput">FA numbers</label>
-			</div>
-			<div class="text-inputs-refuel form-floating mb-3">
-				<input name="new_refuel" type="text" id='new-refuel', class="form-control" placeholder="Typing...", style="display: none">
-				<label for="new_refuel">Name of refueling</label>
-			</div>
-			<div class="text-inputs-refuel form-floating">
-			  <textarea name="description" class="form-control" placeholder="Details..." id="floatingTextarea" style="height: 80px">{{description}}</textarea>
-			  <label for="floatingTextarea"> Some details </label>
-			</div>
+			<form method="POST", enctype="multipart/form-data">
+				<div class="text-inputs-refuel form-floating mb-3">
+					<select name='options' class="form-select" id="floatingSelect" aria-label="Floating label select example">
+					<option value='fresh'> Fresh fuel </option>
+					<option value='swap'> Swap </option>
+					</select>
+					<label for="floatingSelect">Choose option</label>
+				</div>
+				<div class="text-inputs-refuel form-floating mb-3">
+					<input type="text" name="numbers" class="form-control" id="floatingInput" placeholder="Typing...">
+					<label for="floatingInput">FA numbers</label>
+				</div>
+				<div class="text-inputs-refuel form-floating mb-3">
+					<input name="new_refuel" type="text" id='new-refuel', class="form-control" placeholder="Typing...", style="display: none">
+					<label for="new_refuel">Name of refueling</label>
+				</div>
+				<div class="text-inputs-refuel form-floating">
+				<textarea name="description" class="form-control" placeholder="Details..." id="floatingTextarea" style="height: 80px">{{description}}</textarea>
+				<label for="floatingTextarea"> Some details </label>
+				</div>
+				<br>
+				<input type="submit" class="text_inputs btn btn-primary">
+			</form>
 			<br>
-			<input type="submit" class="text_inputs btn btn-primary">
-
-			<!-- <label for="name"> Type name of refueling operation:</label><br>
-			<input type="text" name="name" class='text_inputs'> <br>
-			<label for="description"> Some details:</label><br>
-			<textarea name="description" class='text_inputs'></textarea>  <br>
-			<label for="date"> Date:</label><br>
-			<input type="datetime-local" name="date" class='text_inputs'> <br> <br>
-			<input type="submit" name="submitting" class='text_inputs'> <br>  -->
+			<input type="submit" class="text_inputs btn btn-danger" value="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal" style="width: 50%;">
+		</div>
+	
+	<form action='{{url_for("delete_step", name=name, id=id)}}' method="POST", enctype="multipart/form-data">
+		<!-- Modal -->
+		<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+					<h5 class="modal-title" id="deleteModalLabel">Are you sure on deleting refueling instance?</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						All data of current step will be deleted!
+					</div>
+					<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<br>
+					<button type="submit" class="btn btn-danger">Delete!</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	</form>
 

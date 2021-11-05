@@ -98,10 +98,10 @@ def detail(name):  #! required button to delete instance
 
 @app.route('/update/<name>-<seq>', methods=['POST', 'GET'])
 def update(name, seq):
+    time_before = time.time()
     seq = int(seq)
-    # refuiel_data = db.session.query(RefuelingDB).join(RefuelingActs, RefuelingDB.refueling_name==name).filter(RefuelingActs.id<=seq).first().acts
     refuiel_data = db.session.query(RefuelingActs).join(RefuelingDB).filter(RefuelingDB.refueling_name==name, RefuelingActs.id<=seq).order_by(RefuelingActs.id.desc()).all()
-    print([(i.id, i.description, i.refuel.refueling_name) for i in refuiel_data])
+    print(time.time() - time_before)
     if len(refuiel_data) < 2:
         print('preparing to load initial core config and following step...')
         old_core, pdc_data = np.frombuffer(refuiel_data[0].refuel.initial_burnup_data).reshape((6,4)), map(lambda x: x+"\n",refuiel_data[0].refuel.initial_configuration.decode("utf-8").split("\n"))
@@ -126,30 +126,37 @@ def update(name, seq):
         db.session.query(RefuelingActs).filter(RefuelingActs.id==seq).update({RefuelingActs.burnup_data:new_core_b, RefuelingActs.description:description, RefuelingActs.current_configuration:tobytes(pdc_new)})
         db.session.commit()
         return redirect(url_for('detail', name=name))
-    return render_template('update.html', old_core=old_core, new_core=current_core, description=description)
+    return render_template('update.html', name=name, id=seq, old_core=old_core, new_core=current_core, description=description)
 
-# @app.route("/delete/<name>-<seq>", methods = ["GET", "POST"])
-# def delete(name, seq):
+@app.route("/<id>/delete", methods = ["POST"])
+def delete(id):
+    instance = RefuelingDB.query.get_or_404(id)
+    db.session.delete(instance)
+    db.session.commit()
+    return redirect(url_for('display_list'))
 
+@app.route("/<name>-<id>/delete", methods = ["POST"])
+def delete_step(name, id):
+    instance = RefuelingActs.query.get_or_404(id)
+    db.session.delete(instance)
+    db.session.commit()
+    return redirect(url_for('detail', name=name))
 
 @app.route('/download/<name>-<seq>', methods=['GET','POST'])
 def download(name, seq):
-    file_name = f'{name}_{seq}.PDC'
     pdc = ''
     seq = int(seq)
-    refuiel_data = db.session.query(RefuelingActs).join(RefuelingDB).filter(RefuelingDB.refueling_name==name, RefuelingActs.id==seq).first()
-    print(refuiel_data.id)
-    refuiel_data = db.session.query(RefuelingDB).filter(RefuelingDB.refueling_name==name).first()
-    refuel_seq = refuiel_data.acts
     try:
-        gets_id = ((i.id, i.current_configuration) for i in refuel_seq if i.id==seq) #TODO rewrite it like sql query
-        matched = next(gets_id)
-        print(f'Takes from child where id is {matched[0]}')
-        pdc =  matched[1].decode('utf-8')
-        print(type(pdc))
-    except:
-        print(f'Takes from parent where id is {refuiel_data.id}')
-        pdc = refuiel_data.initial_configuration.decode('utf-8')
+        refuiel_data = db.session.query(RefuelingActs).join(RefuelingDB).filter(RefuelingDB.refueling_name==name, RefuelingActs.id==seq).first()
+        gets_id = refuiel_data.id
+        pdc = refuiel_data.current_configuration.decode("utf-8")
+        print(f'Takes from child where id is {gets_id}')
+    except AttributeError:
+        refuiel_data = db.session.query(RefuelingActs).join(RefuelingDB).filter(RefuelingDB.refueling_name==name).first()
+        gets_id = refuiel_data.refuel.id
+        print(f'Takes from parent where id is {gets_id}')
+        pdc = refuiel_data.refuel.initial_configuration.decode('utf-8')
+    file_name = f'{name}_{gets_id}.PDC'
     Refueling(file_name, data=pdc).for_download
     return send_file(os.path.join(app.config['DOWNLOAD_FOLDER'], file_name), as_attachment=True)
 
