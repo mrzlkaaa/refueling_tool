@@ -51,9 +51,9 @@ class Refueling:
 	OUTPUT_PATH = os.path.join(CWD, 'output')
 	PATTERN = re.compile(r'\.[A-Z]+')
 
-	def __init__(self, name: str, data=None, save=False, *args, **kwargs) -> None:
+	def __init__(self, name=None, data=None, *args, **kwargs) -> None:
 		self.file_name = name
-		self.onsave = save
+		# self.onsave = save
 		if data is not None:
 			self.data = data
 
@@ -82,8 +82,8 @@ class Refueling:
 
 
 class Average(Refueling):
-	def __init__(self, name, *args, **kwargs):
-		super().__init__(name, *args, **kwargs)
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
 		try:
 			self.data = kwargs['pdc'] # takes a list
 		except Exception as e:
@@ -102,7 +102,7 @@ class Average(Refueling):
 
 	def matrix_and_save(self, obj):
 		arr = np.array(obj).reshape((6,4))
-		return arr, self.file_name, iter(self.data)
+		return arr, self.data
 		 
 	# @timeit
 	def average_burnup(self, FA_dic = defaultdict(list)):
@@ -120,8 +120,8 @@ class Average(Refueling):
 class Fresh(Refueling):
 	FRESH_FUEL: str = "U235 2.4600E-03\n--AL   5.3180E-02\n--U238 2.4600E-04\n--U234 2.7330E-05\n--O16  5.4660E-03\n" #* what to write
 	
-	def __init__(self, name, fresh_FA, *args, **kwargs):
-		super().__init__(name, *args, **kwargs)
+	def __init__(self, fresh_FA, *args, **kwargs):
+		super().__init__(*args, **kwargs)
 		try:
 			self.data = list(kwargs["pdc"])
 		except Exception as e:
@@ -138,10 +138,10 @@ class Fresh(Refueling):
 						query = self.q		
 		except Exception as e:
 			print(e)
-		if self.onsave:
-			print("saving on local machine...")
-			self.save()
-		return Average(self.file_name, pdc=self.data).average_burnup()  # ---> ref to average
+		# if self.onsave:
+		# 	print("saving on local machine...")
+			# self.save()
+		return Average(pdc=self.data).average_burnup()  # ---> ref to average
 
 	# @timeit
 	def refueling(self):

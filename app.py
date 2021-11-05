@@ -19,6 +19,8 @@ tobytes = lambda x: bytes(''.join(x), 'UTF-8')
 def home():
     if request.method == 'POST':
         uploaded = request.files['uploaded']
+        bytes_upload = uploaded.read()
+        r.hset("PDC_DATA", "current_pdc", bytes_upload)
         uploaded.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded.filename))
         print(url_for('reading_file', file_name = uploaded.filename))
         return redirect(url_for('reading_file', file_name = uploaded.filename))
@@ -27,27 +29,28 @@ def home():
 
 @app.route('/proc/<file_name>', methods=['GET', 'POST'])
 def reading_file(file_name):
-    current, pdc_name, _ = Average(file_name).average_burnup()
+    pdc = list(map(lambda x: x+"\n", r.hget("PDC_DATA, current_pdc").decode("utf-8").split("\n")))
+    current, initial_config = Average(pdc=pdc).average_burnup()
+    r.hset('PDC_DATA, current_core', current.tobytes())
     if request.method == 'POST':
         print('detected_POST')
         option = request.form['options']
         numbers = request.form['numbers']
         if option == 'fresh':
-            new, pdc_name_new, _ = Fresh(file_name, numbers, save=True).refueling()
+            new, new_config = Fresh(numbers, pdc=pdc).refueling()
             print(new)
         elif option == 'swap':
-            new, pdc_name_new, _ = Swap(file_name, numbers, save=True).swap()
+            new, new_config = Swap(numbers, pdc=pdc).swap()
             print(new)
-        r.set('current', 'this is my data embedded to redis')
-        session['old_core'] = (current.tolist(), pdc_name)
-        session['new_core'] = (new.tolist(), pdc_name_new)
+        r.hset("PDC_DATA", 'new_pdc', tobytes(new_config))
+        r.hset("PDC_DATA", 'new_core', tobytes(new.tobytes()))
         return redirect(url_for('core_refueling'))
     return render_template('reading_file.html', burnup = current)
 
 @app.route('/refueling', methods=['GET', 'POST'])
 def core_refueling():
     print(r.get("current"))
-    old_core, pdc_data = np.array(session.get('old_core')[0]), tobytes(Refueling(session.get('old_core')[1]).load_data) # seems like loading of pdc file on this stage is useless (just memory consuming)
+    old_core, pdc_data = np.array(r.hget("PDC_DATA", 'new_pdc')),  r.hget("PDC_DATA", 'new_pdc')
     new_core, pdc_data_new = np.array(session.get('new_core')[0]), tobytes(Refueling(session.get('new_core')[1]).load_data)
     form = RefuelList()
     form.add_existing.choices = [(data.refueling_name, data.refueling_name) for data in RefuelingDB.query.all()]
