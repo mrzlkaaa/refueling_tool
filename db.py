@@ -21,8 +21,8 @@ host = os.environ['HOST']
 database = os.environ['DB']
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@{host}:{port}/{database}'
-# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@db/{database}'
+# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://{user}:{pwd}@{host}:{port}/{database}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql+pg8000://postgres:postgres@db/irt_refueling'
 app.config['SECRET_KEY'] = 'dev'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
