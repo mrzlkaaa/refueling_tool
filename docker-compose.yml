@@ -1,9 +1,9 @@
-version: "3.9"
+version: "3"
 services:
   python-main:
     container_name: py-main
-    image: mrzlkaaa/irt-t-refuel:v0.2.1
-    # build: .
+    # image: mrzlkaaa/irt-t-refuel:v0.2.1
+    build: .
     ports: 
       - "8888:5000"
     depends_on:
@@ -19,5 +19,11 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports: 
       - "5433:5432"
+  in-memory:
+    container_name: redis
+    image: redis
+    restart: always
+    ports: 
+      - "4444:6379"
 
 
