@@ -4,71 +4,90 @@
 	{% endblock %}
 	{% block content %}
 	<form method="POST", enctype="multipart/form-data"> 
-		<div id='box'>
-			<div class='container'>
-				<div class='container_item'>
-					<table class='burnup_data'>
-						<tr>
-							<th> 7 </th>
-							<th> 6 </th>
-							<th> 5 </th>
-							<th> 4 </th>
-						</tr>
-						{% for i in old_core %}
-						<tr>
-							{% for j in i %}
-							<td>{{j}}%</td>
-							{% endfor %}
-						</tr>
-						{% endfor %}
-					</table>
+		<div id='box-large'>
+			<div class="card text-center">
+				<div class="card-header">
+					Old --> New
 				</div>
-				<div class='container_item'>
-					<table class='burnup_data'>
-						<tr>
-							<th> 7 </th>
-							<th> 6 </th>
-							<th> 5 </th>
-							<th> 4 </th>
-						</tr>
-						{% for i in new_core %}
-						<tr>
-							{% for j in i %}
-							<td>{{j}}%</td>
-							{% endfor %}
-						</tr>
-						{% endfor %}
-					</table>
+				<div class='card-body'>
+					<div class='container'>
+						<div class='row'>
+							<div class='col'>
+							<table class='burnup-data-multi'>
+								<tr>
+									<th> 6 </th>
+									<th> 5 </th>
+									<th> 4 </th>
+									<th> 3 </th>
+								</tr>
+								{% set counter_old = namespace(value=7) %}
+								{% for i in old_core %}
+								<tr>
+									{% for j in i %}
+									<td>{{j}}%</td>
+									{% if loop.last %}
+										<th style="width:90px;"> {{ counter_old.value }} </th>
+										{% set counter_old.value = counter_old.value - 1 %}
+									{% endif %}
+									{% endfor %}
+								</tr>
+								{% endfor %}
+							</table>
+							</div>
+						</div>
+						<div class='row'>
+							<div class='col'>
+							<table class='burnup-data-multi'>
+								<tr>
+									<th> 6 </th>
+									<th> 5 </th>
+									<th> 4 </th>
+									<th> 3 </th>
+								</tr>
+								{% set counter_new = namespace(value=7) %}
+								{% for i in new_core %}
+								<tr>
+									{% for j in i %}
+									<td>{{j}}%</td>
+									{% if loop.last %}
+										<th style="width:90px;"> {{ counter_new.value }} </th>
+										{% set counter_new.value = counter_new.value - 1 %}
+									{% endif %}
+									{% endfor %}
+									
+								</tr>
+								{% endfor %}
+							</table>
+							</div>
+						</div>
+					</div>
+					<div class='inputs'> 
+						<select name='options' class="text-inputs-refuel form-select" id="floatingSelect" aria-label="Floating label select example" style='margin-bottom:20px'>
+							<option value='None' selected> Choose option </option>
+							<option value='new'> Add new refueling </option>
+							<option value='add'> Add to existing </option>
+						</select>
+						{{ form.add_existing(class='text-inputs-refuel form-select', id='refuel-names-select', style="display: none; margin-bottom:20px") }}
+						<div class="text-inputs-refuel form-floating mb-3">
+							<input name="new_refuel" type="text" id='new-refuel', class="form-control" placeholder="Typing...", style="display: none">
+							<label for="new_refuel">Name of refueling</label>
+						</div>
+						<div class="text-inputs-refuel form-floating mb-3">
+							<input name="date" type="date" id='date' class="form-control"  placeholder="Date...">
+							<label for="date">Choose date</label>
+						</div>
+						<div class="text-inputs-refuel form-floating">
+						<textarea name="description" class="form-control" placeholder="Details..." id="floatingTextarea" style="height: 80px"></textarea>
+						<label for="floatingTextarea"> Some details </label>
+						</div>
+						<br>
+						<input type="submit" class="text_inputs btn btn-primary">
+					</div>
+				</div>
+				<div class="card-footer text-muted">
+					Click here
 				</div>
 			</div>
-			<select name='options' class="text-inputs-refuel form-select" id="floatingSelect" aria-label="Floating label select example" style='margin-bottom:20px'>
-				<option value='None' selected> Choose option </option>
-				<option value='new'> Add new refueling </option>
-				<option value='add'> Add to existing </option>
-			  </select>
-			{{ form.add_existing(class='text-inputs-refuel form-select', id='refuel-names-select', style="display: none; margin-bottom:20px") }}
-			<div class="text-inputs-refuel form-floating mb-3">
-				<input name="new_refuel" type="text" id='new-refuel', class="form-control" placeholder="Typing...", style="display: none">
-				<label for="new_refuel">Name of refueling</label>
-			</div>
-			<div class="text-inputs-refuel form-floating mb-3">
-				<input name="date" type="datetime-local" id='date' class="form-control"  placeholder="Date...">
-				<label for="date">Choose date</label>
-			</div>
-			<div class="text-inputs-refuel form-floating">
-			  <textarea name="description" class="form-control" placeholder="Details..." id="floatingTextarea" style="height: 80px"></textarea>
-			  <label for="floatingTextarea"> Some details </label>
-			</div>
-			<br>
-			<input type="submit" class="text_inputs btn btn-primary">
-
-			<!-- <label for="name"> Type name of refueling operation:</label><br>
-			<input type="text" name="name" class='text_inputs'> <br>
-			<label for="description"> Some details:</label><br>
-			<textarea name="description" class='text_inputs'></textarea>  <br>
-			<label for="date"> Date:</label><br>
-			<input type="datetime-local" name="date" class='text_inputs'> <br> <br>
-			<input type="submit" name="submitting" class='text_inputs'> <br>  -->
 		</div>
 	</form>
 

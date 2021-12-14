@@ -3,66 +3,77 @@
 	<title> Detail Page</title>
 	{% endblock %}
 	{% block content %}
-	<div id='box-detail'>
+	<div id='box-large'>
 		<div class="card text-center">
-		  <div class="card-header"> {{ refueling.refueling_name }} from {{ refueling.date }} </div>
+		  <div class="card-header"> Fuel cycle {{ refueling.refueling_name }} from {{ refueling.date.strftime("%d %B, %Y") }} </div>
 		  <div class="card-body">
 		  	<div class='container'>
-				<div class='container_item-detail'>
-					<p> Initial core </p>
-					<table class='burnup_data'>
-						<tr>
-							<th> 7 </th>
-							<th> 6 </th>
-							<th> 5 </th>
-							<th> 4 </th>
-						</tr>
-						{% for i in refueling.initial_burnup_data %}
-						<tr>
-							{% for j in i %}
-							<td>{{j}}%</td>
-							{% endfor %}
-						</tr>
-						{% endfor %}
-					</table>
-					<div>
-						<a href="{{url_for('download', name=refueling.refueling_name, seq=0)}}" class="btn btn-primary"> Download .PDC </a>
-					</div>
-				</div>
-				{% for refuel in refuel_seq %}
-					<div class='container_item-detail'>
-						<p> {{refuel.description}} </p>
-						<table class='burnup_data'>
+				<div class='row'>
+					<div class='col'>
+						<p> Initial core </p>
+						<table class='burnup-data-multi'>
 							<tr>
-								<th> 7 </th>
 								<th> 6 </th>
 								<th> 5 </th>
 								<th> 4 </th>
+								<th> 3 </th>
 							</tr>
-							{% for i in refuel.burnup_data %}
+							{% set counter_old = namespace(value=7) %}
+							{% for i in refueling.initial_burnup_data %}
 							<tr>
 								{% for j in i %}
 								<td>{{j}}%</td>
+								{% if loop.last %}
+									<th style="width:90px;"> {{ counter_old.value }} </th>
+									{% set counter_old.value = counter_old.value - 1 %}
+								{% endif %}
 								{% endfor %}
 							</tr>
 							{% endfor %}
 						</table>
 						<div>
-							<a href="{{url_for('download', name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Download .PDC </a>
-							<a href="{{url_for('update', name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Change </a>
+							<a href="{{url_for('view.download', name=refueling.refueling_name, seq=0)}}" class="btn btn-primary"> Download .PDC </a>
 						</div>
+						<br>
+					</div>
+				</div>
+				{% for refuel in refuel_seq %}
+					<div class='row'>
+						<div class="col">
+							<p> {{refuel.description}} </p>
+							<table class='burnup-data-multi'>
+								<tr>
+									<th> 6 </th>
+									<th> 5 </th>
+									<th> 4 </th>
+									<th> 3 </th>
+								</tr>
+								{% set counter_new = namespace(value=7) %}
+								{% for i in refuel.burnup_data %}
+								<tr>
+									{% for j in i %}
+									<td>{{j}}%</td>
+									{% if loop.last %}
+										<th style="width:90px;"> {{ counter_new.value }} </th>
+										{% set counter_new.value = counter_new.value - 1 %}
+									{% endif %}
+									{% endfor %}
+								</tr>
+								{% endfor %}
+							</table>
+							<div>
+								<a href="{{url_for('view.download', name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Download .PDC </a>
+								<a href="{{url_for('view.update', name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Change </a>
+							</div>
+						</div>	
 					</div>
 				{% endfor %}
 			</div>
-			<br>
-		    <h5 class="card-title"> </h5>
-		    <br>
-		    
 		  </div>
 		  <div class="card-footer text-muted"> Download <a href='#'> document </a> or Delete <a href='#' data-bs-toggle="modal" data-bs-target="#deleteModal"> instance </a>  </div>
 		</div>
 	</div>
-	<form action='{{url_for("delete", id=refueling.id)}}' method="POST", enctype="multipart/form-data">
+	<form action='{{url_for("view.delete", id=refueling.id)}}' method="POST", enctype="multipart/form-data">
 		<!-- Modal -->
 		<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
 			<div class="modal-dialog">
