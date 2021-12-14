@@ -22,7 +22,6 @@ def home():
         return redirect(url_for('view.reading_file', file_name = uploaded.filename))
     return render_template('home.html')
 
-
 @view.route('/proc/<file_name>', methods=['GET', 'POST'])
 def reading_file(file_name):
     pdc = list(map(lambda x: x+"\n", r.hget("PDC_DATA", "current_pdc").decode("utf-8").split("\n")))
