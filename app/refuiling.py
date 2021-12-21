@@ -5,7 +5,7 @@ import re
 import numpy as np
 import typing
 import logging
-from .model import *
+# from .model import *
 from collections import defaultdict
 from statistics import mean
 from typing import List, Any, Union, Optional, Callable
@@ -53,19 +53,13 @@ class Refueling:
 	@property
 	def for_download(self):
 		with open(os.path.join(self.OUTPUT_PATH, self.file_name), 'w') as out:
-			# for i in self.data:
-			# 	out.write(i)
 			return out.writelines(self.data)
 
 
 class Average(Refueling):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		try:
-			self.data = kwargs['pdc'] # takes a list
-		except Exception as e:
-			self.data = self.load_data
-			print(self.data[:50])
+		self.data = kwargs['pdc']
 
 	@property
 	def U5_densities(self):
@@ -81,7 +75,6 @@ class Average(Refueling):
 		arr = np.array(obj).reshape((6,4))
 		return arr, self.data
 		 
-	# @timeit
 	def average_burnup(self, FA_dic = defaultdict(list)):
 		if len(FA_dic) > 0: FA_dic.clear()
 		U5 = self.U5_densities
@@ -99,10 +92,7 @@ class Fresh(Refueling):
 	
 	def __init__(self, fresh_FA, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		try:
-			self.data = list(kwargs["pdc"])
-		except Exception as e:
-			self.data = self.load_data
+		self.data = list(kwargs["pdc"])
 		self.fresh_FA = fresh_FA
 
 	def replace_save(self, matrs):
@@ -115,12 +105,8 @@ class Fresh(Refueling):
 						query = self.q		
 		except Exception as e:
 			print(e)
-		# if self.onsave:
-		# 	print("saving on local machine...")
-			# self.save()
 		return Average(pdc=self.data).average_burnup()  # ---> ref to average
 
-	# @timeit
 	def refueling(self):
 		try:
 			convert = int(self.fresh_FA)
@@ -134,10 +120,7 @@ class Fresh(Refueling):
 class Swap(Refueling):
 	def __init__(self, swap_FA, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		try:
-			self.data = list(kwargs["pdc"])
-		except Exception as e:
-			self.data = self.load_data
+		self.data = list(kwargs["pdc"])
 		self.swap_FA = swap_FA
 	
 	def loop(self, matrs, store=None, reverse=False):
@@ -153,16 +136,12 @@ class Swap(Refueling):
 						query = self.q
 		return temp_store
 
-	# @timeit
 	def swap(self):
 		convert = list(map(lambda x: int(x), self.swap_FA.split(','))) 
 		first, second = FAs_num[convert[0]-1], FAs_num[convert[1]-1]
 		store1, store2 = self.loop(first), self.loop(second)
 		swstore1, swstore2 = {k1:v2 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}, {k2:v1 for (k1,v1), (k2,v2) in zip(store1.items(),store2.items())}
 		self.loop(first, store=swstore1, reverse=True), self.loop(second, store=swstore2, reverse=True)
-		# if self.onsave:
-		# 	print("saving on local machine...")
-		# 	self.save()
 		return Average(pdc=self.data).average_burnup()  # ---> ref to average
 
 

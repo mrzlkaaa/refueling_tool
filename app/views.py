@@ -12,31 +12,29 @@ app = create_app()
 
 tobytes = lambda x: bytes(''.join(x), 'UTF-8')
 
-@view.route("/home", methods=['GET', 'POST'])
+@view.route("/upload_PDC", methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
         uploaded = request.files['uploaded']
         bytes_upload = uploaded.read()
         r.hset("PDC_DATA", "current_pdc", bytes_upload)
-        uploaded.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded.filename))
-        return redirect(url_for('view.reading_file', file_name = uploaded.filename))
+        return redirect(url_for('view.reading_file'))
     return render_template('home.html')
 
-@view.route('/proc/<file_name>', methods=['GET', 'POST'])
-def reading_file(file_name):
+@view.route('/reading_file', methods=['GET', 'POST'])
+def reading_file():
+    #* < x+\n > expression guarantee initail style of .PDC
     pdc = list(map(lambda x: x+"\n", r.hget("PDC_DATA", "current_pdc").decode("utf-8").split("\n")))
-    current, initial_config = Average(pdc=pdc).average_burnup()
+    before = time.time()
+    current, _ = Average(pdc=pdc).average_burnup()
+    print(time.time() - before)
     r.hset('PDC_DATA', 'current_core', current.tobytes())
     if request.method == 'POST':
         print('detected_POST')
         option = request.form['options']
         numbers = request.form['numbers']
-        if option == 'fresh':
-            new, new_config = Fresh(numbers, pdc=pdc).refueling()
-            print(new)
-        elif option == 'swap':
-            new, new_config = Swap(numbers, pdc=pdc).swap()
-            print(new)
+        if option == 'fresh': new, new_config = Fresh(numbers, pdc=pdc).refueling()
+        elif option == 'swap': new, new_config = Swap(numbers, pdc=pdc).swap()
         r.hset("PDC_DATA", 'new_pdc', tobytes(new_config))
         r.hset("PDC_DATA", 'new_core', new.tobytes())
         return redirect(url_for('view.core_refueling'))
@@ -48,7 +46,8 @@ def core_refueling():
     old_core, pdc_data = np.frombuffer(r.hget("PDC_DATA", 'current_core')).reshape((6,4)), r.hget("PDC_DATA", 'current_pdc')
     new_core, pdc_data_new = np.frombuffer(r.hget("PDC_DATA", 'new_core')).reshape((6,4)), r.hget("PDC_DATA", 'new_pdc')
     form = RefuelList()
-    form.add_existing.choices = [(data.refueling_name, data.refueling_name) for data in RefuelingDB.query.all()] #! the longest query!
+    # form.add_existing.choices = [(data.refueling_name, data.refueling_name) for data in RefuelingDB.query.options(load_only("refueling_name")).all()]
+    print(time.time() - time_before)
     if request.method == 'POST':
         name = request.form.get('new_refuel')
         new_core_b = r.hget("PDC_DATA", 'new_core')
@@ -70,7 +69,6 @@ def core_refueling():
             db.session.add_all([new_refuel, add_act])
         db.session.commit()
         return redirect(url_for('view.display_list'))
-    print(time.time() - time_before)
     return render_template('refueling.html', old_core=old_core, new_core=new_core, form=form)
 
 @view.route('/list')
@@ -81,14 +79,30 @@ def display_list():
     return render_template('list.html', list=refueling_list)
 
 @view.route('/detail/<name>', methods=['GET','POST'])
-def detail(name):  #! required button to delete instance
-    time_before = time.time()
-    refuiel_data = db.session.query(RefuelingDB).filter(RefuelingDB.refueling_name==name).options(load_only("refueling_name", "initial_burnup_data", "date"), subqueryload("acts").load_only("id", "description", "burnup_data")).first()
-    print(time.time() - time_before)
+def detail(name):
+    refuiel_data = db.session.query(RefuelingDB).filter(RefuelingDB.refueling_name==name).options(load_only("id", "refueling_name", "initial_burnup_data", "date"), subqueryload("acts").load_only("id", "description", "burnup_data")).first()
+    print(f"id is {refuiel_data.id}")
     refuel_seq = refuiel_data.acts
-    refuiel_data.initial_burnup_data = np.frombuffer(refuiel_data.initial_burnup_data).reshape((6,4))
+    print(type(refuiel_data.initial_burnup_data))
+    initial_burnup = np.frombuffer(refuiel_data.initial_burnup_data).reshape((6,4))
     processed_refuel_seq = sorted([{'id': i.id, 'description': i.description, 'burnup_data':np.frombuffer(i.burnup_data).reshape((6,4))} for i in refuel_seq], key=lambda x: x['id'])
-    return render_template('detail.html', refueling=refuiel_data, refuel_seq=processed_refuel_seq)
+    print(processed_refuel_seq[-1]["id"])
+    if request.method == "POST":
+        option = request.form['options']
+        numbers = request.form['numbers']
+        desc = request.form.get('description')
+        latest_id = processed_refuel_seq[-1]["id"]
+        refuiel_data_pdc = RefuelingActs.query.join(RefuelingDB).filter(RefuelingActs.id==latest_id, RefuelingDB.refueling_name==name).first()
+        print(refuiel_data_pdc)
+        pdc = map(lambda x: x+"\n", refuiel_data_pdc.current_configuration.decode("utf-8").split("\n"))
+        if option == 'fresh': new, new_config = Fresh(numbers, pdc=pdc).refueling()
+        elif option == 'swap': new, new_config = Swap(numbers, pdc=pdc).swap()
+        # refuel_data = RefuelingDB.query.filter(RefuelingDB.refueling_name==name).first()
+        add_act = RefuelingActs(description=desc, current_configuration=tobytes(new_config), burnup_data=new.tobytes(), refuel=refuiel_data)
+        db.session.add(add_act)
+        db.session.commit()
+        return redirect(url_for('view.detail', name=name))
+    return render_template('detail.html', initial_burnup=initial_burnup, refueling=refuiel_data, refuel_seq=processed_refuel_seq)
 
 @view.route('/update/<name>-<seq>', methods=['POST', 'GET'])
 def update(name, seq):

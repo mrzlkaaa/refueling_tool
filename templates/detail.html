@@ -19,7 +19,7 @@
 								<th> 3 </th>
 							</tr>
 							{% set counter_old = namespace(value=7) %}
-							{% for i in refueling.initial_burnup_data %}
+							{% for i in initial_burnup %}
 							<tr>
 								{% for j in i %}
 								<td>{{j}}%</td>
@@ -65,10 +65,38 @@
 								<a href="{{url_for('view.download', name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Download .PDC </a>
 								<a href="{{url_for('view.update', name=refueling.refueling_name, seq=refuel.id)}}" class="btn btn-primary"> Change </a>
 							</div>
+							<br>
 						</div>	
 					</div>
 				{% endfor %}
 			</div>
+			<a id="add-step" class="btn btn-primary">Add new step</a>
+			<br> <br>
+			<form method="POST" enctype="multipart/form-data" >
+				<div id="adding-options" class='inputs' style="display:none;"> 
+					<div class="text-inputs-refuel form-floating mb-3">
+						<select name='options' class="form-select" id="floatingSelect" aria-label="Floating label select example">
+							<option value='fresh'> Fresh fuel </option>
+							<option value='swap'> Swap </option>
+						</select>
+						<label for="floatingSelect">Choose option</label>
+					</div>
+					<div class="text-inputs-refuel form-floating mb-3">
+						<input type="text" name="numbers" class="form-control" id="floatingInput" placeholder="Typing...">
+						<label for="floatingInput">FA numbers</label>
+					</div>
+					<div class="text-inputs-refuel form-floating mb-3">
+						<input name="new_refuel" type="text" id='new-refuel', class="form-control" placeholder="Typing...", style="display: none">
+						<label for="new_refuel">Name of refueling</label>
+					</div>
+					<div class="text-inputs-refuel form-floating">
+					<textarea name="description" class="form-control" placeholder="Details..." id="floatingTextarea" style="height: 80px"></textarea>
+					<label for="floatingTextarea"> Some details </label>
+					</div>
+					<br>
+					<input type="submit" class="text_inputs btn btn-primary">
+				</div>
+			</form>
 		  </div>
 		  <div class="card-footer text-muted"> Download <a href='#'> document </a> or Delete <a href='#' data-bs-toggle="modal" data-bs-target="#deleteModal"> instance </a>  </div>
 		</div>
@@ -93,4 +121,16 @@
 			</div>
 		</div>
 	</form>
+	<script>
+		$(document).ready(function() {
+			$("#add-step").click(function(){
+				if ($("#adding-options").css("display") == 'none') {
+					$("#adding-options").css("display","block");
+				}
+				else {
+					$("#adding-options").css("display","none");
+				}
+			})
+		})
+	</script>
 	{% endblock %}
