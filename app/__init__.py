@@ -18,7 +18,7 @@ port = os.environ['PORT']
 host = os.environ['HOST'] 
 database = os.environ['DB']
 
-r = redis.Redis(host="localhost", port = "6379", db=0)
+r = redis.Redis(host="redis", port = "6379", db=0)
 db = SQLAlchemy()
 migrate = Migrate()
 

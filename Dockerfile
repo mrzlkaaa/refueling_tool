@@ -6,4 +6,4 @@ RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 # EXPOSE 8080
 # ENTRYPOINT [ "python" ]
-CMD gunicorn --bind 0.0.0.0:5000 -w 3 detectors_app:app
+CMD gunicorn --bind 0.0.0.0:5000 -w 3 app:application
