@@ -18,7 +18,7 @@ $(document).ready(function(){
 
     var $select = $("#refuel-names-select")
     $.ajax({
-        url:`http://localhost:8080/`,
+        url:`http://109.123.162.90:8080/`,
         type:"GET",
         success: function(results) {
             console.log(results)
