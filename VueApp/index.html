@@ -1,0 +1,118 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <style>
+        .main-box {
+            margin: 0 auto;
+            width: 50%;
+        }
+        .table {
+            text-align: center;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+    <div id="VueApp" class='main-box'>
+        <div class="card text-center">
+          <div class="card-header">
+            Calculate Thermal Power Output
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Fill the forms below</h5> <br>
+            <!--* add container here -->
+            <div class="container">
+                <div v-for="(obj, index) in data"
+                     class="row">
+                    <div class="col" style="width:50%">
+                        <label for="Power" class="form-label">Reactor Power</label>
+                        <div class="input-group mb-3">
+                            <input v-model="obj.power" name="Power" class="form-control" type="number">
+                            <span class="input-group-text" id="basic-addon2">kW</span>
+                        </div>
+                    </div>
+                    <div class="col" style="width:50%">
+                        <label for="From" class="form-label">From</label>
+                        <input v-model="obj.fromDate" name="From" class="form-control" type="datetime-local">
+                    </div>
+                    <div class="col" style="width:50%">
+                        <label for="To" class="form-label">To</label>
+                        <input v-model="obj.toDate" name="To" class="form-control" type="datetime-local">
+                    </div>
+                </div>
+            </div>
+            <br>
+            <button @click="AddFileds" class="btn btn-primary"> Add fields </button> <br> <br>
+            
+            <div class='row'>
+				<div class='col center-text'>
+					<table class="table">
+						<thead>
+						  <tr>
+							<th scope="col">Power, kW</th>
+							<th scope="col">Sum Time, h</th>
+							<th scope="col">Energy Output, MWhour</th>
+							
+						  </tr>
+						</thead>
+						<tbody>
+						
+						  <tr v-for="(i,index) in data">
+							<th scope="row">{{i.power}}</th>
+							<td>{{TotalHours(index, Date.parse(i.toDate), Date.parse(i.fromDate))}} </td>
+							<td>{{EnergyOutput(index, i.totalHours)}}</td>
+							
+						  </tr>
+						</tbody>
+						
+					  </table>
+				</div>
+          </div>
+          <input type="submit" class="btn btn-primary">
+        <br>
+        </div>
+    </div>
+    
+    <script>
+        let app = Vue.createApp({
+            data: function() {
+                return {
+                    data: 
+                        [
+                            {
+                                power:0,
+                                fromDate:"",
+                                toDate: "",
+                                totalHours:0,
+                                energyOutput:0,
+                            },
+                        ]
+                }
+            },
+            methods: {
+                AddFileds(){
+                    return this.data.push({power:0,fromDate:"",toDate:""})
+                    
+                },
+
+                TotalHours(index, to, from) {
+                    this.data[index].totalHours = (to-from)/1000/3600
+                    return this.data[index].totalHours
+                },
+                
+                EnergyOutput(index, totalHours) {
+                    this.data[index].energyOutput = (this.data[index].power*this.data[index].totalHours)/1000
+                    return this.data[index].energyOutput
+                }
+            }
+        })
+        app.mount("#VueApp")
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>
