@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 new_template_folder = os.path.join(os.getcwd().split()[0], "templates")
 new_static_folder = os.path.join(os.getcwd().split()[0], "static")
+DOWNLOAD_FOLDER = os.path.join(os.getcwd().split()[0], "output")
 # print(new_template_folder)
 
 load_dotenv()
@@ -18,7 +19,7 @@ port = os.environ['PORT']
 host = os.environ['HOST'] 
 database = os.environ['DB']
 
-r = redis.Redis(host="localhost", port = "6379", db=0)
+r = redis.Redis(host="redis", port = "6379", db=0)
 db = SQLAlchemy()
 migrate = Migrate()
 
@@ -30,7 +31,7 @@ def create_app():
         SQLALCHEMY_DATABASE_URI = f'postgresql+pg8000://{user}:{pwd}@{host}:{port}/{database}',
         SECRET_KEY = "DEV",
         UPLOAD_FOLDER = UPLOAD_FOLDER,
-        DOWNLOAD_FOLDER = 'output/'
+        DOWNLOAD_FOLDER = DOWNLOAD_FOLDER
     )
     app.template_folder = new_template_folder
     app._static_folder = new_static_folder
