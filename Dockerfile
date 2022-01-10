@@ -1,7 +1,6 @@
 
 FROM python:3.9.5-slim-buster
-COPY . /app
-WORKDIR /app
+COPY . .
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 # EXPOSE 8080
