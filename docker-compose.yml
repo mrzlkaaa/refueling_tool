@@ -2,28 +2,30 @@ version: "3"
 services:
   python-main:
     container_name: py-main
-    # image: mrzlkaaa/irt-t-refuel:v0.2.1
     build: .
     ports: 
-      - "8888:5000"
+      - "5000:5000"
     depends_on:
       - db
-
+      - redis
+  go:
+    image: refuel_go:v0.1
+    restart: always
+    ports: 
+      - "1234:8080"
   db:
     container_name: db
     image: postgres:12
     restart: always
     environment:
-      - POSTGRES_DB=irt_refueling
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${DB}
+      - POSTGRES_USER=${PSQL_USER}
+      - POSTGRES_PASSWORD=${PSWD}
     ports: 
       - "5433:5432"
-  in-memory:
-    container_name: redis
-    image: redis
+  
+  redis:
+    image: redis:latest
     restart: always
     ports: 
-      - "4444:6379"
-
-
+      - "6379:6379"
