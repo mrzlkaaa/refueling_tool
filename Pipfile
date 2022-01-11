@@ -38,6 +38,7 @@ wtforms = "==2.3.3"
 pytest = "*"
 redis = "*"
 flask-cors = "*"
+gunicorn = "*"
 
 [dev-packages]
 

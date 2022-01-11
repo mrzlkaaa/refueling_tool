@@ -7,7 +7,6 @@ from wtforms import SelectField
 from sqlalchemy.sql import func
 from functools import wraps
 
-
 class RefuelingDB(db.Model):
 	__tablename__ = 'reactor_refuel'
 	id = db.Column(db.Integer, primary_key=True)
