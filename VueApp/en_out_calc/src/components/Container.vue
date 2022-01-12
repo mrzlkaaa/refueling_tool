@@ -20,26 +20,8 @@
         </div> <br>
         </div>
         <button @click="AddFileds" class="btn btn-primary"> Add fields </button> <br>
-        <div class='row'>
-            <div class='col center-text'>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Power, kW</th>
-                            <th scope="col">Sum Time, h</th>
-                            <th scope="col">Energy Output, MWhour</th>
-                            
-                        </tr>
-                        </thead>
-                        <tbody>
-                            <Table 
-                                v-model=data
-                                >
-                            </Table>
-                        </tbody>
-                    </table>
-            </div>
-        </div>
+        <Table v-model="data"></Table>
+        <button class="btn btn-primary"> Submit </button>
 </div>
 </template>
 
@@ -58,7 +40,7 @@ export default {
             data: 
                 [
                     {
-                        power:6000,
+                        power:1000,
                         fromDate:"",
                         toDate: "",
                         totalHours:5,
@@ -77,7 +59,8 @@ export default {
     methods:{
         AddFileds(){
             this.data.push({})
-        }
+        },
     }
+
 }
 </script>

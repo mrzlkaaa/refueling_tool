@@ -1,9 +1,26 @@
 <template>
-    <tr v-for="i,index in values" v-bind:key="index">
-        <th>{{i.power}}</th>
-        <td>{{TotalHours(index, Date.parse(i.toDate), Date.parse(i.fromDate))}} </td>
-        <td>{{EnergyOutput(index)}}</td>
-    </tr>
+    <div class='row'>
+            <div class='col center-text'>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Power, kW</th>
+                            <th scope="col">Sum Time, h</th>
+                            <th scope="col">Energy Output, MWhour</th>
+                            
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="i,index in values" v-bind:key="index">
+                                <th>{{i.power}}</th>
+                                <td>{{TotalHours(index, Date.parse(i.toDate), Date.parse(i.fromDate))}} </td>
+                                <td>{{EnergyOutput(index)}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    
 </template>
 
 <script>

@@ -7,8 +7,7 @@
             <h5 class="card-title">Fill the forms below</h5> <br>
             <Container></Container>
             <br>
-            <input type="submit" class="btn btn-primary">
-            <br>
+            
       </div>
   </div>
 </template>
