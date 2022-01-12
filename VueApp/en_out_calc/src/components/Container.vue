@@ -21,7 +21,7 @@
         </div>
         <button @click="AddFileds" class="btn btn-primary"> Add fields </button> <br>
         <Table v-model="data"></Table>
-        <button class="btn btn-primary"> Submit </button>
+        <button @click="Submit" class="btn btn-primary"> Submit </button>
 </div>
 </template>
 
@@ -40,7 +40,7 @@ export default {
             data: 
                 [
                     {
-                        power:1000,
+                        power:6000,
                         fromDate:"",
                         toDate: "",
                         totalHours:5,
@@ -60,7 +60,18 @@ export default {
         AddFileds(){
             this.data.push({})
         },
+        Submit(){
+            const request = new Request(
+            "http://localhost:8888/post",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(this.data)
+            }
+       );
+            fetch(request)
+                .then(response => response.json())
     }
-
+        }
 }
 </script>
