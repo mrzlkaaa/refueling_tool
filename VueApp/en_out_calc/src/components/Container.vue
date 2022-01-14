@@ -84,15 +84,15 @@ export default {
                 .then(response => response.json())
         },
         GetWeeks(fcname) {
-
+            fetch(`http://localhost:8888/getNewWeekNum/${fcname}`)
+            .then(response => response.json())
+            .then(data => (this.FormsData.week = data))
         }
-
     },
     created() {
             fetch("http://localhost:8888/refuelingsList")
             .then(response => response.json())
             .then(data => (this.Refuelings = data.names))
     }
-
 }
 </script>
