@@ -4,7 +4,7 @@
             Calculate Thermal Power Output
       </div>
       <div class="card-body">
-            <h5 class="card-title">Fill the forms below</h5> <br>
+            
             <Container></Container>
             <br>
             
@@ -13,7 +13,8 @@
 </template>
 
 <script>
-import Container from "./components/Container"
+import Container from "./components/Container.vue"
+
 export default {
   name: 'App',
   components: {

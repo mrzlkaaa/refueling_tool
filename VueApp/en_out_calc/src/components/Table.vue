@@ -35,7 +35,6 @@ export default {
             set(val){
                 this.$emit("update:modelValue", val)
             }
-
         }
     },
     methods: {

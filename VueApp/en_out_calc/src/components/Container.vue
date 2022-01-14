@@ -1,6 +1,18 @@
 <template>
 <div>
-    <div v-for="(obj,index) in data" v-bind:key="index">
+    <div class="row">
+        <div class="col">
+            <label for="FCname" class="form-label">Fuel Cycle Name</label>
+            <!-- <Input v-model="Refuelings" name="FCname" class="form-control"> </Input> -->
+            <Select v-model="Refuelings" @fc-update=GetWeeks> </Select>
+        </div>
+        <div class="col">
+            <label for="Week" class="form-label">Week</label>
+            <Input v-model="FormsData.week" name="Week" class="form-control" type="number"> </Input>
+        </div>
+    </div>
+    <br>
+    <div v-for="(obj,index) in FormsData.weeklyDetail" v-bind:key="index">
         <div class="row">
             <div  class="col" style="width:50%">
                 <label for="Power" class="form-label">Reactor Power</label>
@@ -20,24 +32,28 @@
         </div> <br>
         </div>
         <button @click="AddFileds" class="btn btn-primary"> Add fields </button> <br>
-        <Table v-model="data"></Table>
+        <Table v-model="FormsData.weeklyDetail"></Table>
         <button @click="Submit" class="btn btn-primary"> Submit </button>
 </div>
 </template>
 
 <script>
-import Input from "./Input"
-import Table from "./Table"
-
+import Input from "./Input.vue"
+import Table from "./Table.vue"
+import Select from "./Select.vue"
 export default {
     name: "Container",
     components: {
         Input,
         Table,
+        Select
     },
-    data: function() {
+    data() {
         return {
-            data: 
+            FormsData:{
+                fcName: "FC001",
+                week: 1,
+                weeklyDetail: 
                 [
                     {
                         power:6000,
@@ -46,32 +62,37 @@ export default {
                         totalHours:5,
                         energyOutput:0,
                     },
-                    {
-                        power:5000,
-                        fromDate:"",
-                        toDate: "",
-                        totalHours:0,
-                        energyOutput:0,
-                    }
                 ]
+            },
+            Refuelings: [],
         }
     },
     methods:{
         AddFileds(){
-            this.data.push({})
+            this.FormsData.weeklyDetail.push({})
         },
         Submit(){
             const request = new Request(
-            "http://localhost:8888/post",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(this.data)
-            }
-       );
+            "http://localhost:8888/submitWeekData",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(this.FormsData)
+                }
+            );
             fetch(request)
                 .then(response => response.json())
-    }
+        },
+        GetWeeks(fcname) {
+
         }
+
+    },
+    created() {
+            fetch("http://localhost:8888/refuelingsList")
+            .then(response => response.json())
+            .then(data => (this.Refuelings = data.names))
+    }
+
 }
 </script>

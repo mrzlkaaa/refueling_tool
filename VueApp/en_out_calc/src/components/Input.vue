@@ -10,6 +10,7 @@ export default {
         inputValue:{
             get(){
                 console.log(typeof(this.modelValue))
+                console.log(this.modelValue)
                 return this.modelValue
             },
             set(val){
