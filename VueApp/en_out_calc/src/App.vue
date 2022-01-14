@@ -1,42 +1,21 @@
-<template>
-  <div class="card text-center">
-      <div class="card-header">
-            Calculate Thermal Power Output
-      </div>
-      <div class="card-body">
-            <h5 class="card-title">Fill the forms below</h5> <br>
-            <Container></Container>
-            <br>
-            
-      </div>
-  </div>
-</template>
-
-<script>
-import Container from "./components/Container"
-export default {
-  name: 'App',
-  components: {
-    Container,
-  }
-}
+<script setup>
+// This starter template is using Vue 3 <script setup> SFCs
+// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
+import HelloWorld from './components/HelloWorld.vue'
 </script>
+
+<template>
+  <img alt="Vue logo" src="./assets/logo.png" />
+  <HelloWorld msg="Hello Vue 3 + Vite" />
+</template>
 
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  width:50%;
   text-align: center;
   color: #2c3e50;
-  margin: 0 auto; 
-}
-.main-box {
-    margin: 0 auto;
-    width: 50%;
-}
-.table {
-    text-align: center;
+  margin-top: 60px;
 }
 </style>
