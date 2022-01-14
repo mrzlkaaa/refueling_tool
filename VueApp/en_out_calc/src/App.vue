@@ -1,13 +1,27 @@
-<script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + Vite" />
+  <div class="card text-center">
+      <div class="card-header">
+            Calculate Thermal Power Output
+      </div>
+      <div class="card-body">
+            
+            <Container></Container>
+            <br>
+            
+      </div>
+  </div>
 </template>
+
+<script>
+import Container from "./components/Container.vue"
+
+export default {
+  name: 'App',
+  components: {
+    Container,
+  }
+}
+</script>
 
 <style>
 #app {
