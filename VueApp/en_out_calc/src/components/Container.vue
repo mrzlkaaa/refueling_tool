@@ -4,7 +4,7 @@
         <div class="col">
             <label for="FCname" class="form-label">Fuel Cycle Name</label>
             <!-- <Input v-model="Refuelings" name="FCname" class="form-control"> </Input> -->
-            <Select v-model="Refuelings" @fc-update=GetWeeks> </Select>
+            <Select v-bind:refuelingsList="RefuelingsList" @fc-update=GetWeeks> </Select>
         </div>
         <div class="col">
             <label for="Week" class="form-label">Week</label>
@@ -50,21 +50,21 @@ export default {
     },
     data() {
         return {
-            FormsData:{
-                fcName: "FC001",
-                week: 1,
-                weeklyDetail: 
-                [
-                    {
-                        power:6000,
-                        fromDate:"",
-                        toDate: "",
-                        totalHours:5,
-                        energyOutput:0,
-                    },
-                ]
-            },
-            Refuelings: [],
+        FormsData:{
+            fcName: "FC001",
+            week: 1,
+            weeklyDetail: 
+            [
+                {
+                    power:6000,
+                    fromDate:"",
+                    toDate: "",
+                    totalHours:5,
+                    energyOutput:0,
+                },
+            ]
+        },
+        RefuelingsList: [],
         }
     },
     methods:{
@@ -87,12 +87,37 @@ export default {
             fetch(`http://localhost:8888/getNewWeekNum/${fcname}`)
             .then(response => response.json())
             .then(data => (this.FormsData.week = data))
+            this.FormsData.fcName = fcname
         }
     },
     created() {
             fetch("http://localhost:8888/refuelingsList")
             .then(response => response.json())
-            .then(data => (this.Refuelings = data.names))
+            .then(data => (this.RefuelingsList = data.names))
     }
 }
 </script>
+
+
+// FormsData:{
+//                 fcName: "FC001",
+//                 weeklyOuts:[
+//                     {
+//                         week: 1,
+//                         weeklyDetail: 
+//                         [
+//                             {
+//                                 power:6000,
+//                                 fromDate:"",
+//                                 toDate: "",
+//                                 totalHours:5,
+//                                 energyOutput:0,
+//                             },
+//                         ]
+//                     }
+//                 ]
+                
+//             },
+//             Refuelings: [],
+//         }
+//     },

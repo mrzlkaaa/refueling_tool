@@ -1,14 +1,17 @@
 <template>
-  <div class="card text-center">
-      <div class="card-header">
-            Calculate Thermal Power Output
-      </div>
-      <div class="card-body">
-            
-            <Container></Container>
-            <br>
-            
-      </div>
+  <div>
+    <h1> Add new weekly Data </h1>
+    <div class="card text-center">
+        <div class="card-header">
+              Calculate Thermal Power Output
+        </div>
+        <div class="card-body">
+              
+              <Container></Container>
+              <br>
+              
+        </div>
+    </div>
   </div>
 </template>
 
@@ -30,7 +33,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 20px;
 }
 .main-box {
     margin: 0 auto;

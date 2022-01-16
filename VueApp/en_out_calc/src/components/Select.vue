@@ -1,30 +1,24 @@
 <template>
-    <select v-model="selected" class="form-select" aria-label=".form-select-lg example" @change="FCupdate">
-        <option selected> {{selected}} </option>
-        <option v-for="(name, index) in names" v-bind:key="index" :value="name"> {{name}} </option>
+    <select v-model="selectedName" class="form-select" aria-label=".form-select-lg example" @change="FCupdate">
+        <!-- <option selected> {{selected}} </option> -->
+        <option selected value> Choose any </option>
+        <option v-for="(name, index) in refuelingsList" v-bind:key="index" :value="name"> {{name}} </option>
     </select>
 </template>
 
 <script>
 export default {
     Name: "Select",
-    props: ["modelValue"],
+    props: ["refuelings-list"],
     data() {
         return {
-            selected:"Choose one",
-        }
-    },
-    computed:{
-        names : {
-            get() {
-                return this.modelValue
-            }
+            selectedName:"",
         }
     },
     methods: {
         FCupdate() {
-            this.$emit("fcUpdate", this.selected)
-            console.log(this.selected)
+            this.$emit("fcUpdate", this.selectedName)
+            console.log(this.selectedName)
         }
     }
 }
