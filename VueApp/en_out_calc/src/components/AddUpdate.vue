@@ -3,12 +3,12 @@
     <Parent
         :week="FormsData.week"
         @newWeekNum="changeWeekNum"
-        />
-    <Child/>
-
-        <button @click="AddFileds" class="btn btn-primary"> Add fields </button> <br>
-        <Table v-model="FormsData.weeklyDetail"></Table>
-        <button @click="Submit" class="btn btn-primary"> Submit </button>
+    />
+    <Child
+        @updateData="updateData"
+    />
+    <Table v-model="FormsData.weeklyDetail"></Table>
+    <button @click="submit" class="btn btn-primary"> Submit </button>
 </div>
 </template>
 
@@ -35,10 +35,7 @@ export default {
         }
     },
     methods:{
-        AddFileds(){
-            this.FormsData.weeklyDetail.push({})
-        },
-        Submit(){
+        submit(){
             const request = new Request(
             "http://localhost:8888/submitWeekData",
             {
@@ -56,13 +53,12 @@ export default {
             this.FormsData.week = num
             this.FormsData.fcName = fcname
         },
-        
+        updateData(weeklyDetails) {
+            console.log(weeklyDetails)
+            // this.FormsData
+            this.FormsData.weeklyDetail = weeklyDetails
+            console.log(this.FormsData)
+        }  
     },
-    
-    // updated() {
-    //     this.$watch("FormsData.week", () =>{
-        
-    //     })
-    // }
 }
 </script>

@@ -33,7 +33,7 @@ export default {
         getWeekNum(fcname) {
             fetch(`http://localhost:8888/getNewWeekNum/${fcname}`)
             .then(response => response.json())
-            .then(data => (submitNewWeekNum(data, fcname)))
+            .then(data => (this.submitNewWeekNum(data, fcname)))
             .catch((error) => console.log(error.message))
             
         },

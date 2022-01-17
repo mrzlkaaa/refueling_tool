@@ -6,7 +6,7 @@
                     <label for="Power" class="form-label">Reactor Power</label>
                     <div class="input-group mb-3">
                         <Input v-model="obj.power" name="Power" type="number"> </Input>
-                        <span class="input-group-text" id="basic-addon2">kW</span>
+                        <span class="input-group-text" id="basic-addon2">kW </span>
                     </div>
                 </div>
                 <div class="col" style="width:50%">
@@ -19,6 +19,7 @@
                     </div>
             </div> <br>
         </div>
+        <button @click="AddFileds" class="btn btn-primary"> Add fields </button> <br>
     </div>
 </template>
 
@@ -36,23 +37,23 @@ export default {
                 {
                     power:6000,
                     fromDate:"2022-01-17T16:08",
-                    toDate: "",
+                    toDate: "2022-01-18T16:08",
                     totalHours:5,
                     energyOutput:0,
                 },
             ]
         }
     },
-    // computed: {
-    //     weeklyDetails: {
-    //         get(){
-    //             return this.modelValue
-    //         },
-    //         set(val){
-    //             this.$emit("update:modelValue", val)
-    //         }
-
-    //     }
-    // }
+    methods: {
+        AddFileds(){
+            this.weeklyDetails.push({})
+        },
+    },
+    updated() {
+        this.$emit("updateData", this.weeklyDetails)
+    },
+    mounted(){
+        this.$emit("updateData", this.weeklyDetails)
+    }
 }
 </script>
