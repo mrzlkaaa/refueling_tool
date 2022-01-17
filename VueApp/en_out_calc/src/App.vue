@@ -6,22 +6,19 @@
               Calculate Thermal Power Output
         </div>
         <div class="card-body">
-              
-              <Container></Container>
-              <br>
-              
+              <AddUpdate></AddUpdate>
         </div>
     </div>
   </div>
 </template>
 
 <script>
-import Container from "./components/Container.vue"
+import AddUpdate from "./components/AddUpdate.vue"
 
 export default {
   name: 'App',
   components: {
-    Container,
+    AddUpdate,
   }
 }
 </script>

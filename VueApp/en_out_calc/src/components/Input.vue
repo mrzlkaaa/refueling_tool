@@ -9,12 +9,9 @@ export default {
     computed:{
         inputValue:{
             get(){
-                console.log(typeof(this.modelValue))
-                console.log(this.modelValue)
                 return this.modelValue
             },
             set(val){
-                console.log(this.modelValue)
                 this.$emit("update:modelValue", val)
             }
         }

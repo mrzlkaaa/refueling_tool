@@ -1,5 +1,5 @@
 <template>
-    <select v-model="selectedName" class="form-select" aria-label=".form-select-lg example" @change="FCupdate">
+    <select v-model="selectedName" class="form-select" aria-label=".form-select-lg example" @change="fcUpdated">
         <!-- <option selected> {{selected}} </option> -->
         <option selected value> Choose any </option>
         <option v-for="(name, index) in refuelingsList" v-bind:key="index" :value="name"> {{name}} </option>
@@ -16,8 +16,8 @@ export default {
         }
     },
     methods: {
-        FCupdate() {
-            this.$emit("fcUpdate", this.selectedName)
+        fcUpdated() {
+            this.$emit("fcName", this.selectedName)
             console.log(this.selectedName)
         }
     }
