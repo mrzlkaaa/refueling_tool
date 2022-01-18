@@ -1,12 +1,14 @@
 <template>
   <div>
-    <h1> Add new weekly Data </h1>
+    <h1> {{msg}} weekly Data </h1>
     <div class="card text-center">
         <div class="card-header">
               Calculate Thermal Power Output
         </div>
         <div class="card-body">
-              <AddUpdate></AddUpdate>
+              <AddUpdate
+                @msg="changeMsg"
+                />
         </div>
     </div>
   </div>
@@ -19,6 +21,16 @@ export default {
   name: 'App',
   components: {
     AddUpdate,
+  },
+  data() {
+    return {
+      msg: "Add"
+    }
+  },
+  methods: {
+    changeMsg(val){
+      this.msg = val
+    }
   }
 }
 </script>

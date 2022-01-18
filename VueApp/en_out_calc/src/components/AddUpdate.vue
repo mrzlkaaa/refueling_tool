@@ -1,11 +1,11 @@
 <template>
 <div>
     <Parent
-        :week="FormsData.week"
-        @newWeekNum="changeWeekNum"
+        @headerData="headerData"
+        @details="populateDetails"
     />
     <Child
-        @updateData="updateData"
+        v-model="FormsData.weeklyDetail"
     />
     <Table v-model="FormsData.weeklyDetail"></Table>
     <button @click="submit" class="btn btn-primary"> Submit </button>
@@ -27,15 +27,16 @@ export default {
     },
     data() {
         return {
-        FormsData:{
-            fcName: "FC001",
-            week: 1,
-        },
-        Week: 0,
+            FormsData:{
+                fcName: "",
+                week: 0,
+                weeklyDetail: [{}],
+            },
         }
     },
     methods:{
         submit(){
+            console.log(this.FormsData)
             const request = new Request(
             "http://localhost:8888/submitWeekData",
             {
@@ -47,18 +48,30 @@ export default {
             fetch(request)
                 .then(response => response.json())
                 .catch((error) => console.log(error.message))
-            this.FormsData.week += 1;
+            // this.FormsData.week += 1;
         },
-        changeWeekNum(num, fcname) {
+        headerData(num, fcname) {
             this.FormsData.week = num
             this.FormsData.fcName = fcname
         },
-        updateData(weeklyDetails) {
-            console.log(weeklyDetails)
-            // this.FormsData
-            this.FormsData.weeklyDetail = weeklyDetails
-            console.log(this.FormsData)
-        }  
+        populateDetails(details) {
+            this.FormsData.weeklyDetail = []
+            if (details.length == 0) {
+                this.FormsData.weeklyDetail.push({})
+                this.changeTitle("Add")
+            }
+            for (let i = 0; i < details.length; i++) {
+                let obj = {}
+                obj.power = details[i].Power   
+                obj.fromDate = details[i].FromDate
+                obj.toDate = details[i].ToDate
+                this.FormsData.weeklyDetail.push(obj)
+                this.changeTitle("Update")
+            }
+        },
+        changeTitle(val){
+            this.$emit("msg",val)
+        }
     },
 }
 </script>

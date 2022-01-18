@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-for="(obj,index) in weeklyDetails" v-bind:key="index">
+        <div v-for="(obj,index) in weeklyDetail" v-bind:key="index">
             <div class="row">
                 <div  class="col" style="width:50%">
                     <label for="Power" class="form-label">Reactor Power</label>
@@ -30,30 +30,28 @@ export default {
     components: {
         Input,
     },
-    data(){
-        return{
-            weeklyDetails: 
-            [
-                {
-                    power:6000,
-                    fromDate:"2022-01-17T16:08",
-                    toDate: "2022-01-18T16:08",
-                    totalHours:5,
-                    energyOutput:0,
-                },
-            ]
+    props: ["modelValue"],
+    computed: {
+        weeklyDetail:{
+            get() {
+                return this.modelValue
+            },
+            set(val){
+                this.$emit("update:modelValue", val)
+            }
         }
     },
     methods: {
         AddFileds(){
-            this.weeklyDetails.push({})
+            this.weeklyDetail.push({})
         },
     },
     updated() {
-        this.$emit("updateData", this.weeklyDetails)
+        console.log(this.weeklyDetail)
+        // this.$emit("updateData", this.weeklyDetails)
     },
-    mounted(){
-        this.$emit("updateData", this.weeklyDetails)
-    }
+    // mounted(){
+    //     this.$emit("updateData", this.weeklyDetails)
+    // }
 }
 </script>
