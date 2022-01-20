@@ -3,12 +3,18 @@
     <Parent
         @headerData="headerData"
         @details="populateDetails"
+        ref="form"
     />
+    <br>
     <Child
         v-model="FormsData.weeklyDetail"
+        @onDelete="deleteObj"
     />
     <Table v-model="FormsData.weeklyDetail"></Table>
-    <button @click="submit" class="btn btn-primary"> Submit </button>
+    <Button
+        :msg="msg"
+    />
+    <!-- <button @click="submit" class="btn btn-primary"> Submit </button> -->
 </div>
 </template>
 
@@ -16,6 +22,7 @@
 import Parent from "./ParentForms.vue"
 import Child from "./ChildForms.vue"
 import Table from "./Table.vue"
+import Button from "./Button.vue"
 
 export default {
     name: "Container",
@@ -23,7 +30,7 @@ export default {
         Parent,
         Child,
         Table,
-        
+        Button,
     },
     data() {
         return {
@@ -32,6 +39,12 @@ export default {
                 week: 0,
                 weeklyDetail: [{}],
             },
+            msg: "",
+        }
+    },
+    watch:{
+        msg(newval){
+            this.$emit("msg", newval)
         }
     },
     methods:{
@@ -48,7 +61,9 @@ export default {
             fetch(request)
                 .then(response => response.json())
                 .catch((error) => console.log(error.message))
-            // this.FormsData.week += 1;
+                //* call api to see updates on weeks
+                setTimeout(this.$refs.form.getWeeksNum, 500, this.$refs.form.fcName)
+            
         },
         headerData(num, fcname) {
             this.FormsData.week = num
@@ -58,7 +73,8 @@ export default {
             this.FormsData.weeklyDetail = []
             if (details.length == 0) {
                 this.FormsData.weeklyDetail.push({})
-                this.changeTitle("Add")
+                this.msg = "Add"
+                // this.changeTitle("Add")
             }
             for (let i = 0; i < details.length; i++) {
                 let obj = {}
@@ -66,11 +82,14 @@ export default {
                 obj.fromDate = details[i].FromDate
                 obj.toDate = details[i].ToDate
                 this.FormsData.weeklyDetail.push(obj)
-                this.changeTitle("Update")
+                this.msg = "Update"
             }
         },
-        changeTitle(val){
-            this.$emit("msg",val)
+        deleteObj(index){
+            this.FormsData.weeklyDetail = this.FormsData.weeklyDetail.filter((_, indx) => indx != index)
+        },
+        prePopTimeField(){
+
         }
     },
 }

@@ -19,8 +19,6 @@ export default {
     methods: {
         selectChanged() {
             this.$emit("weekName", this.selectedName)
-            console.log("weekName sent")
-            console.log(this.selectedName)
         },
     }
 }

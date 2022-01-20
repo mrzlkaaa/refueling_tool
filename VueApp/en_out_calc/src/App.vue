@@ -1,14 +1,14 @@
 <template>
   <div>
-    <h1> {{msg}} weekly Data </h1>
+    <h3> Calculate Thermal Power Output </h3>
     <div class="card text-center">
         <div class="card-header">
-              Calculate Thermal Power Output
+          {{msg}} weekly data
         </div>
         <div class="card-body">
-              <AddUpdate
-                @msg="changeMsg"
-                />
+          <AddUpdate
+            @msg="changeMsg"
+            />
         </div>
     </div>
   </div>
@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      msg: "Add"
+      msg: ""
     }
   },
   methods: {
@@ -45,10 +45,25 @@ export default {
   margin-top: 20px;
 }
 .main-box {
-    margin: 0 auto;
-    width: 50%;
+  margin: 0 auto;
+  width: 50%;
 }
 .table {
-    text-align: center;
+  text-align: center;
+}
+.row {
+  position: relative;
+}
+.col .fa-times {
+  position: absolute;
+  top:0;
+  right:15px;
+  color:red;
+}
+.btn {
+  width:25%;
+}
+.col {
+  width:33%;
 }
 </style>

@@ -41,6 +41,7 @@ export default {
             .then(response => response.json())
             .then(data => this.weeks=data)
             .catch((error) => console.log(error.message))
+            console.log(this.weeks)
             
         },
         getWeekDetails(weekNum) {
