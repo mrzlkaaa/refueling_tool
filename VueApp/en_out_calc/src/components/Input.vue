@@ -13,8 +13,19 @@ export default {
             },
             set(val){
                 this.$emit("update:modelValue", val)
+                
             }
         }
+    }, 
+    watch: {
+        modelValue: {
+            deep: true,
+            handler(){
+                this.$emit('assignToDate')
+            }
+        }
+            
+
     }
 }
 </script>

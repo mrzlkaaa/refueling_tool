@@ -60,6 +60,18 @@ export default {
   right:15px;
   color:red;
 }
+.col .fa-link {
+  position: absolute;
+  top:0;
+  right:40px;
+  /* color:#0d6efd; */
+}
+.active {
+  color:#0d6efd;
+}
+.inactive {
+  color:grey;
+}
 .btn {
   width:25%;
 }
