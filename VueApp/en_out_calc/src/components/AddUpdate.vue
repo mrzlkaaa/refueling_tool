@@ -13,6 +13,7 @@
     <Table v-model="FormsData.weeklyDetail"></Table>
     <Button
         :msg="msg"
+        @click="submit"
     />
     <!-- <button @click="submit" class="btn btn-primary"> Submit </button> -->
 </div>
@@ -51,7 +52,7 @@ export default {
         submit(){
             console.log(this.FormsData)
             const request = new Request(
-            "http://localhost:8888/submitWeekData",
+            "http://www.nss-irt-t.xyz:8888/submitWeekData",
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

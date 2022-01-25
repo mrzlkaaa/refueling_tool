@@ -1,5 +1,6 @@
 <template>
   <div>
+    <NavBar/>
     <h3> Calculate Thermal Power Output </h3>
     <div class="card text-center">
         <div class="card-header">
@@ -16,10 +17,12 @@
 
 <script>
 import AddUpdate from "./components/AddUpdate.vue"
+import NavBar from "./components/NavBar.vue"
 
 export default {
   name: 'App',
   components: {
+    NavBar,
     AddUpdate,
   },
   data() {
@@ -42,7 +45,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 20px;
+  margin-top: 50px;
 }
 .main-box {
   margin: 0 auto;

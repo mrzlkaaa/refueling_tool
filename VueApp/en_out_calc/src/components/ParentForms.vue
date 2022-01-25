@@ -37,7 +37,7 @@ export default {
     methods: {
         getWeeksNum(fcName) {
             this.fcName = fcName
-            fetch(`http://localhost:8888/WeeksNum/${this.fcName}`)
+            fetch(`http://www.nss-irt-t.xyz:8888/WeeksNum/${this.fcName}`)
             .then(response => response.json())
             .then(data => this.weeks=data)
             .catch((error) => console.log(error.message))
@@ -47,7 +47,7 @@ export default {
         getWeekDetails(weekNum) {
             this.weekNum = weekNum
             this.submitHeader(this.weekNum, this.fcName)
-            fetch(`http://localhost:8888/WeekDetails/${this.fcName}/${this.weekNum}`)
+            fetch(`http://www.nss-irt-t.xyz:8888/WeekDetails/${this.fcName}/${this.weekNum}`)
             .then(response => response.json())
             .then(data => this.submitDetails(data))
             .catch((error) => console.log(error.message))  
@@ -62,7 +62,7 @@ export default {
         }
     },
     created() {
-            fetch("http://localhost:8888/refuelingsList")
+            fetch("http://www.nss-irt-t.xyz:8888/refuelingsList")
             .then(response => response.json())
             .then(data => (this.refuelingsList = data.names))
     },
