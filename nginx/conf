@@ -1,23 +1,59 @@
 upstream diary_ref {
     server diary:8080; #* put name of service + port
 }
+# upstream python {
+#     server pythonmain:5000; #* put name of service + port
+# }
+
 
 server {
 listen 80;
 server_name www.nss-irt-t.xyz;
 
 
+    # static files
+    # location ^~ /static/  {
+    #     include  /etc/nginx/mime.types;
+    #     root    /python/;
+    # }
+
+    # location /static {
+    #     alias   /python/static;
+    # }
+
     location / {
-        # include /etc/nginx/includes/proxy.conf;
-        # proxy_set_header Host $http_host;
-        proxy_set_header                        Host $http_host;
-        proxy_set_header                        Upgrade $http_upgrade;
-        proxy_set_header                        Connection "upgrade";
-        proxy_http_version                      1.1;
-        proxy_set_header                        X-Forwarded-Host $http_host;
-        proxy_connect_timeout                   60s;
-        proxy_send_timeout                      60s;
-        proxy_read_timeout                      60s;
         proxy_pass http://diary_ref; 
     }
-}
+
+    # location /upload_PDC {
+    #     proxy_pass http://python/upload_PDC; 
+    #     rewrite ^/upload_PDC?$ /reading_file break;
+    # }
+
+    # location /list {
+    #     proxy_pass http://python/list; 
+    # }
+
+    # location /reading_file {
+    #     proxy_pass http://python/reading_file; 
+    # }
+
+    # location /refueling {
+    #     proxy_pass http://python/refueling; 
+    # }
+
+    # location ~* ^/detail/(.*) {
+    #     proxy_pass http://python/detail/$1; 
+    # }
+
+    # location ~* ^/update/(.*) {
+    #     proxy_pass http://python/update/$1; 
+    # }
+
+    # location ~* ^/(.*)/delete {
+    #     proxy_pass http://python/$1/delete; 
+    # }
+
+    # location ~* ^/download/(.*) {
+    #     proxy_pass http://python/download/$1; 
+    }

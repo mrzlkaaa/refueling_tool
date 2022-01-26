@@ -1,7 +1,7 @@
 <template>
   <div>
     <NavBar/>
-    <h3> Calculate Thermal Power Output </h3>
+    <h3> Calculate Thermal Power Output</h3>
     <div class="card text-center">
         <div class="card-header">
           {{msg}} weekly data
@@ -20,6 +20,7 @@ import AddUpdate from "./components/AddUpdate.vue"
 import NavBar from "./components/NavBar.vue"
 
 export default {
+
   name: 'App',
   components: {
     NavBar,
@@ -34,7 +35,7 @@ export default {
     changeMsg(val){
       this.msg = val
     }
-  }
+  },
 }
 </script>
 

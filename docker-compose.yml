@@ -1,22 +1,36 @@
 version: "3"
 services:
+  # pythonmain:
+      # container_name: pythonmain
+      # build: python/
+      # ports: 
+      #   - "5000:5000"
+
   diary:
     container_name: diary_vue
-    build: ./VueApp/en_out_calc/
+    build: VueApp/en_out_calc/
     ports:
       - 8080:8080
 
-  nginx_diary:
-    build: ./nginx/
+  nginx_serv:
+    build: nginx/
     restart: always
     ports:
       - 80:80
+
 
   api:
     image: refuel_diary_go:latest
     restart: always
     ports: 
       - "8888:8888"
+
+  # redis_ref:
+  #   container_name: redis_ref
+  #   image: redis:latest
+  #   restart: always
+  #   ports:
+  #     - 6379:6379
 
   # python-main:
   #   container_name: py-main
@@ -31,20 +45,3 @@ services:
   #   restart: always
   #   ports: 
   #     - "1234:8080"
-  # db:
-  #   container_name: db
-  #   image: postgres:12
-  #   restart: always
-  #   environment:
-  #     - POSTGRES_DB=${DB}
-  #     - POSTGRES_USER=${PSQL_USER}
-  #     - POSTGRES_PASSWORD=${PSWD}
-  #   ports: 
-  #     - "5433:5432"
-
-  # redis:
-  #   image: redis:latest
-  #   restart: always
-  #   ports: 
-  #     - "6379:6379"
-

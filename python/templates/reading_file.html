@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+	{% block title %}
+	<title> Reading File Page</title>
+	{% endblock %}
+	{% block content %}
+		<form method="POST", enctype="multipart/form-data"> 
+			<div id="box-small">
+				<div class="card text-center">
+					<div class="card-header">
+						Core configuration
+					</div>
+					<div class='card-body'>
+						<div class='container'>
+							<table class='burnup-data'>
+								<th>6</th>
+								<th>5</th>
+								<th>4</th>
+								<th>3</th>
+								{% set counter = namespace(value=7) %}
+								{% for i in burnup %}
+								<tr>
+									{% for j in i %}
+										<td>{{j}}%</td>	
+										{% if loop.last %}
+											<th style="width:90px;"> {{ counter.value }} </th>
+											{% set counter.value = counter.value - 1 %}
+										{% endif %}
+									{% endfor %}
+								</tr>
+								{% endfor %}
+							</table>
+						</div>
+						<div class='inputs'> 
+							<div class="text-inputs-refuel form-floating mb-3">
+							<select name='options' class="form-select" id="floatingSelect" aria-label="Floating label select example">
+								<option value='fresh'> Fresh fuel </option>
+								<option value='swap'> Swap </option>
+							</select>
+							<label for="floatingSelect">Choose option</label>
+							</div>
+							<div class="text-inputs-refuel form-floating mb-3">
+							<input type="text" name="numbers" class="form-control" id="floatingInput" placeholder="Typing...">
+							<label for="floatingInput">FA numbers</label>
+							</div>
+							<input type="submit" class="text_inputs btn btn-primary">
+						</div>
+					</div>
+					<div class="card-footer text-muted">
+						Click here
+					  </div>
+				</div>
+			</div>
+		</form>
+		<script> 
+			console.log(document.forms)
+		 </script>
+	{% endblock %}
