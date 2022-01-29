@@ -8,5 +8,8 @@ export default defineConfig({
     watch: {
       usePolling: true
     }
+  }, 
+  devServer: {
+    proxy: 'http://localhost:8000'
   }
 })

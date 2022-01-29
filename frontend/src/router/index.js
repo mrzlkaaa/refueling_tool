@@ -1,10 +1,10 @@
 import {createRouter, createWebHistory} from "vue-router"
-import HelloWorld from "../views/HelloWorld.vue"
+import AddRefuel from "../views/AddRefuel.vue"
 import Diary from "../views/Diary.vue"
 
 const routes = [
-  { path: '/',
-    component: HelloWorld,
+  { path: '/add-refuel',
+    component: AddRefuel,
   },
   { path: '/diary',
     component: Diary, },
