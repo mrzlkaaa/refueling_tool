@@ -29,11 +29,15 @@ app.add_middleware(
 async def root(file: UploadFile):
     cont = await file.read()
     pdc = list(map(lambda x: x+"\n", cont.decode("utf-8").split("\n")))
-    redis.set("foo", "bar")
-    value = redis.get("foo")
-    print(value)
     mp, _ = Average(pdc=pdc).average_burnup()
-    return {"map": mp.tolist()} #* return cells map to display
+    redis.set(file.filename, mp.tobytes())
+    #* return object with name of file and cells map to display
+    return {"obj": {
+                    "filename": file.filename,
+                    "map":mp.tolist(),
+                    },
+            "status": True,
+            } 
 
 
 

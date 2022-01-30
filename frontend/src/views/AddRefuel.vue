@@ -9,7 +9,8 @@
                 title="Attach your local .PDC file to start use service"
                 />
                 <br>
-                <div v-if="burnupMap.length == 0" class="row">
+                <span>{{fileDataUpd}}</span>
+                <div v-if="!fileData.status" class="row">
                     <div class="col">
                         <Input
                         type="file"
@@ -20,6 +21,31 @@
                         <form @click.prevent="submit">
                             <Button/>
                         </form>
+                    </div>
+                </div>
+                <div v-if="fileData.status">
+                    <div class="row">
+                        <div class="col">
+                            <Table
+                            :map="fileData.obj.map"
+                            />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3">
+							<select name='options' class="form-select" id="floatingSelect" aria-label="Floating label select example">
+								<option value='fresh'> Fresh fuel </option>
+								<option value='swap'> Swap </option>
+							</select>
+							<label for="floatingSelect">Choose option</label>
+							</div>
+							<div class="text-inputs-refuel form-floating mb-3">
+							<input type="text" name="numbers" class="form-control" id="floatingInput" placeholder="Typing...">
+							<label for="floatingInput">FA numbers</label>
+							</div>
+							<input type="submit" class="text_inputs btn btn-primary">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -33,13 +59,17 @@
     import CardTitle from "../components/CardTitle.vue"
     import Input from "../components/Refueling/Input.vue"
     import Button from "../components/Refueling/Button.vue"
+    import Table from "../components/Refueling/Table.vue"
+    import Label from "../components/Refueling/Label.vue"
+
     export default {
         name: "AddRefuel",
         data:function() {
             return {
                 postForm: Object,
-                burnupMap: [],
-                // form: "",
+                fileData: {
+                    status: false,
+                },
             }
         },
         components: {
@@ -47,6 +77,13 @@
             CardTitle,
             Input,
             Button,
+            Table,
+            Label,
+        },
+        computed: {
+            fileDataUpd(){
+                return this.fileData.status ? "yes" : "no"
+            }
         },
         methods: {
             submit() {
@@ -64,8 +101,9 @@
             );
             fetch(request)
                 .then(response => response.json())
-                .then(data => console.log(data))
+                .then(data => this.fileData=data)
                 .catch((error) => console.log(error.message))
+            // console.log(this.fileData)
             },
             upload(e) {this.postForm = e.target.files[0]}
         }
@@ -78,4 +116,19 @@
     .col {
         width:50%;
     }
+    .slide-enter-active, .slide-leave-active {
+        transition: opacity 1s;
+    }
+    .slide-enter, .slide-leave-to {
+        /* transform: translateX(-200px); */
+        opacity: 0;
+    }
+    .table {
+        margin: auto;
+        width: 350px;
+    }
+    .table td {
+        height:40px;
+    }
+
 </style>
