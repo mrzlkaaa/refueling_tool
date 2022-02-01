@@ -2,15 +2,15 @@
     <div class="main-box">
         <div class="card text-center">
             <CardHeader
-            header="File uploading" 
+            header="Add new instance" 
             />
             <div class="card-body">
-                <CardTitle
+                <!-- <CardTitle
                 title="Attach your local .PDC file to start use service"
-                />
+                /> -->
                 <br>
                 <span>{{fileDataUpd}}</span>
-                <div v-if="!fileData.status" class="row">
+                <div v-if="!initialData.status" class="row">
                     <div class="col">
                         <Input
                         type="file"
@@ -18,36 +18,47 @@
                         />
                     </div>
                     <div class="col">
-                        <form @click.prevent="submit">
-                            <Button/>
+                        <form @click.prevent="submitFile">
+                            <Button
+                            text="Upload"
+                            />
                         </form>
                     </div>
                 </div>
-                <div v-if="fileData.status">
+                <div v-if="initialData.status">
+                    <div class="container-flex" >
+                        <div class="row">
+                            <div class="col">
+                                <Table
+                                :map="initialData.map"
+                                />
+                            </div>
+                        </div>
+                        <div v-if="firstStep.status" class="row">
+                            <div class="col">
+                                <Table
+                                :map="firstStep.map"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <br>
                     <div class="row">
-                        <div class="col">
-                            <Table
-                            :map="fileData.obj.map"
+                        <div v-if="showRefForm" class="col">
+                            <RefuelForm
+                            :refuelName="initialData.fileName"
+                            @refuelForm="fillFromRefuelForm"
+                            />
+                        </div>
+                        <div v-else class="col">
+                            <ConfirmationForm
+                            @confForm="fillFromConfForm"
+                            @backRefuel="showRefForm=!showRefForm"
                             />
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-floating mb-3">
-							<select name='options' class="form-select" id="floatingSelect" aria-label="Floating label select example">
-								<option value='fresh'> Fresh fuel </option>
-								<option value='swap'> Swap </option>
-							</select>
-							<label for="floatingSelect">Choose option</label>
-							</div>
-							<div class="text-inputs-refuel form-floating mb-3">
-							<input type="text" name="numbers" class="form-control" id="floatingInput" placeholder="Typing...">
-							<label for="floatingInput">FA numbers</label>
-							</div>
-							<input type="submit" class="text_inputs btn btn-primary">
-                        </div>
-                    </div>
                 </div>
+                
             </div>
         
         </div>
@@ -60,16 +71,27 @@
     import Input from "../components/Refueling/Input.vue"
     import Button from "../components/Refueling/Button.vue"
     import Table from "../components/Refueling/Table.vue"
-    import Label from "../components/Refueling/Label.vue"
+    import RefuelForm from "../components/Refueling/RefuelForm.vue"
+    import ConfirmationForm from "../components/Refueling/ConfirmationForm.vue"
+    
 
     export default {
         name: "AddRefuel",
         data:function() {
             return {
-                postForm: Object,
-                fileData: {
+                finalForm: {
+                    name:"",
+                    date: "",
+                    acts: []
+                },
+                postFile: Object,
+                initialData: {
                     status: false,
                 },
+                firstStep:{
+                    status: false,
+                },
+                showRefForm: true,
             }
         },
         components: {
@@ -78,17 +100,18 @@
             Input,
             Button,
             Table,
-            Label,
+            RefuelForm,
+            ConfirmationForm,
         },
         computed: {
             fileDataUpd(){
-                return this.fileData.status ? "yes" : "no"
+                return this.initialData.status ? "yes" : "no"
             }
         },
         methods: {
-            submit() {
+            submitFile() {
                 let formData = new FormData()
-                formData.append("file", this.postForm)
+                formData.append("file", this.postFile)
                 const request = new Request(
                 "http://localhost:8000/average",
             {
@@ -101,19 +124,58 @@
             );
             fetch(request)
                 .then(response => response.json())
-                .then(data => this.fileData=data)
+                .then(data => (this.initialData=data, 
+                    this.finalForm.acts.push(this.initialData)))
                 .catch((error) => console.log(error.message))
-            // console.log(this.fileData)
+            console.log(this.initialData)
             },
-            upload(e) {this.postForm = e.target.files[0]}
+            upload(e) {this.postFile = e.target.files[0]},
+            fillFromRefuelForm(obj){
+                this.firstStep = obj
+                this.finalForm.acts.push(this.firstStep)
+                this.showRefForm = !this.showRefForm
+            },
+            fillFromConfForm(obj){
+                this.finalForm.name=obj.name
+                this.finalForm.date=obj.date
+                this.finalForm.acts.at(0).fileName = `${this.finalForm.name}_${this.finalForm.acts.at(0).fileName}`
+                this.finalForm.acts.at(-1).fileName = `${this.finalForm.name}_${this.finalForm.acts.at(-1).fileName}`
+                this.finalForm.acts.at(-1).description = obj.description
+                console.log(this.finalForm)
+
+                const request = new Request(
+                "http://localhost:8888/add",
+                {
+                    method: "POST",
+                    headers: { 
+                            // 'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            },
+                    body: JSON.stringify(this.finalForm)
+                }
+                );
+                fetch(request)
+                    .then(response => response.json())
+                    // .then(data => (this.initialData=data, 
+                    //     this.finalForm.acts.push(this.initialData)))
+                    .catch((error) => console.log(error.message))
+                
+            }
         }
     }
 </script>
 <style>
-    .row{
-        position: relative;
+    .container-flex {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        height: 100%;
+        align-items: stretch;
     }
     .col {
+        /* position:absolute; */
         width:50%;
     }
     .slide-enter-active, .slide-leave-active {
@@ -130,5 +192,6 @@
     .table td {
         height:40px;
     }
+    
 
 </style>

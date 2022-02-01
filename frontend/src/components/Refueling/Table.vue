@@ -1,11 +1,11 @@
 <template>
-    <table class='table'>
+    <table class='table table-borderless'>
         <thead>
             <tr>
-            <th scope="col">6</th>
-            <th scope="col">5</th>
-            <th scope="col">4</th>
-            <th scope="col">3</th>
+            <th>6</th>
+            <th >5</th>
+            <th>4</th>
+            <th>3</th>
             </tr>
         </thead>
         <tr v-for="(v,i) in map" v-bind:key="i">

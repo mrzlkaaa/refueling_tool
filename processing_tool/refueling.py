@@ -64,7 +64,7 @@ class Average(Refueling):
 
 	def insert_nulls(self, lst, indexes):
 		for i in indexes:
-			lst.insert(i, 0)
+			lst.insert(i, "Be")
 		return lst
 
 	def matrix_and_save(self, obj):

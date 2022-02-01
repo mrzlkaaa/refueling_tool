@@ -1,12 +1,12 @@
 <template>
-    <input type="text" :class="[cls ? cls : 'form-control']" v-model="text">
+    <textarea v-model="text" class="form-control" style="height:80px;"></textarea>
 </template>
-
 <script>
+
 export default {
-    name: "Input",
-    props: {
-        cls: String,
+    name: "TextArea",
+    props:{
+        text: "",
     },
     computed:{
         text: {
