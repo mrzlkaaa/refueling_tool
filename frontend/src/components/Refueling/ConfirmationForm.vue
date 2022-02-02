@@ -103,8 +103,7 @@ export default {
             handler(){
                 console.log(this.formData)
             }
-        }
-        
+        }   
     }
 
 }

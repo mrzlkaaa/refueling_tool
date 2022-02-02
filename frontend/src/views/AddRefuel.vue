@@ -1,5 +1,11 @@
 <template>
-    <div class="main-box">
+    <div id="addRefuel" class="main-box">
+        <div v-if="alert.status">
+            <AlertBox
+            :code="alert.statusCode"
+            :text="alert.msg"
+            />
+        </div>
         <div class="card text-center">
             <CardHeader
             header="Add new instance" 
@@ -9,7 +15,7 @@
                 title="Attach your local .PDC file to start use service"
                 /> -->
                 <br>
-                <span>{{fileDataUpd}}</span>
+                <!-- <span>{{fileDataUpd}}</span> -->
                 <div v-if="!initialData.status" class="row">
                     <div class="col">
                         <Input
@@ -73,6 +79,7 @@
     import Table from "../components/Refueling/Table.vue"
     import RefuelForm from "../components/Refueling/RefuelForm.vue"
     import ConfirmationForm from "../components/Refueling/ConfirmationForm.vue"
+    import AlertBox from "../components/Refueling/AlertBox.vue"
     
 
     export default {
@@ -92,6 +99,11 @@
                     status: false,
                 },
                 showRefForm: true,
+                alert: {
+                    status: false,
+                    statusCode: 200,
+                    msg: '',
+                }
             }
         },
         components: {
@@ -102,6 +114,7 @@
             Table,
             RefuelForm,
             ConfirmationForm,
+            AlertBox,
         },
         computed: {
             fileDataUpd(){
@@ -155,11 +168,27 @@
                 }
                 );
                 fetch(request)
-                    .then(response => response.json())
-                    // .then(data => (this.initialData=data, 
-                    //     this.finalForm.acts.push(this.initialData)))
-                    .catch((error) => console.log(error.message))
-                
+                    .then(response => 
+                        {   console.log(response.status)
+                            this.alert.statusCode=response.status
+                            this.alert.status=true
+                            return (response.ok ? setTimeout(this.redirect, 5000) 
+                                                : '', 
+                                                response.json())
+                        }
+                    )
+                    .then(data => this.alert.msg=data)
+                    .catch((error) => console.log(`catched errors: ${error}`))
+                    
+            },
+            counter(started){
+                setInterval(() => {
+                    this.alert.time=Date.now()-started
+                    }, 100)
+            },
+            redirect(){
+                console.log("initiated")
+                this.$router.push({path:"/diary"})
             }
         }
     }
@@ -174,8 +203,7 @@
         height: 100%;
         align-items: stretch;
     }
-    .col {
-        /* position:absolute; */
+    #addRefuel .col {
         width:50%;
     }
     .slide-enter-active, .slide-leave-active {
@@ -185,13 +213,11 @@
         /* transform: translateX(-200px); */
         opacity: 0;
     }
-    .table {
+    #addRefuel .table {
         margin: auto;
         width: 350px;
     }
-    .table td {
+    #addRefuel .table td {
         height:40px;
     }
-    
-
 </style>

@@ -7,7 +7,10 @@ const routes = [
     component: AddRefuel,
   },
   { path: '/diary',
-    component: Diary, },
+    component: Diary, 
+  },
+  // { path: '/list',
+  //   component: Diary, },
 ]
 
 const router = createRouter({

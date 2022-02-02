@@ -1,5 +1,5 @@
 <template>
-<div class="main-box">
+<div id="diary" class="main-box">
     <div class="card text-center">
         <div class="card-header">
             Thermal Power Output
@@ -102,11 +102,7 @@ export default {
 }
 </script>
 <style>
-    
-    .table {
-    text-align: center;
-    }
-    .row {
+    #diary .row {
     position: relative;
     }
     .col .fa-times {
@@ -130,7 +126,11 @@ export default {
     .btn {
     width:25%;
     }
-    .col {
+    #diary .col {
     width:33%;
+    }
+    #diary .table {
+        width:100%;
+        text-align: center;
     }
 </style>
