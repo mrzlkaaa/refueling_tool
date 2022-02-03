@@ -11,9 +11,6 @@
             header="Add new instance" 
             />
             <div class="card-body">
-                <!-- <CardTitle
-                title="Attach your local .PDC file to start use service"
-                /> -->
                 <br>
                 <!-- <span>{{fileDataUpd}}</span> -->
                 <div v-if="!initialData.status" class="row">
@@ -70,8 +67,6 @@
 </template>
 
 <script>
-    import CardHeader from "../components/CardHeader.vue"
-    import CardTitle from "../components/CardTitle.vue"
     import Input from "../components/Refueling/Input.vue"
     import Button from "../components/Refueling/Button.vue"
     import Table from "../components/Refueling/Table.vue"
@@ -105,8 +100,6 @@
             }
         },
         components: {
-            CardHeader,
-            CardTitle,
             Input,
             Button,
             Table,
@@ -170,7 +163,7 @@
                         {   console.log(response.status)
                             this.alert.statusCode=response.status
                             this.alert.status=true
-                            return (response.ok ? setTimeout(this.redirect, 5000) 
+                            return (response.ok ? setTimeout(this.redirect, 3000) 
                                                 : '', 
                                                 response.json())
                         }
@@ -186,7 +179,7 @@
             },
             redirect(){
                 console.log("initiated")
-                this.$router.push({path:"/diary"})
+                this.$router.push({name: "List"})
             }
         }
     }

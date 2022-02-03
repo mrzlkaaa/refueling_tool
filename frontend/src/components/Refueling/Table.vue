@@ -3,7 +3,7 @@
         <thead>
             <tr>
             <th>6</th>
-            <th >5</th>
+            <th>5</th>
             <th>4</th>
             <th>3</th>
             </tr>
