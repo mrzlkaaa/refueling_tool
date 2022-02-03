@@ -34,6 +34,7 @@ class RefuelFormData(BaseModel):
     action: str
     faNums: str
     filename: str
+    pdc: list
 
 @app.post("/average")
 async def average(file: UploadFile):
@@ -53,12 +54,12 @@ async def average(file: UploadFile):
 
 @app.post("/changes")
 async def changes(form: RefuelFormData):
-    pdc = list(map(lambda x: x+"\n", redis.get(form.filename).decode("utf-8").split("\n")))
+    # pdc = list(map(lambda x: x+"\n", redis.get(form.filename).decode("utf-8").split("\n")))
     match form.action:
         case "fresh":
-            mp, pdc = Fresh(form.faNums, pdc=pdc).refueling()
+            mp, pdc = Fresh(form.faNums, pdc=form.pdc).refueling()
         case "swap":
-            mp, pdc = Swap(form.faNums, pdc=pdc).swap()
+            mp, pdc = Swap(form.faNums, pdc=form.pdc).swap()
     filename = f"1_{form.filename[2:]}"  
     redis.set(f"{filename}", convert_to_bytes(pdc))
     #* return object with name of file and cells map to display

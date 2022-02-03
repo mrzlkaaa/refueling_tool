@@ -19,11 +19,11 @@
         <div class="row">
             <div class="col">
                 <UpdateForm
-                :test="refuelDetails[0].ID"
+                :latterInstance="refuelDetails.at(-1)"
                 />
             </div>
         </div>
-        </div>
+    </div>
 </template>
 <script>
 import Table from "../components/Refueling/Table.vue"
@@ -57,15 +57,16 @@ export default {
     watch: {
         id(){
             console.log("changed")
-            this.getDetails(this.id)
+            this.getDetails(this.id, -1) //* second arg is slice index
         }
     },
+    //TODO use the same methods for update 
     methods: {
-        getDetails(id){
+        getDetails(id, index){
             fetch(`http://localhost:8888/refuelings/${id}/details`)
             .then(response => response.json())
             .then(data => {
-                this.preLoadPDC(data.at(-1).ID, -1)
+                this.preLoadPDC(data.at(index).ID, index)
                 return this.refuelDetails = data})
             .catch(error => console.error(error))
         },
