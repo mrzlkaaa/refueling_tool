@@ -33,7 +33,6 @@ convert_to_bytes = lambda x: bytes("".join(x), "UTF-8")
 class RefuelFormData(BaseModel):
     action: str
     faNums: str
-    filename: str
     pdc: list
 
 @app.post("/average")
@@ -41,11 +40,8 @@ async def average(file: UploadFile):
     cont = await file.read()
     pdc = list(map(lambda x: x+"\n", cont.decode("utf-8").split("\n")))
     mp, pdc = Average(pdc=pdc).average_burnup()
-    filename = f"0_{file.filename}"
-    redis.set(filename, convert_to_bytes(pdc))
     #* return object with name of file and cells map to display
     return {
-                "fileName": filename,
                 "map":mp.tolist(),
                 "pdc": pdc,
                 "description":"initial core config",
@@ -60,11 +56,9 @@ async def changes(form: RefuelFormData):
             mp, pdc = Fresh(form.faNums, pdc=form.pdc).refueling()
         case "swap":
             mp, pdc = Swap(form.faNums, pdc=form.pdc).swap()
-    filename = f"1_{form.filename[2:]}"  
-    redis.set(f"{filename}", convert_to_bytes(pdc))
+    # redis.set(f"{filename}", convert_to_bytes(pdc))
     #* return object with name of file and cells map to display
     return {
-                "fileName": filename,
                 "map":mp.tolist(),
                 "pdc": pdc,
                 "description": "",

@@ -49,13 +49,23 @@
                     <div class="row">
                         <div v-if="showRefForm" class="col">
                             <RefuelForm
-                            :refuelName="initialData.fileName"
+                            ref="newConfig"
+                            :pdc="initialData.pdc"
                             @refuelForm="fillFromRefuelForm"
                             />
+                            <div class="form-container">
+                                <Button
+                                text="Next"
+                                width="20%"
+                                @click="$refs.newConfig.getNewConfig()"
+                                />
+                            </div>
                         </div>
                         <div v-else class="col">
                             <ConfirmationForm
-                            @confForm="fillFromConfForm"
+                            v-model="finalForm"
+                            @response="applyReponse"
+                            @alertMsg="alert.msg=$event"
                             @backRefuel="showRefForm=!showRefForm"
                             />
                         </div>
@@ -128,10 +138,9 @@
             );
             fetch(request)
                 .then(response => response.json())
-                .then(data => (this.initialData=data, 
+                .then(data => (console.log(data), this.initialData=data, 
                     this.finalForm.acts.push(this.initialData)))
                 .catch((error) => console.log(error.message))
-            console.log(this.initialData)
             },
             upload(e) {this.postFile = e.target.files[0]},
             fillFromRefuelForm(obj){
@@ -139,47 +148,19 @@
                 this.finalForm.acts.push(this.firstStep)
                 this.showRefForm = !this.showRefForm
             },
-            fillFromConfForm(obj){
-                this.finalForm.name=obj.name
-                this.finalForm.date=obj.date
-                this.finalForm.acts.at(0).fileName = `${this.finalForm.name}_${this.finalForm.acts.at(0).fileName}`
-                this.finalForm.acts.at(-1).fileName = `${this.finalForm.name}_${this.finalForm.acts.at(-1).fileName}`
-                this.finalForm.acts.at(-1).description = obj.description
-                console.log(this.finalForm)
-
-                const request = new Request(
-                "http://localhost:8888/add",
-                {
-                    method: "POST",
-                    headers: { 
-                            // 'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            },
-                    body: JSON.stringify(this.finalForm)
-                }
-                );
-                fetch(request)
-                    .then(response => 
-                        {   console.log(response.status)
-                            this.alert.statusCode=response.status
-                            this.alert.status=true
-                            return (response.ok ? setTimeout(this.redirect, 3000) 
-                                                : '', 
-                                                response.json())
-                        }
-                    )
-                    .then(data => this.alert.msg=data)
-                    .catch((error) => console.log(`catched errors: ${error}`))
-                    
-            },
             counter(started){
                 setInterval(() => {
                     this.alert.time=Date.now()-started
                     }, 100)
             },
-            redirect(){
-                console.log("initiated")
-                this.$router.push({name: "List"})
+            applyReponse(e){
+                this.alert.statusCode=e.statusCode
+                this.alert.status = e.status
+                if (e.redirect) {
+                    console.log("initiated")
+                    //TODO redirect to exlicit url like <<refuels/ID/detail>>
+                    setTimeout(()=>{this.$router.push({name: "List"})}, 3000) 
+                }
             }
         }
     }

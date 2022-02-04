@@ -10,7 +10,8 @@
                 aria-label="Search"
                 />
                 <br>
-                <router-link v-for="(refuel, i) in refuels" :key="i" :to="{name: 'Detail', params: {id: refuel.ID}}">
+                <router-link v-for="(refuel, i) in refuels" :key="i" :to="{name: 'Detail', 
+                    params: {id: refuel.ID, name:refuel.RefuelName}}">
                     <div  class="card text-center">
                         <CardHeader
                         :header="refuel.Date"

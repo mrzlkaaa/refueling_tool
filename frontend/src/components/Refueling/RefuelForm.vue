@@ -25,10 +25,6 @@
             <!-- <div class="arrows-container">
                 <i @click="getNewConfig" class="fas fa-arrow-right fa-1x"></i>
             </div> -->
-            <Button
-            text="Next"
-            @click="getNewConfig"
-            />
         </div>
         
     <!-- </div> -->
@@ -48,7 +44,7 @@
             Button
         },
         props:{
-            refuelName: String,
+            pdc: Array,
         },
         data(){
             return {
@@ -72,7 +68,7 @@
                 this.data.faNums = inp
             },
             getNewConfig() {
-                this.data.filename = this.refuelName
+                this.data.pdc = this.pdc
                 console.log(this.data)
                 const request = new Request(
                 "http://localhost:8000/changes",

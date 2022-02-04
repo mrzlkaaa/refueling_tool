@@ -4,7 +4,7 @@
             <Input
             type="number"
             id="floatingInput"
-            @typed="formData.name=$event"
+            @typed="finalForm.name=$event"
             />
             <Label
             for="floatingInput"
@@ -15,7 +15,7 @@
             <Input
             id="floatingInput"
             type="date"
-            @typed="formData.date=$event"
+            @typed="finalForm.date=$event"
             />
             <Label
             for="floatingInput"
@@ -25,7 +25,7 @@
         <div class="form-floating mb-3">
             <TextArea
             id="floatingTextarea"
-            @typed="formData.description=$event"
+            @typed="finalForm.acts[1].description=$event"
             />
             <Label
             for="floatingTextarea"
@@ -43,7 +43,7 @@
             <div class="col">
                 <Button
                 text="Submit"
-                @click="$emit('confForm', formData)"
+                @click="record"
                 />
             </div>
         </div>
@@ -64,14 +64,16 @@ export default {
         Label,
         TextArea,
     },
+    props:["modelValue"],
     emits:["backRefuel", "confForm"],
+
     data(){
         return {
-            formData: {
-                name:"",
-                date:"",
-                description:"",
-            },
+            // formData: {
+            //     name:"",
+            //     date:"",
+            //     description:"",
+            // },
             selectOpt:[
                 {
                     "name": "New Refueling",
@@ -85,6 +87,13 @@ export default {
             ],
         }
     },
+    computed:{
+        finalForm:{
+            get(){
+                return this.modelValue
+            }
+        }
+    },
     methods:{
         changeForm(selected){
             switch(selected){
@@ -96,14 +105,41 @@ export default {
                     break;    
             }
         },
+        record(){
+            //*Adding requsets
+            console.log(this.finalForm)
+            const request = new Request(
+            "http://localhost:8888/add",
+            {
+                method: "POST",
+                headers: { 
+                        // 'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        },
+                body: JSON.stringify(this.finalForm)
+            }
+            );
+            fetch(request)
+            .then(response => 
+                {   console.log(response.status)
+                    return (this.$emit("response", 
+                        {
+                            statusCode: response.status,
+                            status: true,
+                            redirect: response.ok ? true : false
+                        }), response.json())
+                }
+            )
+            .then(data => this.$emit("alertMsg", data)) //* pass alert msg
+            .catch((error) => console.log(`catched errors: ${error}`))
+        },
     },
     watch:{
-        formData:{
-            deep:true,
+        'finalForm.name':{
             handler(){
-                console.log(this.formData)
+                this.finalForm.acts.forEach((e,i) => e.fileName=`${this.finalForm.name}_${i}.PDC`)
             }
-        }   
+        }
     }
 
 }
