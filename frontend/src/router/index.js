@@ -16,11 +16,12 @@ const routes = [
   { path: '/refuels',
     name: "List",
     component: List,
+    props: true,
     children: [{
       path: ":id/detail",
       name: "Detail",
       component: Detail,
-      props: true,
+      props: {name:true},
     }]
   },
 ]

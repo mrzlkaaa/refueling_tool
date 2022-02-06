@@ -166,15 +166,6 @@
     }
 </script>
 <style>
-    .container-flex {
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        height: 100%;
-        align-items: stretch;
-    }
     #addRefuel .col {
         width:50%;
     }

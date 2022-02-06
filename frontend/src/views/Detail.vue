@@ -8,6 +8,7 @@
                         <CardHeader
                         :header="refuelDetail.Description"
                         />
+                        <i @click="onDelete(refuelDetail.ID)" class="fas fa-times"></i>
                         <Table
                         :map="refuelDetail.CoreConfig"
                         />
@@ -32,7 +33,6 @@
                         <Label
                         for="floatingTextarea"
                         text="Comments for first step"
-                        
                         />
                     </div>
                     <Button
@@ -41,9 +41,6 @@
                     @click="$refs.newConfig.getNewConfig()"
                     />
                 </div>
-                <!-- <UpdateForm
-                :latterInstance="refuelDetails.at(-1)"
-                /> -->
             </div>
         </div>
     </div>
@@ -69,47 +66,48 @@ export default {
         Input,
         TextArea,
     },
-    props: ["id", "name"], //TODO add excption if ID is not given
+    props: ["id"], //TODO add excption if ID is not given
     data(){
         return {
             refuelDetails: [{
                 pdc: [],
-            }],
+            },],
             finalForm:{},
             description:'',
         }
     },
     mounted(){
         console.log("ready")
-        this.getDetails(this.id)
+        console.log(this.$route.params)
+        this.getDetails(-1)
     },
     watch: {
         id(){
             console.log("changed")
-            this.getDetails(this.id, -1) //* second arg is slice index
+            this.getDetails(-1)
         },
         refuelDetails:{
             deep: true,
             handler(){
-                this.finalForm.refuelId = this.id
+                this.finalForm.refuelId = this.$route.params.id
             }
         }
     },
     //TODO use the same methods for update 
     methods: {
-        getDetails(id, index){
-            fetch(`http://localhost:8888/refuelings/${id}/details`)
+        getDetails(index){
+            fetch(`http://localhost:8888/refuelings/${this.$route.params.id}/details`)
             .then(response => response.json())
             .then(data => {
-                this.preLoadPDC(data.at(index).ID, index)
-                return (this.refuelDetails = data, console.log(data, this.refuelDetails))})
+                this.refuelDetails = data
+                return (this.preLoadPDC(this.refuelDetails.at(index).ID, index))})
             .catch(error => console.error(error))
             
         },
-        preLoadPDC(id, index) {
-            console.log(this.refuelDetails)
+        preLoadPDC(actId, index) {
+            console.log(actId)
             console.log("called")
-            fetch(`http://localhost:8888/refuelings/${id}/PDC`)
+            fetch(`http://localhost:8888/refuelings/${this.$route.params.id}/${actId}/PDC`)
             .then(response => response.json())
             .then(data => (this.refuelDetails.at(index).PDC = data, console.log(this.refuelDetails.at(index))))
             .catch(error => console.error(error))
@@ -121,16 +119,22 @@ export default {
             this.finalForm.description = this.description
             this.finalForm.map = obj.map
             this.finalForm.pdc = obj.pdc
-            this.finalForm.name = `${this.name}_${this.refuelDetails.length}.PDC`
+            this.finalForm.name = `${this.$route.params.id}_${this.refuelDetails.length}.PDC`
             this.refuelDetails.push(
                 {
+                    ID: (() => this.refuelDetails.at(-1).ID)()+1,
                     PDC: this.finalForm.pdc,
                     CoreConfig: this.finalForm.map,
                     Description: this.finalForm.description
                 }
             )
+            console.log(this.refuelDetails)
             console.log(this.finalForm)
         },
+        onDelete(actId){
+            console.log(actId)
+            this.refuelDetails = this.refuelDetails.filter(e => e.ID !== actId)
+        }
     },
 }
 </script>
@@ -141,6 +145,12 @@ export default {
     }
     #detail .table td {
         height:40px;
+    }
+    .card .fa-times {
+        position: absolute;
+        top: 8px;
+        right:8px;
+
     }
     .forms-container {
         width:40%; 

@@ -11,7 +11,7 @@
                 />
                 <br>
                 <router-link v-for="(refuel, i) in refuels" :key="i" :to="{name: 'Detail', 
-                    params: {id: refuel.ID, name:refuel.RefuelName}}">
+                    params: {id: refuel.ID}}">
                     <div  class="card text-center">
                         <CardHeader
                         :header="refuel.Date"
@@ -46,10 +46,10 @@ export default {
         }
     },
     mounted(){
-            fetch("http://localhost:8888/refuelings")
-            .then(response => response.json())
-            .then(data => this.refuels = data)
-            .catch(error => console.log(error.message))
+        fetch("http://localhost:8888/refuelings")
+        .then(response => response.json())
+        .then(data => this.refuels = data)
+        .catch(error => console.log(error.message))
     }
 }
 </script>
@@ -57,9 +57,21 @@ export default {
     .container {
         margin-top: 60px;
     }
-
     #r {
     }
     #l {
+    }
+    .container-flex {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        height: 100%;
+        align-items: stretch;
+    }
+    .container-flex .col {
+        margin: auto;
+        flex: 0 0 50%;
     }
 </style>
