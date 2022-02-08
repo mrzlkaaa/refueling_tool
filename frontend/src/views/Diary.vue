@@ -58,7 +58,7 @@ export default {
         submit(){
             console.log(this.FormsData)
             const request = new Request(
-            "http://localhost:8888/submitWeekData",
+            "http://localhost:8889/submitWeekData",
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

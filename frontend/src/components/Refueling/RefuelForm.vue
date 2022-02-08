@@ -34,7 +34,7 @@
     import Select from "./Select.vue"
     import Label from "./Label.vue"
     import Button from "./Button.vue"
-    
+    import SO from "../../constants.js"
     export default {
         name: "RefuelForm",
         components:{
@@ -53,10 +53,7 @@
                     action: "",
                     faNums: "",
                 },
-                selectOpt:[
-                    {name:'Fresh fuel', value:'fresh'},
-                    {name:'Swap', value:'swap'},
-                ],
+                selectOpt: SO,
             }
         },
         methods: {
@@ -71,20 +68,20 @@
                 this.data.pdc = this.pdc
                 console.log(this.data)
                 const request = new Request(
-                "http://localhost:8000/changes",
-            {
-                method: "POST",
-                headers: { 
-                        'Accept': 'application/json',
-                        "Content-Type": "application/json",
-                        'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify(this.data)
-            }
-            );
-            fetch(request)
-                .then(response => response.json())
-                .then(data => this.$emit("refuelForm", data))
-                .catch((error) => console.log(error.message))
+                    "http://localhost:8000/changes",
+                    {
+                        method: "POST",
+                        headers: { 
+                                'Accept': 'application/json',
+                                "Content-Type": "application/json",
+                                'Access-Control-Allow-Origin': '*' },
+                        body: JSON.stringify(this.data)
+                    }
+                );
+                fetch(request)
+                    .then(response => response.json())
+                    .then(data => this.$emit("refuelForm", data))
+                    .catch((error) => console.log(error.message))
             // console.log(this.fileData)
             },
         },

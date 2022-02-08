@@ -32,16 +32,24 @@
                     <div class="container-flex" >
                         <div class="row">
                             <div class="col">
-                                <Table
-                                :map="initialData.map"
-                                />
+                                <div class="card text-center">
+                                    <!-- <CardHeader
+                                    :header="refuelDetail.Description"
+                                    /> -->
+                                    <Table
+                                    :map="initialData.map"
+                                    />
+                                </div> <br>
                             </div>
-                        </div>
-                        <div v-if="firstStep.status" class="row">
-                            <div class="col">
-                                <Table
-                                :map="firstStep.map"
+                            <div v-if="firstStep.status" class="col">
+                                <div class="card text-center">
+                                    <!-- <CardHeader
+                                        :header="refuelDetail.Description"
+                                        /> -->
+                                    <Table
+                                    :map="firstStep.map"
                                 />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -82,7 +90,7 @@
     import Table from "../components/Refueling/Table.vue"
     import RefuelForm from "../components/Refueling/RefuelForm.vue"
     import ConfirmationForm from "../components/Refueling/ConfirmationForm.vue"
-    import AlertBox from "../components/Refueling/AlertBox.vue"
+    import AlertBox from "../components/AlertBox.vue"
     
 
     export default {
@@ -166,9 +174,9 @@
     }
 </script>
 <style>
-    #addRefuel .col {
+    /* #addRefuel .col {
         width:50%;
-    }
+    } */
     .slide-enter-active, .slide-leave-active {
         transition: opacity 1s;
     }

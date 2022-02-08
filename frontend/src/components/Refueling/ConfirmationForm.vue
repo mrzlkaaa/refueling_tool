@@ -69,11 +69,6 @@ export default {
 
     data(){
         return {
-            // formData: {
-            //     name:"",
-            //     date:"",
-            //     description:"",
-            // },
             selectOpt:[
                 {
                     "name": "New Refueling",
