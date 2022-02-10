@@ -38,6 +38,7 @@ class RefuelFormData(BaseModel):
 @app.post("/average")
 async def average(file: UploadFile):
     cont = await file.read()
+    print(cont)
     pdc = list(map(lambda x: x+"\n", cont.decode("utf-8").split("\n")))
     mp, pdc = Average(pdc=pdc).average_burnup()
     #* return object with name of file and cells map to display

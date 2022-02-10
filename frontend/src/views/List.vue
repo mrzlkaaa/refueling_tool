@@ -65,7 +65,7 @@ export default {
     mounted(){
         fetch("http://localhost:8888/refuelings")
         .then(response => response.json())
-        .then(data => this.refuels = data)
+        .then(data => (this.refuels = data.sort((a,b) => b.RefuelName - a.RefuelName)))
         .catch(error => console.log(error.message))
         // this.backUpRefuels = this.refuels
 

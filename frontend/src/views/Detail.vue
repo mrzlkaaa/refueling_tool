@@ -17,7 +17,7 @@
                         <CardHeader
                         :header="refuelDetail.Description"
                         />
-                        <i class="fas fa-file-export"></i>
+                        <i @click="onSave(refuelDetail.PDC, refuelDetail.ID, i)" class="fas fa-file-export"></i>
                         <i @click="onDelete(refuelDetail.ID)" class="fas fa-times"></i>
                         <Table
                         :map="refuelDetail.CoreConfig"
@@ -65,6 +65,8 @@ import RefuelForm from "../components/Refueling/RefuelForm.vue"
 import Button from "../components/Refueling/Button.vue"
 import Input from "../components/Refueling/Input.vue"
 import TextArea from "../components/Refueling/TextArea.vue"
+// require("downloadjs")(data, strFileName, strMimeType)
+
 export default {
     name: "Detail",
     components: {
@@ -91,7 +93,8 @@ export default {
                 statusCode: 200,
                 msg: '',
                 time: 5,
-            }
+            },
+            url:"",
         }
     },
     mounted(){
@@ -194,6 +197,23 @@ export default {
                 .then(data => (console.log(data), this.alert.msg = data))
                 .catch(error => console.error(error))
             }
+        },
+        async onSave(pdc, actId, index){
+            let download = new Promise((resolve, reject) => {
+                pdc ? resolve("ok") : reject("Whoops!")
+            })
+            download
+            .then(() => this.save(pdc))
+            .catch(() => (this.preLoadPDC(actId, index), setTimeout(this.save, 1000, this.refuelDetails[index].PDC)))
+        },
+        save(pdc){
+            const url = window.URL.createObjectURL(new Blob(pdc, {type: "text/plain"}))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'file.PDC') //or any other extension
+            document.body.appendChild(link)
+            console.log("click")
+            link.click()
         }
     },
 }
