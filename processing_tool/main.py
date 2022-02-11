@@ -1,6 +1,5 @@
 import uvicorn
 import sys
-import redis
 from fastapi import FastAPI, UploadFile
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,16 +7,15 @@ from refueling import *
 
 
 app = FastAPI()
-redis = redis.Redis(host='irt-t.ru',
-                    port=6379)
-print(redis.connection_pool.__dict__)
-
 
 origins = [
     "http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",
     "http://localhost:3000",
+    "http://localhost:8080",
     "http://localhost:8000",
+    "http://109.123.162.90:80",
+    "http://nss-irt-t.xyz"
 ]
 
 app.add_middleware(
@@ -38,7 +36,6 @@ class RefuelFormData(BaseModel):
 @app.post("/average")
 async def average(file: UploadFile):
     cont = await file.read()
-    print(cont)
     pdc = list(map(lambda x: x+"\n", cont.decode("utf-8").split("\n")))
     mp, pdc = Average(pdc=pdc).average_burnup()
     #* return object with name of file and cells map to display
