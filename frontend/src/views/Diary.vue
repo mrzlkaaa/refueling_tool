@@ -58,7 +58,7 @@ export default {
         submit(){
             console.log(this.FormsData)
             const request = new Request(
-            "http://localhost:8889/submitWeekData",
+            "http://109.123.162.90:8889/submitWeekData",
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -74,7 +74,7 @@ export default {
         },
         headerData(num, fcname) {
             this.FormsData.week = num
-            this.FormsData.fcName = fcname
+            this.FormsData.fcName = fcname.toString()
         },
         populateDetails(details) {
             this.FormsData.weeklyDetail = []

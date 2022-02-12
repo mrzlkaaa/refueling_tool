@@ -15,12 +15,14 @@ services:
   diary:
     container_name: diary_go
     image: diary_go:v1.0.0
+    restart: always
     ports:
       - 8889:8889
 
   refuel:
     container_name: refuel_go
     image: refuel_go:v1.0.0
+    restart: always
     ports:
       - 8888:8888
   

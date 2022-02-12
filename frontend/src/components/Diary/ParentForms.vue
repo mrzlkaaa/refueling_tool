@@ -37,7 +37,7 @@ export default {
     methods: {
         getWeeksNum(fcName) {
             this.fcName = fcName
-            fetch(`http://localhost:8889/WeeksNum/${this.fcName}`)
+            fetch(`http://109.123.162.90:8889/WeeksNum/${this.fcName}`)
             .then(response => response.json())
             .then(data => this.weeks=data)
             .catch((error) => console.log(error.message))
@@ -47,7 +47,7 @@ export default {
         getWeekDetails(weekNum) {
             this.weekNum = weekNum
             this.submitHeader(this.weekNum, this.fcName)
-            fetch(`http://localhost:8889/WeekDetails/${this.fcName}/${this.weekNum}`)
+            fetch(`http://109.123.162.90:8889/WeekDetails/${this.fcName}/${this.weekNum}`)
             .then(response => response.json())
             .then(data => this.submitDetails(data))
             .catch((error) => console.log(error.message))  
@@ -62,7 +62,7 @@ export default {
         }
     },
     created() {
-            fetch("http://localhost:8888/refuelingsList")
+            fetch("http://109.123.162.90:8888/refuelingsList")
             .then(response => response.json())
             .then(data => (this.refuelingsList = data.names))
     },

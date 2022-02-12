@@ -63,7 +63,7 @@ export default {
         }
     },
     mounted(){
-        fetch("http://localhost:8888/refuelings")
+        fetch("http://109.123.162.90:8888/refuelings")
         .then(response => response.json())
         .then(data => (this.refuels = data.sort((a,b) => b.RefuelName - a.RefuelName)))
         .catch(error => console.log(error.message))
@@ -74,7 +74,7 @@ export default {
         onDelete(id){
             if (confirm(`Are you sure you want to delete ${id}?`)){
                 const request = new Request(
-                `http://localhost:8888/refuelings/${id}/delete`,
+                `http://109.123.162.90:8888/refuelings/${id}/delete`,
                     {
                         method: "POST",
                         headers: { 

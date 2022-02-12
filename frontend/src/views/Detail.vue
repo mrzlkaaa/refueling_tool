@@ -117,7 +117,7 @@ export default {
     //TODO use the same methods for update 
     methods: {
         getDetails(index){
-            fetch(`http://localhost:8888/refuelings/${this.$route.params.id}/details`)
+            fetch(`http://109.123.162.90:8888/refuelings/${this.$route.params.id}/details`)
             .then(response => response.json())
             .then(data => {
                 this.refuelDetails = data
@@ -128,14 +128,14 @@ export default {
         preLoadPDC(actId, index) {
             console.log(actId)
             console.log("called")
-            fetch(`http://localhost:8888/refuelings/${this.$route.params.id}/${actId}/PDC`)
+            fetch(`http://109.123.162.90:8888/refuelings/${this.$route.params.id}/${actId}/PDC`)
             .then(response => response.json())
             .then(data => (this.refuelDetails.at(index).PDC = data, console.log(this.refuelDetails.at(index))))
             .catch(error => console.error(error))
         },
         addNewAct(){
             const request = new Request(
-                "http://localhost:8888/add-act",
+                "http://109.123.162.90:8888/add-act",
                     {
                         method: "POST",
                         headers: { 
@@ -174,7 +174,7 @@ export default {
             console.log(actId)
             if (confirm(`Are you sure you want to delete ${actId}?`)){
                 const request = new Request(
-                `http://localhost:8888/refuelings/${this.$route.params.id}/${actId}/delete`,
+                `http://109.123.162.90:8888/refuelings/${this.$route.params.id}/${actId}/delete`,
                     {
                         method: "POST",
                         headers: { 

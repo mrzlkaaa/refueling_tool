@@ -135,7 +135,7 @@
                 let formData = new FormData()
                 formData.append("file", this.postFile)
                 const request = new Request(
-                "http://localhost:8000/average",
+                "http://109.123.162.90:8000/average",
             {
                 method: "POST",
                 headers: { 
