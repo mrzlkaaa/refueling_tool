@@ -2,19 +2,19 @@ version: "3"
 services:
   frontend:
       container_name: vue
-      image: ref_frontend:v1.0.0
+      image: mrzlkaaa/irt-t-refuel:v1.0.0
       ports:
         - "80:80"
 
   processing:
       container_name: python_processing
-      image: refuel_proccesing:v1.0.0
+      image: mrzlkaaa/refuel_proccesing:v1.0.0
       ports: 
         - "8890:8890"
 
   diary:
     container_name: diary_go
-    image: diary_go:v1.0.0
+    image: mrzlkaaa/diary_go:v1.0.0
     restart: always
     ports:
       - 8889:8889
@@ -28,14 +28,14 @@ services:
 
   refuel:
     container_name: refuel_go
-    image: refuel_go:v1.0.0
+    image: mrzlkaaa/refuel_go:v1.0.0
     restart: always
     ports:
       - 8888:8888
   
   ref_go_api:
     container_name: ref_go_api
-    image: ref_go_api:v1.0.0
+    image: mrzlkaaa/refuel_api:v1.0.0
     restart: always
     ports:
       - 88:88
