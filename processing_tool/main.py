@@ -8,15 +8,19 @@ from refueling import *
 
 app = FastAPI()
 
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost:3000",
-    "http://localhost:8080",
-    "http://localhost:8000",
-    "http://109.123.162.90:80",
-    "http://nss-irt-t.xyz"
-]
+# origins = [
+#     "http://localhost.tiangolo.com",
+#     "https://localhost.tiangolo.com",
+#     "http://localhost:3000",
+#     "http://localhost:8080",
+#     "http://localhost:8000",
+#     "http://109.123.162.90:80",
+#     "http://nss-irt-t.xyz:90"
+#     "http://test.nss-irt-t.xyz"
+#     "http://test.nss-irt-t.xyz:80"
+# ]
+
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,

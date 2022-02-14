@@ -117,7 +117,7 @@ export default {
     //TODO use the same methods for update 
     methods: {
         getDetails(index){
-            fetch(`http://109.123.162.90:8888/refuelings/${this.$route.params.id}/details`)
+            fetch(`${this.refuelDepHost}/refuelings/${this.$route.params.id}/details`)
             .then(response => response.json())
             .then(data => {
                 this.refuelDetails = data
@@ -128,14 +128,14 @@ export default {
         preLoadPDC(actId, index) {
             console.log(actId)
             console.log("called")
-            fetch(`http://109.123.162.90:8888/refuelings/${this.$route.params.id}/${actId}/PDC`)
+            fetch(`${this.refuelDepHost}/refuelings/${this.$route.params.id}/${actId}/PDC`)
             .then(response => response.json())
             .then(data => (this.refuelDetails.at(index).PDC = data, console.log(this.refuelDetails.at(index))))
             .catch(error => console.error(error))
         },
         addNewAct(){
             const request = new Request(
-                "http://109.123.162.90:8888/add-act",
+                `${this.refuelDepHost}/add-act`,
                     {
                         method: "POST",
                         headers: { 
@@ -174,7 +174,7 @@ export default {
             console.log(actId)
             if (confirm(`Are you sure you want to delete ${actId}?`)){
                 const request = new Request(
-                `http://109.123.162.90:8888/refuelings/${this.$route.params.id}/${actId}/delete`,
+                `${this.refuelDepHost}/refuelings/${this.$route.params.id}/${actId}/delete`,
                     {
                         method: "POST",
                         headers: { 
@@ -198,13 +198,23 @@ export default {
                 .catch(error => console.error(error))
             }
         },
-        async onSave(pdc, actId, index){
+        onSave(pdc, actId, index){
+            let checkPDC = (ref) => {
+                if (!ref.PDC) {
+                    console.log("calling PDC")
+                } else {
+                    console.log("ready")
+                    clearInterval(intrv)
+                    this.save(ref.PDC)
+                }
+            }
+            let intrv = setInterval(checkPDC, 100, this.refuelDetails[index])
             let download = new Promise((resolve, reject) => {
                 pdc ? resolve("ok") : reject("Whoops!")
             })
             download
             .then(() => this.save(pdc))
-            .catch(() => (this.preLoadPDC(actId, index), setTimeout(this.save, 1000, this.refuelDetails[index].PDC)))
+            .catch(() => (this.preLoadPDC(actId, index), intrv))
         },
         save(pdc){
             const url = window.URL.createObjectURL(new Blob(pdc, {type: "text/plain"}))

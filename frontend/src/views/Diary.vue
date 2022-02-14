@@ -58,7 +58,7 @@ export default {
         submit(){
             console.log(this.FormsData)
             const request = new Request(
-            "http://109.123.162.90:8889/submitWeekData",
+            `${this.diaryDepHost}/submitWeekData`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

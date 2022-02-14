@@ -1,6 +1,6 @@
 server {
 listen 80;
-server_name testing.nss-irt-t.xyz;
+server_name test.nss-irt-t.xyz;
 root /usr/share/nginx/html;
 index   index.html;
 

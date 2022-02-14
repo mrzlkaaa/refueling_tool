@@ -3,14 +3,14 @@ services:
   frontend:
       container_name: vue
       image: ref_frontend:v1.0.0
-      ports: 
+      ports:
         - "80:80"
 
   processing:
       container_name: python_processing
       image: refuel_proccesing:v1.0.0
       ports: 
-        - "8000:8000"
+        - "8890:8890"
 
   diary:
     container_name: diary_go
@@ -19,6 +19,13 @@ services:
     ports:
       - 8889:8889
 
+  # nginx_diary:
+  #     container_name: nginx_diary
+  #     image: nginx_diary:v1.0.0
+  #     restart: always
+  #     ports:
+  #       - 89:89
+
   refuel:
     container_name: refuel_go
     image: refuel_go:v1.0.0
@@ -26,9 +33,11 @@ services:
     ports:
       - 8888:8888
   
-  # nginx_refuel:
-  #   container_name: nginx_refuel
-  #   image: nginx_refuel:v1.0.0
-  #   restart: always
-  #   ports:
-  #     - 80:80
+  ref_go_api:
+    container_name: ref_go_api
+    image: ref_go_api:v1.0.0
+    restart: always
+    ports:
+      - 88:88
+      - 89:89
+      - 8000:8000

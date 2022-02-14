@@ -104,7 +104,7 @@ export default {
             //*Adding requsets
             console.log(this.finalForm)
             const request = new Request(
-            "http://109.123.162.90:8888/add",
+            `${this.refuelDepHost}/add`,
             {
                 method: "POST",
                 headers: { 

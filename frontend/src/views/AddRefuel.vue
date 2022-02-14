@@ -135,12 +135,13 @@
                 let formData = new FormData()
                 formData.append("file", this.postFile)
                 const request = new Request(
-                "http://109.123.162.90:8000/average",
+                `${this.procDepHost}/average`,
             {
                 method: "POST",
                 headers: { 
-                        'Accept': 'application/json',
-                        'Access-Control-Allow-Origin': '*' },
+                        // 'Accept': 'application/json',
+                        'Access-Control-Allow-Origin': '*' 
+                },
                 body: formData
             }
             );

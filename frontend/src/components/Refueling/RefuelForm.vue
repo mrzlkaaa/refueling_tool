@@ -68,7 +68,7 @@
                 this.data.pdc = this.pdc
                 console.log(this.data)
                 const request = new Request(
-                    "http://109.123.162.90:8000/changes",
+                    `${this.procDepHost}/changes`,
                     {
                         method: "POST",
                         headers: { 
