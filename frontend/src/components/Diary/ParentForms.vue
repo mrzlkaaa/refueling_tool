@@ -3,11 +3,11 @@
         <div class="row">
             <div class="col">
                 <label for="FCname" class="form-label">Fuel Cycle Name</label>
-                <SelectFC :data="refuelingsList" @fcName=getWeeksNum />
+                <Select :data="refuelingsList" @selected=getWeeksNum />
             </div>
             <div class="col">
                 <label for="Week" class="form-label">Week</label>
-                <SelectW :data="weeks" @weekName=getWeekDetails />
+                <Select :data="weeks" @selected=getWeekDetails />
                 <!-- <Input v-model="week" name="Week" class="form-control" type="number"> </Input> -->
             </div>
         </div>
@@ -15,15 +15,13 @@
 </template>
 
 <script>
-import SelectFC from "./SelectFC.vue"
-import SelectW from "./SelectW.vue"
+import Select from "./Select.vue"
 import Input from "./Input.vue"
 
 export default {
     name: "Parent",
     components: {
-        SelectFC,
-        SelectW,
+        Select,
         Input,
     },
     data(){

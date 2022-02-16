@@ -1,7 +1,6 @@
 <template>
     <select v-model="selectedName" class="form-select" aria-label=".form-select-lg example" 
-    @change="selectChanged">
-        <!-- <option selected> {{selected}} </option> -->
+    @change="$emit('selected', selectedName)">
         <option selected value> Choose any </option>
         <option v-for="(name, index) in data" v-bind:key="index" :value="name"> {{name}} </option>
     </select>
@@ -11,6 +10,7 @@
 export default {
     Name: "SelectFC",
     props: ["data"],
+    emits:["selected"],
     data() {
         return {
             selectedName:"",
@@ -18,7 +18,7 @@ export default {
     },
     methods: {
         selectChanged() {
-            this.$emit("fcName", this.selectedName)
+            this.$emit("selected", this.selectedName)
             console.log("fcName sent")
             console.log(this.selectedName)
         },

@@ -24,7 +24,8 @@
                 
             </div> <br>
         </div>
-        <Button 
+        <Button
+            class="btn btn-primary"
             @click="addFileds"
         />
     </div>

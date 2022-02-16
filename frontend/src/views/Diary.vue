@@ -4,28 +4,24 @@
         <div class="card-header">
             Thermal Power Output
         </div>
-        <div class="card-body">
-            <Parent
-                @headerData="headerData"
-                @details="populateDetails"
-                ref="form"
+        <div class="tabs">
+            <Button
+            v-for="tab in tabs"
+            :key="tab.currentTab"
+            :msg="tab.msg"
+            class="btn btn-primary"
+            @click="currentTab=tab.currentTab"
             />
-            <br>
-            <Child
-                v-model="FormsData.weeklyDetail"
-                @onDelete="deleteObj"
-            />
-            <Table v-model="FormsData.weeklyDetail"></Table>
-             <Button
-                :msg="msg"
-                @click="submit"
-            />
+            <component :is="currentTab"></component>
         </div>
+        
     </div>
 </div>
 </template>
 
 <script>
+import WeeklyData from "../components/Diary/WeeklyData.vue"
+import ViewFCData from "../components/Diary/ViewFCData.vue"
 import Parent from "../components/Diary/ParentForms.vue"
 import Child from "../components/Diary/ChildForms.vue"
 import Table from "../components/Diary/Table.vue"
@@ -34,103 +30,86 @@ import Button from "../components/Diary/Button.vue"
 export default {
     name: "Container",
     components: {
+        WeeklyData,
+        ViewFCData,
         Parent,
         Child,
         Table,
         Button,
     },
-    data() {
+    data(){
         return {
-            FormsData:{
-                fcName: "",
-                week: 0,
-                weeklyDetail: [{}],
-            },
-            msg: "",
+            currentTab: "WeeklyData",
+            tabs: [
+                {msg:"Edit", currentTab: "WeeklyData"},
+                {msg:"View", currentTab: "ViewFCData"},
+            ]
         }
-    },
-    watch:{
-        msg(newval){
-            this.$emit("msg", newval)
+    }, 
+    watch: {
+        currentTab(){
+            console.log(this.currentTab)
         }
-    },
-    methods:{
-        submit(){
-            console.log(this.FormsData)
-            const request = new Request(
-            `${this.diaryDepHost}/submitWeekData`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(this.FormsData)
-            }
-            );
-            fetch(request)
-                .then(response => response.json())
-                .catch((error) => console.log(error.message))
-                //* call api to see updates on weeks
-                setTimeout(this.$refs.form.getWeeksNum, 500, this.$refs.form.fcName)
-            
-        },
-        headerData(num, fcname) {
-            this.FormsData.week = num
-            this.FormsData.fcName = fcname.toString()
-        },
-        populateDetails(details) {
-            this.FormsData.weeklyDetail = []
-            if (details.length == 0) {
-                this.FormsData.weeklyDetail.push({})
-                this.msg = "Add"
-                // this.changeTitle("Add")
-            }
-            for (let i = 0; i < details.length; i++) {
-                let obj = {}
-                obj.power = details[i].Power   
-                obj.fromDate = details[i].FromDate
-                obj.toDate = details[i].ToDate
-                this.FormsData.weeklyDetail.push(obj)
-                this.msg = "Update"
-            }
-        },
-        deleteObj(index){
-            this.FormsData.weeklyDetail = this.FormsData.weeklyDetail.filter((_, indx) => indx != index)
-        },
-        prePopTimeField(){
-
-        }
-    },
+    }
 }
 </script>
 <style>
     #diary .row {
-    position: relative;
+        position: relative;
     }
-    .col .fa-times {
-    position: absolute;
-    top:0;
-    right:15px;
-    color:red;
+    #diary .col .fa-times {
+        position: absolute;
+        top:0;
+        right:15px;
+        color:red;
     }
-    .col .fa-link {
-    position: absolute;
-    top:0;
-    right:40px;
-    /* color:#0d6efd; */
+    #diary .col .fa-link {
+        position: absolute;
+        top:0;
+        right:40px;
+        /* color:#0d6efd; */
     }
     .active {
-    color:#0d6efd;
+        color:#0d6efd;
     }
     .inactive {
-    color:grey;
+        color:grey;
     }
     .btn {
-    width:25%;
+        width:25%;
+        
     }
+    .tabs > .btn-primary {
+        background-color: rgba(0,0,0,.03);
+        color:black;
+    }
+    .tabs > .btn-primary:hover {
+        background-color: #d6d5d5;
+        color:black;
+    }
+    .tabs > .btn-primary:focus {
+        background-color: #d6d5d5;
+        color:black;
+    }
+
     #diary .col {
-    width:33%;
+        width:33%;
     }
     #diary .table {
         width:100%;
         text-align: center;
+    }
+    .tabs {
+        border: 1px solid #eee;
+        border-radius: 2px;
+        /* padding: 20px 30px; */
+        margin-bottom: 5px;
+        user-select: none;
+        overflow-x: auto;
+}
+    .tabs > .btn {
+        width: 50%;
+        border-radius:0;
+        border: 1.5px solid #eee;
     }
 </style>

@@ -1,5 +1,6 @@
 <template>
-    <button class="btn btn-primary"> {{msg ? `${msg} data` : "Add fields"}}</button>
+    <button> {{msg ? `${msg} data` : "Add fields"}}</button>
+    <!-- <div>{{$attrs}}</div> -->
 </template>
 
 <script>
