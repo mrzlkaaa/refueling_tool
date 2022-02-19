@@ -2,9 +2,12 @@ version: "3"
 services:
   frontend:
       container_name: vue
-      image: mrzlkaaa/irt-t-refuel:v1.0.0
+      image: mrzlkaaa/irt-t-refuel:v1.0.1
+      # volumes:
+      #   - /ssl_cert:/etc/nginx/certs
       ports:
         - "80:80"
+        - "443:443"
 
   processing:
       container_name: python_processing
@@ -14,7 +17,7 @@ services:
 
   diary:
     container_name: diary_go
-    image: mrzlkaaa/diary_go:v1.0.0
+    image: mrzlkaaa/diary_go:v1.0.1
     restart: always
     ports:
       - 8889:8889
@@ -35,7 +38,7 @@ services:
   
   ref_go_api:
     container_name: ref_go_api
-    image: mrzlkaaa/refuel_api:v1.0.0
+    image: mrzlkaaa/refuel_api:v1.0.1
     restart: always
     ports:
       - 88:88

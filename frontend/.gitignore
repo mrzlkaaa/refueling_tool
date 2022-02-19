@@ -3,3 +3,7 @@ node_modules
 dist
 dist-ssr
 *.local
+ssl_password.txt
+*.key
+*.crt
+*.csr

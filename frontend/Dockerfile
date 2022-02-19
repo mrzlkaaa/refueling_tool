@@ -12,4 +12,5 @@ RUN npm run build
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /frontend/dist /usr/share/nginx/html
 COPY conf /etc/nginx/conf.d/default.conf
+COPY /ssl_cert /etc/nginx/certs
 CMD ["nginx", "-g", "daemon off;"]

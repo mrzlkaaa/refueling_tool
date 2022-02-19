@@ -67,7 +67,7 @@ import Table from "./Table.vue"
         },
         headerData(num, fcname) {
             this.FormsData.week = num
-            this.FormsData.fcName = fcname.toString()
+            this.FormsData.fcName = fcname
         },
         populateDetails(details) {
             this.FormsData.weeklyDetail = []

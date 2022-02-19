@@ -3,11 +3,17 @@
         <div class="row">
             <div class="col">
                 <label for="FCname" class="form-label">Fuel Cycle Name</label>
-                <Select :data="refuelingsList" @selected=getWeeksNum />
+                <Select 
+                :data="refuelingsList"
+                display="value"
+                @selected=getWeeksNum />
             </div>
             <div class="col">
                 <label for="Week" class="form-label">Week</label>
-                <Select :data="weeks" @selected=getWeekDetails />
+                <Select 
+                :data="weeks" 
+                display="key"
+                @selected=getWeekDetails />
                 <!-- <Input v-model="week" name="Week" class="form-control" type="number"> </Input> -->
             </div>
         </div>
@@ -28,7 +34,7 @@ export default {
         return {
             fcName: 0,
             weekNum:'',
-            weeks: [],
+            weeks: {},
             refuelingsList: []
         }
     },
@@ -37,7 +43,7 @@ export default {
             this.fcName = fcName
             fetch(`${this.diaryDepHost}/weeksNum/${this.fcName}`)
             .then(response => response.json())
-            .then(data => this.weeks=data)
+            .then(data => (this.formatDate(data)))
             .catch((error) => console.log(error.message))
             console.log(this.weeks)
             
@@ -57,6 +63,31 @@ export default {
         //! will be initiated by watch?
         submitHeader(num, fcname) {
             this.$emit("headerData", num, fcname)
+        },
+        formatDate(data){
+            this.weeks = {}
+            let obj = Object.keys(data)
+                console.log(typeof(obj))
+                for (let i = 0; i < obj.length-1; i++) {
+                    // console.log(obj[i])
+                    try{
+                        let formattedDate = []
+                        obj[i].split(" - ").forEach(e => {e = new Date(e)
+                            formattedDate.push(e.toDateString())
+                        })
+                        obj[i] = formattedDate.join(" - ")
+                    }
+                    catch (error){
+                        console.error(error)
+                    }
+                    
+                }
+                // let newData = {}
+                for (let i=0; i < obj.length; i++) {
+                    // const key = obj[i]
+                    this.weeks[`${obj[i]}`] = Object.values(data)[i]
+                }
+                // this.data = newData
         }
     },
     created() {

@@ -1,8 +1,12 @@
 server {
-listen 80;
-server_name nss-irt-t.xyz;
-root /usr/share/nginx/html;
-index   index.html;
+    listen 80;
+    listen 443 ssl;
+    server_name nss-irt-t.xyz;
+    ssl_password_file /etc/nginx/certs/ssl_password.txt;
+    ssl_certificate /etc/nginx/certs/sslkey.crt;
+    ssl_certificate_key /etc/nginx/certs/sslkey.key;
+    root /usr/share/nginx/html;
+    index   index.html;
 
     location / {
         try_files $uri $uri/ /index.html;
