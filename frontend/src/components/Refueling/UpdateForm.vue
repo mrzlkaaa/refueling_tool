@@ -38,7 +38,7 @@
 <script>
 import Input from "./Input.vue"
 import Select from "./Select.vue"
-import Label from "./Label.vue"
+import Label from "../Label.vue"
 import Button from "./Button.vue"    
 import TextArea from "./TextArea.vue"
 export default {

@@ -129,13 +129,13 @@ export default {
         margin: auto;
         flex: 0 0 50%;
     }
-    .card .fa-times {
+    #detail .fa-times {
         position: absolute;
         top: 8px;
         right:8px;
 
     }
-    .card .fa-file-export{
+    #detail .fa-file-export{
         position: absolute;
         top: 8px;
         left:8px;

@@ -1,9 +1,14 @@
 <template>
     <div class="DW-section" :style="{display:display}">
-        <!-- <div class="row">
-            <div class="col">sfsf</div>
-            <div class="col">sfsf</div>
-        </div> -->
+        <div class="row">
+            <Table
+            :data="rods"
+            />
+        </div>
+        <div class="row">
+            <div class="col"><b>Power</b></div>
+            <div class="col"><b>Parameters</b></div>
+        </div>
         <div v-for="dw in DW" :key=dw >
             <div class="row DW">
                 <div class="col">
@@ -26,9 +31,13 @@
     </div>
 </template>
 <script>
+import Table from "../Table.vue"
 export default {
     name: "ViewDWData",
-    props:["DW", "display"],
+    components:{
+        Table,
+    },
+    props:["DW", "rods", "display"],
     data(){
         return {
             data:""

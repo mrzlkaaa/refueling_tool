@@ -1,7 +1,17 @@
 import pytest
 from .generator import *
 
-class TestBurn:
+
+class TestGenerator:
+    date = "2022-02-12T13:44"
+
+    def test_date_formatter(self):
+        formatted_date = Generator(date=self.date)
+        print(formatted_date)
+        # pytest.fail(f"{formatted_date}")
+        assert 0
+
+class TestBurn(TestGenerator):
     DPOW = "DPOW"
     DSTP = "DSTP"
     days = [10.78, 2.5, 5.75, 3, 4.81, 3]

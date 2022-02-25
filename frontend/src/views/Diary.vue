@@ -24,7 +24,7 @@ import WeeklyData from "../components/Diary/WeeklyData.vue"
 import ViewFCData from "../components/Diary/ViewFCData.vue"
 import Parent from "../components/Diary/ParentForms.vue"
 import Child from "../components/Diary/ChildForms.vue"
-import Table from "../components/Diary/Table.vue"
+import Table from "../components/Diary/TableWeeklyData.vue"
 import Button from "../components/Diary/Button.vue"
 
 export default {

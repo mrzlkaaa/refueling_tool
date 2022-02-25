@@ -60,11 +60,12 @@ import AlertBox from "../components/AlertBox.vue"
 import Table from "../components/Refueling/Table.vue"
 import CardHeader from "../components/CardHeader.vue"
 import CardBody from "../components/CardBody.vue"
-import Label from "../components/Refueling/Label.vue"
+import Label from "../components/Label.vue"
 import RefuelForm from "../components/Refueling/RefuelForm.vue"
 import Button from "../components/Refueling/Button.vue"
 import Input from "../components/Refueling/Input.vue"
 import TextArea from "../components/Refueling/TextArea.vue"
+import { saveFile } from "../components/helpers"
 // require("downloadjs")(data, strFileName, strMimeType)
 
 export default {
@@ -216,15 +217,7 @@ export default {
             .then(() => this.save(pdc))
             .catch(() => (this.preLoadPDC(actId, index), intrv))
         },
-        save(pdc){
-            const url = window.URL.createObjectURL(new Blob(pdc, {type: "text/plain"}))
-            const link = document.createElement('a')
-            link.href = url
-            link.setAttribute('download', 'file.PDC') //or any other extension
-            document.body.appendChild(link)
-            console.log("click")
-            link.click()
-        }
+        save: saveFile
     },
 }
 </script>

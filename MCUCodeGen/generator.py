@@ -1,5 +1,6 @@
 import os
 import typing
+from datetime import datetime
 
 templates_path = os.path.join(os.getcwd(), "templates")
 
@@ -10,12 +11,16 @@ class Generator:
 
     data: list[str] = []
     def __init__(self, *args, **kwargs):
-        self.temperature = kwargs.get("temperature")
-        self.date = kwargs.get("date") #* string --> add formatter
-        self.kcs = kwargs.get("kcs") #* in mm --> func to convert to cm
-        
-    def date_formatter(self):
-        return
+        if not kwargs.get("temperature") is None:
+            self.temperature = kwargs.get("temperature")+273
+        self.kcs = kwargs.get("kcs") #* if in mm --> func to convert to cm
+
+    def __repr__(self):
+        return f"<Date - {self.date}>"
+     
+    def date_formatter(self, str_date):
+        formatted_date = datetime.strptime(str_date, '%Y-%m-%dT%M:%S')
+        return formatted_date.strftime("%d.%M.%Y")
 
     def open(self, filename):
         with open(filename, "r", encoding="ISO-8859-1") as f:
@@ -58,6 +63,7 @@ class NoBurn(Generator):
     kc1: str = "hkc1"
     kc2: str = "hkc2"
     kc3: str = "hkc3"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -73,12 +79,13 @@ class NoBurn(Generator):
         self.open(self.GEO_FILE)
         indexes = [i for i,v in enumerate(self.data) if self.hkc in v]
         for i in indexes:
+            interests_part = self.data[i][:-1]
             if self.kc1 in self.data[i]:
-                self.data[i] = self.data[i][:-1] + f"-{self.kcs.get('kc1')}"
+                self.data[i] = interests_part + f"-{self.kcs.get('kc1')}" + "\n"
             elif self.kc2 in self.data[i]:
-                self.data[i] = self.data[i][:-1] + f"-{self.kcs.get('kc2')}"
+                self.data[i] = interests_part + f"-{self.kcs.get('kc2')}" + "\n"
             elif self.kc3 in self.data[i]:
-                self.data[i] = self.data[i][:-1] + f"-{self.kcs.get('kc3')}"
+                self.data[i] = interests_part + f"-{self.kcs.get('kc3')}" + "\n"
         return self.data
 
     def splitted(self, line, symbol):

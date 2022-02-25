@@ -1,5 +1,5 @@
 <template>
-    <button> {{msg ? `${msg} data` : "Add fields"}}</button>
+    <button> {{msg ? `${msg}` : ""}}</button>
     <!-- <div>{{$attrs}}</div> -->
 </template>
 

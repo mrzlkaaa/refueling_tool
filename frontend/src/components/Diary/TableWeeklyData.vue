@@ -3,12 +3,9 @@
             <div class='col center-text'>
                     <table class="table">
                         <thead>
-                        <tr>
-                            <th scope="col">Power, kW</th>
-                            <th scope="col">Sum Time, h</th>
-                            <th scope="col">Energy Output, MWhour</th>
-                            
-                        </tr>
+                            <TableRowHeader
+                            :datas="header"
+                            />
                         </thead>
                         <tbody>
                             <tr v-for="i,index in values" v-bind:key="index">
@@ -16,11 +13,9 @@
                                 <td>{{TotalHours(index, Date.parse(i.toDate), Date.parse(i.fromDate))}} </td>
                                 <td>{{EnergyOutput(index)}}</td>
                             </tr>
-                            <tr>
-                                <th>Sum</th>
-                                <th>{{sumTime}}</th>
-                                <th>{{sumEnOut }} </th>
-                            </tr>
+                            <TableRowHeader
+                            :datas="['Sum', sumTime, sumEnOut]"
+                            />
                         </tbody>
                     </table>
             </div>
@@ -28,13 +23,18 @@
 </template>
 
 <script>
+import TableRowHeader from "../TableRowHeader.vue"
 export default {
     name: "Table",
+    components: {
+        TableRowHeader,
+    },
     props: ["modelValue"],
     data(){
         return {
             sumTime: 0,
             sumEnOut: 0,
+            header: ['Power, kW', 'Sum Time, h', 'Energy Output, MW×hour'],
         }
     },
     computed:{

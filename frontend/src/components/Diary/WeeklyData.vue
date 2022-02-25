@@ -7,15 +7,17 @@
         />
         <br>
         <Child
-            v-model="FormsData.weeklyDetail"
+            v-model="FormsData"
             @onDelete="deleteObj"
         />
         <Table v-model="FormsData.weeklyDetail"></Table>
+            <div v-if="msg.length>0">
             <Button
             :msg="msg"
             class="btn btn-primary"
             @click="submit"
-        />
+            />
+            </div>
     </div>
 </template>
 
@@ -23,7 +25,7 @@
 import Button from "./Button.vue"
 import Parent from "./ParentForms.vue"
 import Child from "./ChildForms.vue"
-import Table from "./Table.vue"
+import Table from "./TableWeeklyData.vue"
  export default {
     name: "WeeklyData",
     components: {
@@ -37,6 +39,13 @@ import Table from "./Table.vue"
             FormsData:{
                 fcName: "",
                 week: 0,
+                rodsPosition:{
+                    AR:0,
+                    KS1: 0,
+                    KS2: 0,
+                    KS3: 0,
+                    Temp: 0.0,
+                },
                 weeklyDetail: [{}],
             },
             msg: "",
@@ -45,6 +54,7 @@ import Table from "./Table.vue"
     watch:{
         msg(newval){
             this.$emit("msg", newval)
+            console.log(this.FormsData)
         }
     },
     methods:{
@@ -70,20 +80,22 @@ import Table from "./Table.vue"
             this.FormsData.fcName = fcname
         },
         populateDetails(details) {
+            console.log(details)
             this.FormsData.weeklyDetail = []
-            if (details.length == 0) {
+            if (details.DetailWeek == null) {
                 this.FormsData.weeklyDetail.push({})
-                this.msg = "Add"
+                this.msg = "Add Data"
                 // this.changeTitle("Add")
             }
-            for (let i = 0; i < details.length; i++) {
+            for (let i = 0; i < details.DetailWeek.length; i++) {
                 let obj = {}
-                obj.power = details[i].Power   
-                obj.fromDate = details[i].FromDate
-                obj.toDate = details[i].ToDate
+                obj.power = details.DetailWeek[i].Power   
+                obj.fromDate = details.DetailWeek[i].FromDate
+                obj.toDate = details.DetailWeek[i].ToDate
                 this.FormsData.weeklyDetail.push(obj)
-                this.msg = "Update"
+                this.msg = "Update Data"
             }
+            this.FormsData.rodsPosition = details.RodsPosition
         },
         deleteObj(index){
             this.FormsData.weeklyDetail = this.FormsData.weeklyDetail.filter((_, indx) => indx != index)

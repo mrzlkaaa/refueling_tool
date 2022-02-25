@@ -1,6 +1,89 @@
 <template>
     <div>
-        <div v-for="(obj,index) in weeklyDetail" v-bind:key="index">
+        <div>
+            <div class="row">
+                <div class="col">
+                    <Label
+                    class="form-label"
+                    for="AR"
+                    text="AR"
+                    />
+                    <div class="input-group mb-3">
+                        <Input
+                        v-model="FormsData.rodsPosition.AR"
+                        type="number"
+                        :min="ksLimits[0]"
+                        :max="ksLimits[1]"
+                        />
+                        <span class="input-group-text" id="basic-addon2">cm</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <Label
+                    class="form-label"
+                    for="KS1"
+                    text="KS1"
+                    />
+                    <div class="input-group mb-3">
+                        <Input
+                        v-model="FormsData.rodsPosition.KS1"
+                        type="number"
+                        :min="ksLimits[0]"
+                        :max="ksLimits[1]"
+                        />
+                        <span class="input-group-text" id="basic-addon2">cm</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <Label
+                    class="form-label"
+                    for="KS2"
+                    text="KS2"
+                    />
+                    <div class="input-group mb-3">
+                        <Input
+                        v-model="FormsData.rodsPosition.KS2"
+                        type="number"
+                        :min="ksLimits[0]"
+                        :max="ksLimits[1]"
+                        />
+                        <span class="input-group-text" id="basic-addon2">cm</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <Label
+                    class="form-label"
+                    for="KS3"
+                    text="KS3"
+                    />
+                    <div class="input-group mb-3">
+                        <Input
+                        v-model="FormsData.rodsPosition.KS3"
+                        type="number"
+                        :min="ksLimits[0]"
+                        :max="ksLimits[1]"
+                        />
+                        <span class="input-group-text" id="basic-addon2">cm</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <Label
+                    class="form-label"
+                    for="Temp"
+                    text="Temperature"
+                    />
+                    <div class="input-group mb-3">
+                        <Input
+                        v-model="FormsData.rodsPosition.Temp"
+                        type="number"
+                        />
+                        <span class="input-group-text" id="basic-addon2">&#176;C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div v-for="(obj,index) in FormsData.weeklyDetail" v-bind:key="index">
             <div class="row">
                 <div  class="col">
                     <label for="Power" class="form-label">Reactor Power</label>
@@ -21,10 +104,10 @@
                     ></i>
                     <i class="fas fa-times" @click=onDelete(index)> </i>
                 </div>
-                
             </div> <br>
         </div>
         <Button
+            msg="Add Fields"
             class="btn btn-primary"
             @click="addFileds"
         />
@@ -34,20 +117,23 @@
 <script>
 import Input from "./Input.vue"
 import Button from "./Button.vue"
+import Label from "../Label.vue"
 export default {
     name: "Child",
     components: {
         Input,
         Button,
+        Label,
     },
     props: ["modelValue"],
     data(){
         return {
             linked: [true],
+            ksLimits:[0,60]
         }
     },
     computed: {
-        weeklyDetail:{
+        FormsData:{
             get() {
                 return this.modelValue
             },
@@ -58,7 +144,7 @@ export default {
     },
     methods: {
         addFileds(){
-            this.weeklyDetail.push({})
+            this.FormsData.weeklyDetail.push({})
             this.linked.push(true)
         },
         onDelete(index){
@@ -66,7 +152,7 @@ export default {
         }, 
         setToDate(index){
             if (this.linked[index]) {
-                this.weeklyDetail[index].toDate = this.weeklyDetail[index].fromDate
+                this.FormsData.weeklyDetail[index].toDate = this.FormsData.weeklyDetail[index].fromDate
                 this.linked[index] = !this.linked[index]
             }
         },
@@ -76,13 +162,12 @@ export default {
         modelValue: {
             deep: true,
             handler(newV) {
-                if (newV.length < 2){
+                if (newV.weeklyDetail.length < 2){
                     return
                 }
-                newV.at(-1).fromDate =  newV.at(-2).toDate
+                newV.weeklyDetail.at(-1).fromDate =  newV.weeklyDetail.at(-2).toDate
                 // console.log(newV.at(-1))
-                // console.log(newV.at(-2))
-                this.setToDate(this.weeklyDetail.length-1)
+                this.setToDate(this.FormsData.weeklyDetail.length-1)
             }
         },
     }
