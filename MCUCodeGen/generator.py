@@ -68,7 +68,7 @@ class NoBurn(Generator):
         super().__init__(*args, **kwargs)
 
     def writePHY(self):
-        to_write = f'{self.TEMPR}   {self.temperature}'
+        to_write = f'{self.TEMPR}   {self.temperature}\n'
         self.open(self.PHY_FILE)
         index = [i for i, v in enumerate(self.data) if self.TEMPR in v] 
         self.data[index[0]] = to_write

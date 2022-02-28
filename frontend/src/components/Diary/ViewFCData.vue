@@ -64,7 +64,7 @@ export default {
             //*fetch post
             let days = []
             for (let i=0; i<refuel.WeeklyData.length; i++) {
-                days.push((refuel.WeeklyData[i].TotalTime/24).toFixed(2))
+                days.push((refuel.WeeklyData[i].TotalEnOuts/144).toFixed(2))
                 try{
                     let restFrom = new Date(refuel.WeeklyData[i].DetailWeek.at(-1).ToDate)
                     let restTo = new Date(refuel.WeeklyData[i+1].DetailWeek.at(-1).FromDate)

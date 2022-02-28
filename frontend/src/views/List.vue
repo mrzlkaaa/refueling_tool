@@ -114,7 +114,10 @@ export default {
     }
     #r {
     }
-    #l {
+    #l .fa-times{
+        position: absolute;
+        top: 8px;
+        right:8px;
     }
     .container-flex {
         width: 100%;

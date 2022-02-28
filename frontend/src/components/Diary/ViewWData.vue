@@ -25,10 +25,10 @@
                     
                 </div>
                 <div class="col-2">
-                    <i @click="onDownloadNoBurn(wd, 'margin')" id="margin" class="fas fa-file-export"> </i>
+                    <i @click="onDownloadNoBurn(wd, 'criticality')" id="criticality" class="fas fa-file-export"> </i>
                 </div>
                 <div class="col-2">
-                    <i @click="onDownloadNoBurn(wd, 'criticality')" id="criticality" class="fas fa-file-export"> </i>
+                    <i @click="onDownloadNoBurn(wd, 'margin')" id="margin" class="fas fa-file-export"> </i>
                 </div>
             </div>
             <div class="row">

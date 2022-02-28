@@ -2,7 +2,7 @@ version: "3"
 services:
   frontend:
       container_name: vue
-      image: mrzlkaaa/irt-t-refuel:v1.0.1
+      image: mrzlkaaa/irt-t-refuel:v1.1.0
       # volumes:
       #   - /ssl_cert:/etc/nginx/certs
       ports:
@@ -17,17 +17,17 @@ services:
 
   diary:
     container_name: diary_go
-    image: mrzlkaaa/diary_go:v1.0.1
+    image: mrzlkaaa/diary_go:v1.0.2
     restart: always
     ports:
       - 8889:8889
 
-  # nginx_diary:
-  #     container_name: nginx_diary
-  #     image: nginx_diary:v1.0.0
-  #     restart: always
-  #     ports:
-  #       - 89:89
+  mcu_generator:
+      container_name: mcu_generator
+      image: mrzlkaaa/mcu_generator:v1.0.0
+      restart: always
+      ports:
+        - 8891:8891
 
   refuel:
     container_name: refuel_go
@@ -38,7 +38,7 @@ services:
   
   ref_go_api:
     container_name: ref_go_api
-    image: mrzlkaaa/refuel_api:v1.0.1
+    image: mrzlkaaa/refuel_api:v1.0.2
     restart: always
     ports:
       - 88:88

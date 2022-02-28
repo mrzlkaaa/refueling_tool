@@ -93,7 +93,7 @@ export default {
     created() {
             fetch(`${this.refuelDepHost}/refuelingsList`)
             .then(response => response.json())
-            .then(data => (this.refuelingsList = data.names))
+            .then(data => (this.refuelingsList = data.names.sort((a,b) => b - a)))
     },
     watch: {
         weeks() {
