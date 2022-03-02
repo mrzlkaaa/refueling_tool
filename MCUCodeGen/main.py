@@ -7,9 +7,10 @@ from generator import *
 
 class BurnForm(BaseModel):
     days: list[float] | None = None
+    fc_name:int
 
 class NoBurnForm(BaseModel):
-    # temperature: float
+    fc_name:int
     option: str
     ar: int
     kc1: int
@@ -40,17 +41,17 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.post('/generateNoBurn')
 def mcu_file(form: NoBurnForm):
+    phy = NoBurn(temperature=form.temp, fc_name=form.fc_name).writePHY()
     match form.option:
         case "margin":
-            phy = NoBurn(temperature=form.temp).writePHY()
             return phy
         case "criticality":
-            phy = NoBurn(temperature=form.temp).writePHY()
+            # phy = NoBurn(temperature=form.temp).writePHY()
             geo = NoBurn(kcs={
-                "kc1":form.kc1, "kc2":form.kc2, "kc3":form.kc3}).writeGEO()
+                "kc1":form.kc1, "kc2":form.kc2, "kc3":form.kc3, "ar": form.ar}).writeGEO()
             return phy, geo
 
 @app.post('/generateBurn')
 def mcu_file(form: BurnForm):
-        geo = Burn(days=form.days).write()
+        geo = Burn(days=form.days, fc_name=form.fc_name).write()
         return geo

@@ -38,6 +38,7 @@
             </div>
             <ViewWData
             :WD="refuel.WeeklyData"
+            :fcName="refuel.Name"
             :display="refuel.display"
             />
         </div>    
@@ -82,7 +83,7 @@ export default {
                             'Accept': 'application/json',
                             "Content-Type": "application/json",
                             },
-                    body: JSON.stringify({"days":days})
+                    body: JSON.stringify({"days":days, "fc_name":refuel.Name})
                 }
             )
             fetch(request)

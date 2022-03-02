@@ -56,7 +56,7 @@ export default {
         ViewDWData,
         Button,
     },
-    props:["WD", "display"],
+    props:["WD", "fcName", "display"],
     data(){
         return {
             data:""
@@ -77,6 +77,7 @@ export default {
                             },
                         body: JSON.stringify({
                             "option": option,
+                            "fc_name": this.fcName,
                             "ar":wd.RodsPosition.AR,
                             "kc1":wd.RodsPosition.KS1,
                             "kc2":wd.RodsPosition.KS2,
@@ -90,10 +91,10 @@ export default {
             .then(data => {
                 console.log(data)
                 if (option=="criticality") {
-                    this.saveFile(data[0], "burn")
-                    this.saveFile(data[1], "geom")
+                    this.saveFile(data[0], `${this.fcName}_burn`)
+                    this.saveFile(data[1], `geom_be_tvs_6layer_${this.fcName}`)
                 }else{
-                    this.saveFile(data, "burn")
+                    this.saveFile(data, `${this.fcName}_burn`)
                 }
             })
             .catch(error => console.log(error))

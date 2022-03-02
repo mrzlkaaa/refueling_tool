@@ -8,19 +8,25 @@ class Generator:
     PHY_FILE: str = os.path.join(templates_path, "no_burn")
     PHY_BURN_FILE: str = os.path.join(templates_path, "burn")
     GEO_FILE: str = os.path.join(templates_path, "geom_be_tvs_6layer")
+    FC_REF: str = "#INCLUDE geom_be_tvs_6layer"
 
     data: list[str] = []
     def __init__(self, *args, **kwargs):
         if not kwargs.get("temperature") is None:
             self.temperature = kwargs.get("temperature")+273
         self.kcs = kwargs.get("kcs") #* if in mm --> func to convert to cm
+        self.fc_name = kwargs.get("fc_name")
 
     def __repr__(self):
-        return f"<Date - {self.date}>"
+        return f"<FC_name - {self.fc_name}>"
      
     def date_formatter(self, str_date):
         formatted_date = datetime.strptime(str_date, '%Y-%m-%dT%M:%S')
         return formatted_date.strftime("%d.%M.%Y")
+
+    def change_fc_ref(self):
+        index, *other = [i for i,v in enumerate(self.data) if self.FC_REF in v]
+        self.data[index] = f"{self.FC_REF}_{self.fc_name}\n"
 
     def open(self, filename):
         with open(filename, "r", encoding="ISO-8859-1") as f:
@@ -41,6 +47,7 @@ class Burn(Generator):
         to_write_pow = f"{self.DPOW}  "
         to_write_stp = f"{self.DSTP}  "
         self.open(self.PHY_BURN_FILE)
+        self.change_fc_ref()
         written_pow, written_stp  = self.appending_lines(to_write_pow, to_write_stp)
         indexes = [i for i, v in enumerate(self.data) if self.DPOW in v or self.DSTP in v]
         self.data[indexes[0]] = written_pow
@@ -60,6 +67,8 @@ class Burn(Generator):
 class NoBurn(Generator):
     TEMPR: str = "TEMPR"
     hkc: str = "SET hkc"
+    har: str = "SET har"
+    ar: str = "har"
     kc1: str = "hkc1"
     kc2: str = "hkc2"
     kc3: str = "hkc3"
@@ -70,6 +79,7 @@ class NoBurn(Generator):
     def writePHY(self):
         to_write = f'{self.TEMPR}   {self.temperature}\n'
         self.open(self.PHY_FILE)
+        self.change_fc_ref()
         index = [i for i, v in enumerate(self.data) if self.TEMPR in v] 
         self.data[index[0]] = to_write
         return self.data
@@ -77,7 +87,7 @@ class NoBurn(Generator):
     def writeGEO(self):
         # to_write
         self.open(self.GEO_FILE)
-        indexes = [i for i,v in enumerate(self.data) if self.hkc in v]
+        indexes = [i for i,v in enumerate(self.data) if self.hkc in v or self.har in v]
         for i in indexes:
             interests_part = self.data[i][:-1]
             if self.kc1 in self.data[i]:
@@ -86,6 +96,8 @@ class NoBurn(Generator):
                 self.data[i] = interests_part + f"-{self.kcs.get('kc2')}" + "\n"
             elif self.kc3 in self.data[i]:
                 self.data[i] = interests_part + f"-{self.kcs.get('kc3')}" + "\n"
+            elif self.ar in self.data[i]:
+                self.data[i] = interests_part + f"-{self.kcs.get('ar')}" + "\n"
         return self.data
 
     def splitted(self, line, symbol):
