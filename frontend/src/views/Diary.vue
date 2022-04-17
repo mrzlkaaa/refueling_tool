@@ -50,6 +50,9 @@ export default {
         currentTab(){
             console.log(this.currentTab)
         }
+    },
+    created(){
+        console.log(this.$store.state)
     }
 }
 </script>

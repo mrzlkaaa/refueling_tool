@@ -1,6 +1,6 @@
 <template>
     <tr >
-        <td v-for="data in datas" :key="data">
+        <td v-for="data in content" :key="data">
             {{data}}
         </td>
     </tr>
@@ -8,6 +8,6 @@
 <script>
 export default {
     name: "TableRowBody",
-    props: ["datas"],
+    inject:["content"]
 }
 </script>

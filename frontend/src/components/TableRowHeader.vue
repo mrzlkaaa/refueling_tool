@@ -1,6 +1,6 @@
 <template>
     <tr>
-        <th v-for="data in datas" :key="data">
+        <th v-for="data in header" :key="data">
             {{data}}
         </th>
     </tr>
@@ -8,6 +8,6 @@
 <script>
 export default {
     name: "TableRowHeader",
-    props: ["datas"],
+    inject:["header"],
 }
 </script>

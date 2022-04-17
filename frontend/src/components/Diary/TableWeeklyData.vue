@@ -29,7 +29,7 @@ export default {
     components: {
         TableRowHeader,
     },
-    props: ["modelValue"],
+    props: ["modelValue", "header"],
     data(){
         return {
             sumTime: 0,

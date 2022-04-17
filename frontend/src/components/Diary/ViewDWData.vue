@@ -1,9 +1,7 @@
 <template>
     <div class="DW-section" :style="{display:display}">
         <div class="row">
-            <Table
-            :data="rods"
-            />
+            <Table/>
         </div>
         <div class="row">
             <div class="col"><b>Power</b></div>
@@ -43,6 +41,12 @@ export default {
             data:""
         }
     },
+    provide(){
+        return{
+            header: ['AR', "KO1", "KO2", "KO3", "Temperature"],
+            content: this.rods,
+        }
+    }
 }
 </script>
 <style>
