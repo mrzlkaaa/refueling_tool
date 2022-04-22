@@ -35,8 +35,8 @@ services:
       - 8888:8888
 
   security:
-    container_name: nss_auth_go
-    image: mrzlkaaa/nss_auth_go:v1.0.0
+    container_name: security
+    image: mrzlkaaa/nss_auth:v1.0.0
     restart: always
     ports:
       - 8892:8892
