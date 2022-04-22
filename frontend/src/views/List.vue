@@ -1,8 +1,5 @@
 <template>
     <div class="container">
-        <AlertBox
-        :info="getAlert()"
-        />
         <div class="row">
             <div id="l" class="col col-3">
                 <br>
@@ -58,89 +55,48 @@ export default {
             search: "",
         }
     },
-    //TODO add computed hook to call alert box
-    created(){
-
-        const request = new Request(
-            `${this.refuelDepHost}/refuelings`,
-            {
-                method: "GET",
-                headers: {
-                        "Authorization": this.$store.state.auth.accessToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        }
-            }
-        )
-        fetch(request)
-            .then(response => {
-                this.dat.code=response.status
-                return response.json()
-            })
-            .then(data => {
-                this.dat.msg = data
-                switch (data){
-                    case "token is expired":
-                        this.$store.dispatch("refreshTokens", this.authDepHost)
-                        break;
-                    case "you are not eligible for this service":
-                        this.$store.dispatch("alertWarning", this.dat)
-                        //todo add smth like "contact admin" and form appears
-                        break;
-                    default:
-                        if (this.dat.code==200){
-                            this.refuels = data.sort((a,b) => b.RefuelName - a.RefuelName)
-                        }
-                        else {
-                            setTimeout(this.$router.push, 4000, {name:"Login"})
-                        }
-                        
-                }
-            })
-            .catch(error => console.log(error.message))
-        // this.backUpRefuels = this.refuels
-
-    },
     methods:{
          ...mapGetters([
-            "getAlert"
+            "isAccess"
         ]),
         ...mapActions([
-            "makeFetch"
+            "makeFetch",
+            "alertSuccess",
         ]),
-        onDelete(id){
+        async onDelete(id){ //! not eddited yet
             if (confirm(`Are you sure you want to delete ${id}?`)){
-                const request = new Request(
-                `${this.refuelDepHost}/refuelings/${id}/delete`,
-                    {
-                        method: "POST",
-                        headers: { 
-                                'Accept': 'application/json',
-                                "Content-Type": "application/json",
-                                },
-                        body: JSON.stringify(id)
-                    }
-                )
-                //! is not fixed to new style
-                fetch(request)
-                .then(response => {
-                    this.alert.statusCode = response.status
-                    this.alert.status = true
-                    if (response.status==200 ) {
-                        this.refuels = this.refuels.filter(e => e.ID !== id)
-                        // this.preLoadPDC(this.refuelDetails.at(-1).ID, -1)
-                    }
-                    return response.json() 
-                })
-                .then(data => (console.log(data), this.alert.msg = data))
-                .catch(error => console.error(error))
+                const req = {
+                    url: `${this.refuelDepHost}/refuelings/${id}/delete`,
+                    method: "POST",
+                    data: {"token":this.state.refreshToken},
+                    auth: null, //todo access via getter
+                }
+                let results = await this.makeFetch(req)
+
+                if (results){
+                    this.alertSuccess({msg:results})
+                    this.refuels = this.refuels.filter(e => e.ID !== id)
+                }
             }
+        }
+    },
+    //TODO add computed hook to call alert box
+    async created(){
+        const req = {
+            url: `${this.refuelDepHost}/refuelings`,
+            method: "GET",
+            data: null,
+            auth: this.isAccess(), //todo access via getter
+        }
+        let results = await this.makeFetch(req)
+        if (results){
+            this.refuels = results.sort((a,b) => b.RefuelName - a.RefuelName)
+            this.backUpRefuels = JSON.parse(JSON.stringify(this.refuels))
         }
     },
     watch:{
         search(){
-            //* search by year and name
-            console.log(this.$store.state.alert)
+            //* search by name
             this.refuels = this.backUpRefuels
             this.refuels = this.refuels.filter(e => this.search.length != 0 ? e.RefuelName.toString().includes(this.search) : this.refuels)
         }

@@ -1,12 +1,6 @@
 <template>
-     <div class="container">
-        <AlertBox v-if="alert.display"
-        :type="alert.type"
-        :text="alert.msg"
-        :time="alert.time"
-        :code="alert.code"
-        />
-        <div class="row" v-else>
+     <div class="container" style="position:relative">
+        <div class="row">
             <div id="l" class="col col-3">
                 <br>
                 <router-link v-for="(s, i) in settings" :key="i" :to="{name: s}">

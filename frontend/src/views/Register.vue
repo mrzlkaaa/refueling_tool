@@ -7,12 +7,38 @@
                     <i class="fa-solid fa-user fa-2xl"></i>
                     <Input
                     type="text"
-                    placeholder="Enter your username"
+                    placeholder="Enter your name"
                     id="floatingInput1"
-                    v-model="credentials.Username"
+                    v-model="credentials.Name"
                     />
                     <Label
                     for="floatingInput1"
+                    text="Name"
+                    />
+                </div>
+                <div class="form-floating mb-3">
+                    <i class="fa-solid fa-user fa-2xl"></i>
+                    <Input
+                    type="text"
+                    placeholder="Enter your surname"
+                    id="floatingInput2"
+                    v-model="credentials.Surname"
+                    />
+                    <Label
+                    for="floatingInput2"
+                    text="Surname"
+                    />
+                </div>
+                <div class="form-floating mb-3">
+                    <i class="fa-solid fa-user-gear fa-2xl"></i>
+                    <Input
+                    type="text"
+                    placeholder="Enter your username"
+                    id="floatingInput3"
+                    v-model="credentials.Username"
+                    />
+                    <Label
+                    for="floatingInput3"
                     text="Login"
                     />
                 </div>
@@ -21,12 +47,12 @@
                     <Input
                     type="email"
                     name="email"
-                    id="floatingInputEmail2"
+                    id="floatingInputEmail4"
                     placeholder="Enter your email"
                     v-model="credentials.Email"
                     />
                     <Label
-                    for="floatingInputEmail2"
+                    for="floatingInputEmail4"
                     text="Email"
                     />
                 </div>
@@ -35,11 +61,11 @@
                     <Input
                     type="password"
                     placeholder="Enter your password"
-                    id="floatingInput3"
+                    id="floatingInput5"
                     v-model="credentials.Password"
                     />
                     <Label
-                    for="floatingInput3"
+                    for="floatingInput5"
                     text="Password"
                     />
                 </div>
@@ -48,11 +74,11 @@
                     <Input
                     type="password"
                     placeholder="Enter your password"
-                    id="floatingInput4"
+                    id="floatingInput6"
                     v-model="credentials.Password2"
                     />
                     <Label
-                    for="floatingInput4"
+                    for="floatingInput6"
                     text="Repeat Password"
                     />
                 </div>
@@ -73,6 +99,7 @@
     </form>
 </template>
 <script>
+import {mapActions, mapGetters} from "vuex"
 import Input from "../components/Input.vue"
 import Label from "../components/Label.vue"
 import Button from "../components/Button.vue"
@@ -85,12 +112,10 @@ export default {
     },
     data(){
         return {
-            dat:{
-                code:200,
-                msg:'',
-            },
             disabled:true,
             credentials:{
+                Name:"",
+                Surname: "",
                 Username: '',
                 Email:'',
                 Password: '',
@@ -99,30 +124,25 @@ export default {
         }
     },
     methods:{
-        signUp(){
-            const request = new Request(
-            `${this.authDepHost}/register`,
-            {
+        ...mapGetters([
+            "isAccess",
+        ]),
+        ...mapActions([
+            "makeFetch",
+            "alertSuccess",
+        ]),
+        async signUp(){ //! must be fixed according to new style
+            const req = {
+                url: `${this.authDepHost}/register`,
                 method: "POST",
-                headers: { 
-                        // 'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        },
-                body: JSON.stringify(this.credentials)
-            });
-            fetch(request)
-                .then(response => {
-                    this.dat.code=response.status
-                    return response.json()
-                })
-                .then(data => {
-                    console.log(data)
-                    // this.$store.dispatch()
-                    // this.$store.dispatch("login", joined)
-                    this.$router.push({name:"Login"})
-                })
-                .then(err => console.log(err)) //todo force to appear info-message box
-
+                data: this.credentials,
+                auth: null, //todo access via getter
+            }
+            let results = await this.makeFetch(req)
+            if (results){
+                this.alertSuccess({msg:results})
+                setTimeout(this.$router.push, 1000, {name:"Login"})
+            }
         }
     },
     watch:{
@@ -162,22 +182,27 @@ export default {
     .fa-user {
         position:absolute;
         top: 30px;
-        left:-37px;
+        left:-46px;
+    }
+    .fa-user-gear {
+        position:absolute;
+        top: 30px;
+        left:-46px;
     }
     .fa-envelope{
         position:absolute;
         top: 30px;
-        left:-40px;
+        left:-46px;
     }
     .fa-lock{
         position:absolute;
         top: 30px;
-        left:-37px;
+        left:-43px;
     }
     .fa-key{
         position:absolute;
         top: 30px;
-        left:-40px;
+        left:-46px;
     }
     
 </style>

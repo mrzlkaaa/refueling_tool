@@ -38,6 +38,7 @@ const routes = [
   { path: "/settings",
     name: "Settings",
     component: Settings,
+    meta:{requiresAuth: true},
     children: [{
       name: "General",
       component: General,
@@ -45,6 +46,7 @@ const routes = [
     },{
       name: "Users",
       component: Users,
+      meta:{requiresAuth: true},
       path: "/settings/users"
     }]
   },
@@ -66,10 +68,9 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
 
   store.dispatch('autologgining')
-  
-  if (to.meta.requiresAuth && store.state.auth.user == null | 
-         !store.state.auth.refreshToken){
-    next({name: "Login"})
+
+  if (to.name !== 'Login' && to.meta.requiresAuth && !store.state.auth.user){
+    next({name:"Login"})
   }
   else if (to.name == "Login" && store.state.auth.user) {
     store.dispatch("logout")
@@ -78,6 +79,7 @@ router.beforeEach(async (to, from, next) => {
   else {
     next()
   }
+
 })
 
 export default router

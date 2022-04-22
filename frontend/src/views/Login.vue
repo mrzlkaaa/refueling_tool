@@ -1,12 +1,8 @@
 <template>
     <form method="post">
         <div class="container">
-            <AlertBox
-            :info="getAlert()"
-            />
-            <h1>Welcome Back</h1> <br>
             <div class="forms-container">
-                
+                <h1>Welcome Back</h1> <br>  
                 <div class="form-floating mb-3">
                     <i class="fa-solid fa-user fa-2xl"></i>    
                     <Input
@@ -32,18 +28,6 @@
                     text="Password"
                     />
                 </div>
-                <!-- <div class="form-check" style='width:40%'>
-                    <Input
-                    type="checkbox"
-                    class="form-check-input"
-                    id="flexCheckDefault"
-                    />
-                    <Label
-                    class="form-check-label"
-                    for="flexCheckDefault"
-                    text="Stay logged"
-                    />
-                </div> <br> -->
                 <Button
                 cls="btn-primary"
                 text="Sign in"
@@ -61,18 +45,16 @@
     </form>
 </template>
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
 import Input from "../components/Input.vue"
 import Label from "../components/Label.vue"
 import Button from "../components/Button.vue"
-import AlertBox from "../components/AlertBox.vue"
 export default {
     name: "Login",
     components:{
         Input,
         Label,
         Button,
-        AlertBox,
     },
     data(){
         return {
@@ -86,43 +68,27 @@ export default {
     },
     methods:{
         //todo add mapstate
-        ...mapGetters([
-            "getAlert"
-        ]),
         ...mapActions(
             [
                 "alertError",
                 "login",
                 "makeFetch",
+                "resetAlert"
             ]
         ),
         async signIn(){
-            console.log(this.data)
+            console.log(process.env.NODE_ENV)
             const req = {
                 url: `${this.authDepHost}/login`,
                 method: "POST",
                 data: this.credentials,
                 auth: null,
             }
-            let results
-            try{
-                const res = await this.makeFetch(req)
-                if (res.ok){
-                    results = await res.json()
-                    console.log(results)
-                    this.login({...results, ...this.credentials})
-                    this.$router.push({name:"List"})
-                }
-                else {
-                    results = await res.json()
-                    let data = {
-                        msg:results,
-                    }
-                    this.alertError(data)
-                }
-            }
-            catch (error) {
-                console.log(error)
+            console.log(req)
+            let results = await this.makeFetch(req)
+            if (results){
+                this.login({...results, ...this.credentials})
+                setTimeout(this.$router.push, 500, {name:"List"})
             }
         }
     },

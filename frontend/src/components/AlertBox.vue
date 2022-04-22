@@ -1,33 +1,38 @@
 <template>
-    <div :style="{'display':info.display}">
-        <div :class=info.type role="alert">
-            {{info.msg}}
+    <div class="alertbox" :style="{'display':getAlert().display, 'position':'absolute'}">
+        <div :class=getAlert().type role="alert">
+            {{getAlert().msg}}
         </div>
-        <img v-if="info.img" :src=img() style="width:50%; height:50;">
     </div>
 </template>
 <script>
-import {mapActions} from 'vuex'
+import {mapGetters, mapActions} from 'vuex'
+
 export default {
     name: "AlertBox", 
     props:["info"],
-    computed:{
+    created(){
+        this.resetAlert()
     },
     updated(){
         this.hideAlert()
     },
     methods:{
+        ...mapGetters([
+            "getAlert",
+        ]),
         ...mapActions([
+            "resetAlert",
             "hideAlert"
         ]),
-        // hide(){
-        //     return this.$emit("hide", {status:false, msg:""})
-        // },
-        img(){
-            let path = "/src/assets/"
-            console.log(path)
-            return `${path}${this.info.code}.png`
-        }
     }
 }
 </script>
+<style>
+    .alertbox {
+        top:60px;
+        left:0px;
+        right:0px;
+        margin:auto;
+    }
+</style>

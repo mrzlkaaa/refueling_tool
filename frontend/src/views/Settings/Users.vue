@@ -1,62 +1,58 @@
 <template>
     <div class="c">
-        <AlertBox v-if="alert.display"
-        :type="alert.type"
-        :text="alert.msg"
-        :time="alert.time"
-        :code="alert.code"
-        />
-        <div class="row">
-            <div id="users-header" class="col" v-for="h,i in header" :key="i">
-                <b>{{h}}</b>
+        <div>
+            <div class="row">
+                <div id="users-header" class="col" v-for="h,i in header" :key="i">
+                    <b>{{h}}</b>
+                </div>
+            </div>
+            <div id="users" class="row" v-for="c,i in content" :key="i">
+                <div class="col" v-for="cc,ii in c" :key=ii>
+                    <Checkbox 
+                    v-if=isBoolean(cc)
+                    :status="cc"
+                    :text="cc"
+                    @toggle-checkbox="toggleCheckbox(i, ii)"
+                    />
+                    <div v-else>{{cc}}</div>
+                </div>
+                <i @click="onDelete(c.ID)" class="fas fa-times"></i>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">
+                    <Button
+                    cls="btn-primary to-right"
+                    text="Save"
+                    width="10"
+                    :dis="disabled"
+                    @click="onSave"
+                    />
+                </div>
             </div>
         </div>
-        <div id="users" class="row" v-for="c,i in content" :key="i">
-            <div class="col" v-for="cc,ii in c" :key=ii>
-                <Checkbox 
-                v-if=isBoolean(cc)
-                :status="cc"
-                :text="cc"
-                @toggle-checkbox="toggleCheckbox(i, ii)"
-                />
-                <div v-else>{{cc}}</div>
-            </div>
-            <i @click="onDelete(c.ID)" class="fas fa-times"></i>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col"></div>
-            <div class="col">
-                <Button
-                cls="btn-primary to-right"
-                text="Save"
-                width="10"
-                :dis="disabled"
-                @click="onSave"
-                />
-            </div>
-        </div>
-        
     </div>
     
 </template>
 <script>
+import {mapGetters, mapActions} from "vuex"
+import Modal from "../../components/Modal.vue"
 import Checkbox from "../../components/Checkbox.vue"
 import Button from "../../components/Button.vue"
 import AlertBox from "../../components/AlertBox.vue"
 export default {
     name: "Users",
     components: {
+        Modal,
         Checkbox,
         Button,
         AlertBox,
     },
     data(){
         return {
-            dat:{
-                code : 200,
-                msg: "",
-            },
+            showModal:true,
+            display: true,
             header: ["ID",'Name', "Surname", "Email", "Username", "Moderator", "Admin"],
             content:[],
             origin: [],
@@ -65,6 +61,15 @@ export default {
         }
     },
     methods:{
+        ...mapGetters([
+            
+            
+            "isAccess"
+        ]),
+        ...mapActions([
+            "makeFetch",
+            "alertSuccess",
+        ]),
         isBoolean:(value) => {
             if (typeof(value) == "boolean"){
                 return true
@@ -97,53 +102,38 @@ export default {
                 matchedInd.map(i => this.onChange.splice(i, 1))
             }
         },
-        onDelete(id){
-            if (confirm(`Are you sure you want to delete ${id}?`)){ 
-                const request = new Request(
-                `${this.authDepHost}/users/${id}/delete`,
-                    {
-                        method: "POST",
-                        headers: {
-                                "Authorization": this.$store.state.accessToken,
-                                'Accept': 'application/json',
-                                "Content-Type": "application/json",
-                                },
-                        // body: JSON.stringify(id)
-                    }
-                )
-                fetch(request)
-                .then(response => {
-                    this.dat.code=response.status
-                    return response.json()
-                })
-                .then(data => {
-                    this.dat.msg = data
-                    switch (data){
-                        case "token is expired":
-                            this.$store.dispatch("refreshTokens", this.authDepHost)
-                            break;
-                        case "you are not eligible for this service":
-                            this.$store.dispatch("alertWarning", this.dat)
-                            //todo add smth like "contact admin" and form appears
-                            break;
-                        default:
-                            if (this.dat.code==200){
-                                this.$store.dispatch("alertSuccess", this.dat.msg)
-                                this.content = this.content.filter(e => e.ID != id)
-                            }
-                            else {
-                                this.$store.dispatch("alertError", this.dat)
-                            }
-                            
-                            // this.$store.dispatch("alertError", data)
-                    }
-                    // setTimeout(this.$router.push, 1000, {name:"Users"})
-                })
-                .catch(error => console.log(error.message))
+        async onDelete(id){
+            if (confirm(`Are you sure you want to delete user ${id}?`)){
+                const req = {
+                    url: `${this.authDepHost}/users/${id}/delete`,
+                    method: "POST",
+                    data: null,
+                    auth: this.isAccess(),
+                }
+                let results = await this.makeFetch(req)
+                if (results){
+                    this.alertSuccess({msg:results})
+                    this.content = this.content.filter(e => e.ID != id)
+                    this.origin = JSON.parse(JSON.stringify(this.content))
+                    this.onChange = []
+                }
+                
             }
         },
-        onSave(){
-
+        async onSave(){
+            const req = {
+                url: `${this.authDepHost}/users/update`, //todo on change
+                method: "POST",
+                data: this.onChange,
+                auth: this.isAccess(),
+            }
+            console.log(req)
+            let results = await this.makeFetch(req)
+            if (results){
+                this.alertSuccess({msg:results})
+                this.origin = JSON.parse(JSON.stringify(this.content))
+                this.onChange = []
+            }
         }
     },
     watch:{
@@ -160,52 +150,19 @@ export default {
             }
         }
     },
-    created(){
-        const request = new Request(
-            `${this.authDepHost}/getusers`,
-            {
-                method: "GET",
-                headers: {
-                        "Authorization": this.$store.state.accessToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        }
-            }
-        )
-        fetch(request)
-            .then(response => {
-                this.dat.code=response.status                
-                return response.json()
-            })
-            .catch(error => console.log(error))
-            .then(data => {
-                console.log(data)
-                this.dat.msg = data
-                switch (data){
-                    case "token is expired":
-                        this.$store.dispatch("refreshTokens", this.authDepHost)
-                        break;
-                    case "you are not eligible for this service":
-                        this.$store.dispatch("alertWarning", this.dat)
-                        //todo add smth like "contact admin" and form appears
-                        break;
-                    default:
-                        if (this.dat.code==200){
-                            this.content = data
-                            this.origin = JSON.parse(JSON.stringify(data))
-                        }
-                        // else {
-                        //     // setTimeout(this.$router.push, 4000, {name:"Login"})
-                        // }
-                }
-            })
-            .catch(error => console.log(`catched ${error}`))
-    },
-    computed:{
-        alert(){
-            return this.$store.state.alert
+    async created(){
+        const req = {
+            url: `${this.authDepHost}/getusers`,
+            method: "GET",
+            data: null,
+            auth: this.isAccess(),
         }
-    }
+        let results = await this.makeFetch(req)
+        if (results){
+            this.content = results
+            this.origin = JSON.parse(JSON.stringify(this.content))
+        }
+    },
 }
 </script>
 <style>

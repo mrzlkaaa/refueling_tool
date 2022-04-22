@@ -1,15 +1,6 @@
 <template>
     <div id="detail"> 
         <br>
-        <div v-if="alert.status">
-            <AlertBox
-            :code="alert.statusCode"
-            :text="alert.msg"
-            :time="alert.time"
-            @hide="alert.status=$event.status,
-                   alert.msg=$event.msg"
-            />
-        </div>
         <div class="container-flex" >
             <div class="row">
                 <div v-for="(refuelDetail,i) in refuelDetails" :key="i" class="col">
@@ -56,6 +47,7 @@
     </div>
 </template>
 <script>
+import {mapGetters, mapActions} from "vuex"
 import AlertBox from "../components/AlertBox.vue"
 import Table from "../components/Refueling/Table.vue"
 import CardHeader from "../components/CardHeader.vue"
@@ -117,45 +109,52 @@ export default {
     },
     //TODO use the same methods for update 
     methods: {
-        getDetails(index){
-            fetch(`${this.refuelDepHost}/refuelings/${this.$route.params.id}/details`)
-            .then(response => response.json())
-            .then(data => {
-                this.refuelDetails = data
-                return (this.preLoadPDC(this.refuelDetails.at(index).ID, index))})
-            .catch(error => console.error(error))
+        ...mapGetters([
+            "isAccess"
+        ]),
+        ...mapActions([
+            "makeFetch",
+            "alertSuccess",
+
+        ]),
+        async getDetails(index){
+            const req = {
+                url: `${this.refuelDepHost}/refuelings/${this.$route.params.id}/details`,
+                method: "GET",
+                data: null,
+                auth: this.isAccess(),
+            }
+            let results = await this.makeFetch(req)
+            if (results){
+                this.refuelDetails = results
+                await this.preLoadPDC(this.refuelDetails.at(index).ID, index)
+            }
             
         },
-        preLoadPDC(actId, index) {
-            console.log(actId)
-            console.log("called")
-            fetch(`${this.refuelDepHost}/refuelings/${this.$route.params.id}/${actId}/PDC`)
-            .then(response => response.json())
-            .then(data => (this.refuelDetails.at(index).PDC = data, console.log(this.refuelDetails.at(index))))
-            .catch(error => console.error(error))
+        async preLoadPDC(actId, index) {
+            const req = {
+                url: `${this.refuelDepHost}/refuelings/${this.$route.params.id}/${actId}/PDC`,
+                method: "GET",
+                data: null,
+                auth: this.isAccess(),
+            }
+            let results = await this.makeFetch(req)
+            if (results){
+                this.refuelDetails.at(index).PDC = results
+            }
         },
-        addNewAct(){
-            const request = new Request(
-                `${this.refuelDepHost}/add-act`,
-                    {
-                        method: "POST",
-                        headers: { 
-                                'Accept': 'application/json',
-                                "Content-Type": "application/json",
-                                },
-                        body: JSON.stringify(this.finalForm)
-                    }
-            )
-            fetch(request)
-            .then(response => {
-                this.alert.statusCode = response.status
-                this.alert.status = true
-                return response.json()
-            })
-            .then(data => (
-                this.alert.msg = data.msg,
-                this.refuelDetails.at(-1).ID = data.id))
-            .catch(error => console.error(error))
+        async addNewAct(){
+            const req = {
+                url: `${this.refuelDepHost}/add-act`,
+                method: "POST",
+                data: this.finalForm,
+                auth: this.isAccess(),
+            }
+            let results = await this.makeFetch(req)
+            if (results){
+                this.alertSuccess({msg:results.msg})
+                this.refuelDetails.at(-1).ID = results.id
+            }
         },
         fillFromRefuelForm(obj){
             this.finalForm.description = this.description
@@ -171,32 +170,21 @@ export default {
             )
             this.addNewAct()
         },
-        onDelete(actId){
+        async onDelete(actId){
             console.log(actId)
             if (confirm(`Are you sure you want to delete ${actId}?`)){
-                const request = new Request(
-                `${this.refuelDepHost}/refuelings/${this.$route.params.id}/${actId}/delete`,
-                    {
-                        method: "POST",
-                        headers: { 
-                                'Accept': 'application/json',
-                                "Content-Type": "application/json",
-                                },
-                        body: JSON.stringify(actId)
-                    }
-                )
-                fetch(request)
-                .then(response => {
-                    this.alert.statusCode = response.status
-                    this.alert.status = true
-                    if (response.status==200 ) {
-                        this.refuelDetails = this.refuelDetails.filter(e => e.ID !== actId)
-                        this.preLoadPDC(this.refuelDetails.at(-1).ID, -1)
-                    }
-                    return response.json() 
-                })
-                .then(data => (console.log(data), this.alert.msg = data))
-                .catch(error => console.error(error))
+                const req = {
+                    url: `${this.refuelDepHost}/refuelings/${this.$route.params.id}/${actId}/delete`,
+                    method: "POST",
+                    data: null,
+                    auth: this.isAccess(),
+                }
+                let results = await this.makeFetch(req)
+                if (results){
+                    this.alertSuccess({msg:results})
+                    this.refuelDetails = this.refuelDetails.filter(e => e.ID !== actId)
+                    await this.preLoadPDC(this.refuelDetails.at(-1).ID, -1)
+                }
             }
         },
         onSave(pdc, actId, index){

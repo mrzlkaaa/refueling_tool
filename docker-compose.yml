@@ -2,7 +2,7 @@ version: "3"
 services:
   frontend:
     container_name: vue
-    image: mrzlkaaa/irt-t-refuel:v1.1.1
+    image: mrzlkaaa/irt-t-refuel:v1.2.0
     ports:
       - "80:80"
       - "443:443"
@@ -29,16 +29,24 @@ services:
 
   refuel:
     container_name: refuel_go
-    image: mrzlkaaa/refuel_go:v1.0.0
+    image: mrzlkaaa/refuel_go:v1.1.0
     restart: always
     ports:
       - 8888:8888
 
+  security:
+    container_name: nss_auth_go
+    image: mrzlkaaa/nss_auth_go:v1.0.0
+    restart: always
+    ports:
+      - 8892:8892
+
   ref_go_api:
     container_name: ref_go_api
-    image: mrzlkaaa/refuel_api:v1.0.2
+    image: mrzlkaaa/refuel_api:v1.1.0
     restart: always
     ports:
       - 88:88
       - 89:89
+      - 90:90
       - 8000:8000

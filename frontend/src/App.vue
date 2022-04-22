@@ -1,16 +1,22 @@
 <template>
 <div>
   <NavBar/>
+  <Modal/>
+  <AlertBox/>
   <router-view/>
 </div>
 </template>
 
 <script>
   import NavBar from "./components/NavBar.vue"
+  import AlertBox from "./components/AlertBox.vue"
+  import Modal from "./components/Modal.vue"
   export default {
     name: "App",
     components: {
-    NavBar,
+      NavBar,
+      AlertBox,
+      Modal,
     }  
   }
   
