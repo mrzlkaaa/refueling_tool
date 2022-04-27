@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import WeeklyData from "../components/Diary/WeeklyData.vue"
 import ViewFCData from "../components/Diary/ViewFCData.vue"
 import Parent from "../components/Diary/ParentForms.vue"

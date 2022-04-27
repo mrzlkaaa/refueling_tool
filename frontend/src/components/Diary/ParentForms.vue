@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import Select from "./Select.vue"
 import Input from "./Input.vue"
 
@@ -39,8 +40,26 @@ export default {
         }
     },
     methods: {
-        getWeeksNum(fcName) {
+        ...mapGetters([
+            "isAccess"
+        ]),
+        ...mapActions([
+            "makeFetch",
+            "alertSuccess",
+        ]),
+        async getWeeksNum(fcName) {
             this.fcName = fcName
+            // const req = {
+            //     url: `${this.diaryDepHost}/weeksNum/${this.fcName}`,
+            //     method: "GET",
+            //     data: null,
+            //     auth: this.isAccess(), //todo access via getter
+            // }
+            // let results = await this.makeFetch(req)
+            // if (results){
+            //     this.refuels = results.sort((a,b) => b.RefuelName - a.RefuelName)
+            //     this.backUpRefuels = JSON.parse(JSON.stringify(this.refuels))
+            // }
             fetch(`${this.diaryDepHost}/weeksNum/${this.fcName}`)
             .then(response => response.json())
             .then(data => (this.formatDate(data)))
@@ -90,10 +109,20 @@ export default {
                 // this.data = newData
         }
     },
-    created() {
-            fetch(`${this.refuelDepHost}/refuelingsList`)
-            .then(response => response.json())
-            .then(data => (this.refuelingsList = data.names.sort((a,b) => b - a)))
+    async created() {
+        const req = {
+            url: `${this.refuelDepHost}/refuelingsList`,
+            method: "GET",
+            data: null,
+            auth: this.isAccess(), //todo access via getter
+        }
+        let results = await this.makeFetch(req)
+        if (results){
+            this.refuelingsList = results.names.sort((a,b) => b - a)
+        }
+        // fetch(`${this.refuelDepHost}/refuelingsList`)
+        // .then(response => response.json())
+        // .then(data => (this.refuelingsList = data.names.sort((a,b) => b - a)))
     },
     watch: {
         weeks() {
