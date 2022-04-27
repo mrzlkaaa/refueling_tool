@@ -7,7 +7,7 @@
                         {{getModal().msg}}
                     </div>
               <div class="modal-body">
-                  <img v-if="getModal().img" :src=img() style="width:450px; height:450px;">
+                  <img v-if="getModal().img" :src="img()" style="width:450px; height:450px;">
               </div>
                 <Button
                 cls="btn-primary"
@@ -40,9 +40,11 @@ export default {
             "resetModal",
         ]),
         img(){
-            let path = "/src/assets/"
-            console.log(path)
-            return `${path}${this.getModal().code}.png`
+            // var images = require.context('../assets/', false, /\.png$/)
+            // let path = "@/assets/"
+            // console.log(path)
+            // return images('./' + this.getModal().code + ".png")
+            return `../assets/${this.getModal().code}.png`
         }
     }
 }

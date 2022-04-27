@@ -11,4 +11,9 @@ server {
     location / {
         try_files $uri $uri/ /index.html;
     }
+
+    location /static {
+        alias /usr/share/nginx/html/src/assets;
+    }
+
 }
