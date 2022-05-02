@@ -61,9 +61,7 @@ export default {
         }
     },
     methods:{
-        ...mapGetters([
-            
-            
+        ...mapGetters([ 
             "isAccess"
         ]),
         ...mapActions([

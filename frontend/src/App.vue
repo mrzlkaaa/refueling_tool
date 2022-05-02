@@ -1,6 +1,8 @@
 <template>
 <div>
-  <NavBar/>
+  <NavBar
+  v-if="isAccess()"
+  />
   <Modal/>
   <AlertBox/>
   <router-view/>
@@ -8,6 +10,7 @@
 </template>
 
 <script>
+  import {mapGetters} from "vuex"
   import NavBar from "./components/NavBar.vue"
   import AlertBox from "./components/AlertBox.vue"
   import Modal from "./components/Modal.vue"
@@ -17,7 +20,12 @@
       NavBar,
       AlertBox,
       Modal,
-    }  
+    },
+    methods:{
+      ...mapGetters([ 
+            "isAccess"
+        ]),
+    }
   }
   
 </script>
