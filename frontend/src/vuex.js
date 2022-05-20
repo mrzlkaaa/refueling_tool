@@ -230,6 +230,35 @@ const moduleAlert = {
     }
 }
 
+
+
+const mail = {
+    state:() => ({
+        display: false,
+        status: true,
+
+    }),
+    getters:{
+        isDisplayed:(state) => state.display
+    },
+    mutations:{
+        hideForm(state){
+            state.display = false;
+        },
+        showForm(state){
+            state.display = true;
+        }
+    },
+    actions:{
+        hideForm({commit}){
+            commit("hideForm")
+        },
+        showForm({commit}){
+            commit("showForm")
+        }
+    }
+}
+
 const store = createStore({
     modules: {
         auth: moduleAuth,
@@ -242,6 +271,7 @@ const store = createStore({
         //     actions:moduleAlert.actions
         // },
         api: apiData,
+        mail:mail
     }
 })
 

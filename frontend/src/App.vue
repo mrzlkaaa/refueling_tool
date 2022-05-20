@@ -1,35 +1,43 @@
 <template>
-<div>
+<div style="position:relative">
   <NavBar
   v-if="isAccess()"
   />
   <Modal/>
   <AlertBox/>
+  <i class="fa-solid fa-circle-question fa-2xl" @click="showForm"></i>
   <router-view/>
+  <Report
+    v-if="isAccess() && isDisplayed()"
+  />
 </div>
 </template>
-
 <script>
-  import {mapGetters} from "vuex"
+  import {mapGetters, mapActions} from "vuex"
   import NavBar from "./components/NavBar.vue"
   import AlertBox from "./components/AlertBox.vue"
   import Modal from "./components/Modal.vue"
+  import Report from "./components/Report.vue"
   export default {
     name: "App",
     components: {
       NavBar,
       AlertBox,
       Modal,
+      Report,
     },
     methods:{
       ...mapGetters([ 
-            "isAccess"
+            "isAccess",
+            "isDisplayed"
         ]),
+      ...mapActions([
+        "showForm"
+      ])
     }
   }
   
 </script>
-
 
 <style>
   #app {
@@ -43,5 +51,11 @@
       margin: auto;
       margin-top: 60px;
       width: 50%;
-      }
+  }
+  .fa-circle-question {
+    position: fixed;
+    bottom: 50px;
+    color:#0d6efd;
+    right:30px;
+  }
 </style>

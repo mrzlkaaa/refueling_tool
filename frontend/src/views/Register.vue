@@ -169,7 +169,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .forms-container {
         
         width:30%; 
