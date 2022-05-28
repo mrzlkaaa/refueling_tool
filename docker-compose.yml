@@ -2,7 +2,7 @@ version: "3"
 services:
   frontend:
     container_name: vue
-    image: mrzlkaaa/irt-t-refuel:v1.2.0
+    image: mrzlkaaa/irt-t-refuel:v1.2.1
     ports:
       - "80:80"
       - "443:443"

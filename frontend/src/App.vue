@@ -5,7 +5,7 @@
   />
   <Modal/>
   <AlertBox/>
-  <i class="fa-solid fa-circle-question fa-2xl" @click="showForm"></i>
+  <i v-if="isAccess()" class="fa-solid fa-circle-question fa-2xl" @click="showForm"></i>
   <router-view/>
   <Report
     v-if="isAccess() && isDisplayed()"
