@@ -81,7 +81,6 @@
                     </div>
                 </div>
             </div>
-            {{linked}}
         </div>
         <br>
         <div v-for="(obj,index) in FormsData.weeklyDetail" v-bind:key="index">
