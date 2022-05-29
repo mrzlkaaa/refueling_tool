@@ -81,6 +81,7 @@
                     </div>
                 </div>
             </div>
+            {{linked}}
         </div>
         <br>
         <div v-for="(obj,index) in FormsData.weeklyDetail" v-bind:key="index">
@@ -88,7 +89,7 @@
                 <div  class="col">
                     <label for="Power" class="form-label">Reactor Power</label>
                     <div class="input-group mb-3">
-                        <Input v-model="obj.power" name="Power" type="number"/>
+                        <Input v-model="obj.power" name="Power" type="number" min="1"/>
                         <span class="input-group-text" id="basic-addon2">kW </span>
                     </div>
                 </div>
@@ -99,9 +100,9 @@
                 <div class="col">
                     <label for="To" class="form-label">To</label>
                     <Input v-model="obj.toDate"  name="To" class="form-control" type="datetime-local"/>
-                    <i :class="[linked[index] ? 'fas fa-link active' : 'fas fa-link inactive']"
+                    <!-- <i :class="[linked[index] ? 'fas fa-link active' : 'fas fa-link inactive']"
                         @click="toggleStyle(index)"
-                    ></i>
+                    ></i> -->
                     <i class="fas fa-times" @click=onDelete(index)> </i>
                 </div>
             </div> <br>
@@ -128,9 +129,13 @@ export default {
     props: ["modelValue"],
     data(){
         return {
-            linked: [true],
+            linked: [],
             ksLimits:[0,60]
         }
+    },
+    created(){
+        this.linked.push(true)
+        
     },
     computed: {
         FormsData:{
@@ -146,28 +151,36 @@ export default {
         addFileds(){
             this.FormsData.weeklyDetail.push({})
             this.linked.push(true)
+            // console.log(this.FormsData.weeklyDetail)
+
         },
         onDelete(index){
             this.$emit("onDelete", index)
+            this.linked.splice(index, 1)
         }, 
         setToDate(index){
             if (this.linked[index]) {
                 this.FormsData.weeklyDetail[index].toDate = this.FormsData.weeklyDetail[index].fromDate
-                this.linked[index] = !this.linked[index]
+                // this.linked[index] = !this.linked[index]
             }
         },
         toggleStyle(index){this.linked[index]=!this.linked[index]}
     },
     watch: {
-        modelValue: {
+        'FormsData.weeklyDetail': {
             deep: true,
             handler(newV) {
-                if (newV.weeklyDetail.length < 2){
+                if (newV.length < 2){
                     return
                 }
-                newV.weeklyDetail.at(-1).fromDate =  newV.weeklyDetail.at(-2).toDate
+                newV.at(-1).fromDate =  newV.at(-2).toDate
+                console.log(newV.length)
+                if (!newV.at(-1).toDate){
+                    this.setToDate(this.FormsData.weeklyDetail.length-1)
+                    console.log("wathcer")
+                }
                 // console.log(newV.at(-1))
-                this.setToDate(this.FormsData.weeklyDetail.length-1)
+                
             }
         },
     }
