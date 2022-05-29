@@ -118,7 +118,14 @@ export default {
         }
         let results = await this.makeFetch(req)
         if (results){
-            this.refuelingsList = results.names.sort((a,b) => b - a)
+            this.refuelingsList = results.names.sort((a,b) => {
+                // console.log(a,b)
+                a  = a.toString();
+                b = b.toString();
+                a = parseInt(a.slice(0,3))
+                b = parseInt(b.slice(0,3))
+                return b - a
+            })
         }
         // fetch(`${this.refuelDepHost}/refuelingsList`)
         // .then(response => response.json())
