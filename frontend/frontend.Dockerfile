@@ -3,7 +3,8 @@ FROM node:lts-alpine as build-stage
 # RUN npm install -g http-server
 WORKDIR /frontend
 COPY package*.json ./
-RUN npm install
+#* temporary dependency issue solving
+RUN npm install --save --legacy-peer-deps
 COPY . .
 RUN npm run build
 # CMD [ "http-server", "dist" ]

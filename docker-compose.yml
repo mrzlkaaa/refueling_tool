@@ -2,7 +2,7 @@ version: "3"
 services:
   frontend:
     container_name: vue
-    image: mrzlkaaa/irt-t-refuel:v1.2.1
+    image: mrzlkaaa/irt-t-refuel:v1.2.2
     ports:
       - "80:80"
       - "443:443"
@@ -22,7 +22,7 @@ services:
 
   mcu_generator:
     container_name: mcu_generator
-    image: mrzlkaaa/mcu_generator:v1.0.1
+    image: mrzlkaaa/mcu_generator:v1.0.2
     restart: always
     ports:
       - 8891:8891

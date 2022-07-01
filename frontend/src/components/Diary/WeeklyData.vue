@@ -48,7 +48,7 @@ import Table from "./TableWeeklyData.vue"
                 },
                 weeklyDetail: [{}],
             },
-            msg: "",
+            msg: "Submit",
         }
     },
     watch:{
