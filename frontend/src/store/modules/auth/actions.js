@@ -1,32 +1,45 @@
 import Cookies from "js-cookie"
 import getters from "./getters.js"
+import {store} from "../../../store"
 
 export default {
-    async refreshTokens({dispatch, commit}){ //todo Promise!
+    async refreshTokens(){
         return new Promise((resolve, reject) => {
             const req = {
                 url: `${import.meta.env.VITE_AUTH}/${import.meta.env.VITE_REFRESH}`,
                 method: "POST",
-                data: {"token": this.state.auth.refreshToken}, //* write via getters
+                data: {"token": store.getters["auth/isRefresh"]}, //* write via getters
                 auth: null, //todo access via getter
             }
-            const results = dispatch("api/makeFetch", req, {root:true})
-            if (results){   
-                console.log(results)
-                let dur = 7
-                Cookies.set("RefreshToken", results.refreshToken, {expires: dur})
-                Cookies.set("AccessToken", results.accessToken, {expires: dur})
-                commit('setUser')
-                setTimeout(() => resolve(true), 500)
-                
-            }
-            dispatch("logout")
-            setTimeout(() => reject(false), 500)
+            const request = new Request(
+                req.url,
+                {
+                    method: req.method,
+                    headers: {
+                        "Authorization": req.auth,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: req.data ? JSON.stringify(req.data) : null
+                });
+            console.log("trrr")
+            // try{
+            fetch(request)
+                .then(response => response.json())
+                .then(results => {
+                    console.log(results)
+                    let dur = 7
+
+                    //* first of all is clear old tokens stored in cookies
+                    console.log(results.refreshToken)
+                    Cookies.set("RefreshToken", results.refreshToken, {expires: dur})  
+                    Cookies.set("AccessToken", results.accessToken, {expires: dur})
+                    
+                    resolve("New tokens are stored in cookies")
+                })
+                .catch(err => reject(err))
+                      
         })
-        
-        
-        
-        //* turn code to logout and clear cookies to relog
     },
     async register({dispatch}, form){
         RegisterForm = new FormData()
@@ -40,14 +53,17 @@ export default {
         Cookies.set("AccessToken", UserForm.accessToken, {expires: 7})
         commit('setUser')
     },
+    async setCookies({commit}){
+        commit('setUser')
+    },
     async autologgining({getters, commit}) {
         return new Promise((resolve, reject) => {
             // dispatch("logout")
-            if (!getters["isAuthenticated"] && Cookies.get("Username")) {
+            if (!store.getters["auth/isAuthenticated"] && Cookies.get("Username")) {
                 commit('setUser')
                 setTimeout(() => resolve(true), 100)
-            } else if (getters["isAuthenticated"]){
-                console.log(getters["isAccess"])
+            } else if (store.getters["isAuthenticated"]){
+                console.log(store.getters["auth/isAccess"])
                 setTimeout(() => resolve(true), 100)
             } else {
                 reject("Autorelog is not avaliable")
@@ -61,13 +77,23 @@ export default {
             url: `${import.meta.env.VITE_AUTH}/logout`,
             method: "POST",
             data: null,
-            auth: getters["isAccess"]
+            auth: store.getters["auth/isAccess"]
             // auth: store.state.auth.accessToken, //todo access via getter
         }
         Cookies.remove("Username")
         Cookies.remove("RefreshToken")
         Cookies.remove("AccessToken")
         commit('logout')
-        await dispatch("api/makeFetch", req, {root: true})
-    }
+        dispatch("api/makeFetch", req, {root: true})
+    },
+    // async clearCookies({commit}){
+    //     // return new Promise((resolve, reject) => {
+    //         Cookies.remove("RefreshToken")
+    //         Cookies.remove("AccessToken")
+    //         commit('logout')
+    //         resolve("Cookies are reset")
+    //     // })
+        
+        
+    // }
 }

@@ -1,4 +1,5 @@
 import Cookies from "js-cookie"
+import {store} from "../../../store"
 
 export default {
     setUser: (state) => { 
@@ -10,5 +11,5 @@ export default {
         state.user = null
         state.refreshToken = null
         state.accessToken = null
-    }
+    },
 }

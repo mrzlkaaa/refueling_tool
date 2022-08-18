@@ -17,7 +17,7 @@ const api = {
         responseCode: null,
     }),
     actions:{
-        async makeFetch({dispatch}, req){
+        async makeFetch({dispatch}, req){ //todo transform into promise
             console.log(req.data)
             const request = new Request(
             req.url,
@@ -33,17 +33,18 @@ const api = {
             try{
                 const response = await fetch(request)
                 let results = await response.json()
+                
                 if (response.ok){
-                    console.log(router.name)
                     return results
                 }
-                else {
-                    let ok = await dispatch('errorsHandler', results)
-                    if (!ok) {
-                        router.push({name:"Login"})
-                    }
-                    return null
-                }
+                let ok = await dispatch('errorsHandler', results)
+                console.log(ok)
+                //* return recursion?
+                // if (!ok) {
+                //     console.log(ok)
+                //     router.push({name:"Login"})
+                // }
+                return null
                 
             }
             catch (err){
@@ -51,15 +52,13 @@ const api = {
                 // throw err
             }
         },
-        async errorsHandler({dispatch}, msg){
+        async errorsHandler({dispatch}, msg){ //! must be Promise
+            console.log(msg)
             switch (msg){
-                case "token is expired":
-                    return await dispatch("auth/refreshTokens", {}, {root:true})
-                            .then((callback) => callback)
-                            .catch((err) => err)
-                    // return await dispatch("auth/refreshTokens", {}, {root:true}) //* must await for token refresh
-
-                    // break;
+                
+                case "token is expired": //! better to redirect to refreshToken page where vuex comes to play
+                    router.push({name:"RefreshToken"})
+                    break;
                 case "you are not eligible for this service":
                     dispatch("alert/modalWarning", {img:true, msg:msg, code:401}, {root:true})
                     //todo add smth like "contact admin" and form appears
@@ -67,11 +66,15 @@ const api = {
                 case "Wrong credentials":
                     dispatch("alert/alertError", {msg:msg}, {root:true})
                     break;
-                    case "User not found":
-                        dispatch("alert/alertError", {msg:msg}, {root:true})
-                        break;
+                case "User not found":
+                    dispatch("alert/alertError", {msg:msg}, {root:true})
+                    break;
+                case "signature is invalid":
+                    router.push({name:"RefreshToken"})
+                    break;
                 default:
                     dispatch("alert/modalError", {msg:msg}, {root:true})
+                    
             }
         }
     }
