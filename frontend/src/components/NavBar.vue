@@ -44,7 +44,7 @@ import {mapGetters} from "vuex"
 export default {
     name: "NavBar",
 	methods:{
-		...mapGetters([
+		...mapGetters("auth", [
 			"isAuthenticated"
 		])
 	}

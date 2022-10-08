@@ -3,7 +3,7 @@
         <div class="modal-mask">
           <div class="modal-wrapper">
             <div class="modal-container">
-                    <div :class=getModal().type role="alert">
+                    <div :class="getModal().type" role="alert">
                         {{getModal().msg}}
                     </div>
               <div class="modal-body">
@@ -33,10 +33,10 @@ export default {
         this.resetModal()
     },
     methods:{
-        ...mapGetters([
+        ...mapGetters("alert", [
             "getModal",
         ]),
-        ...mapActions([
+        ...mapActions("alert", [
             "resetModal",
         ]),
         img(){

@@ -13,15 +13,16 @@ export default {
     props:["info"],
     created(){
         this.resetAlert()
+        console.log(this.getAlert())
     },
     updated(){
         this.hideAlert()
     },
     methods:{
-        ...mapGetters([
+        ...mapGetters("alert", [
             "getAlert",
         ]),
-        ...mapActions([
+        ...mapActions("alert", [
             "resetAlert",
             "hideAlert"
         ]),

@@ -21,3 +21,12 @@ export default {
     },
 }
 </script>
+<style>
+    .table {
+        margin: auto;
+        width: 350px;
+    }
+    .table td {
+        height:40px;
+    }
+</style>

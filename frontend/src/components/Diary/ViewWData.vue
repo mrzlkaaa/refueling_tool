@@ -49,7 +49,7 @@
 <script>
 import ViewDWData from "./ViewDWData.vue"
 import Button from "./Button.vue"
-import { toggleBlock, dateStringFormatter, saveFile } from "../helpers"
+import { toggleBlock, dateStringFormatter, saveFile } from "../../helpers"
 export default {
     name: "ViewWData",
     components: {

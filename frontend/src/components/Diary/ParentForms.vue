@@ -24,6 +24,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import Select from "./Select.vue"
 import Input from "./Input.vue"
+import { sortRefuelings } from "../../helpers"
 
 export default {
     name: "Parent",
@@ -40,12 +41,12 @@ export default {
         }
     },
     methods: {
-        ...mapGetters([
+        ...mapGetters("auth", [
             "isAccess"
         ]),
         ...mapActions([
-            "makeFetch",
-            "alertSuccess",
+            "api/makeFetch",
+            "alert/alertSuccess",
         ]),
         async getWeeksNum(fcName) {
             this.fcName = fcName
@@ -116,16 +117,9 @@ export default {
             data: null,
             auth: this.isAccess(), //todo access via getter
         }
-        let results = await this.makeFetch(req)
-        if (results){
-            this.refuelingsList = results.names.sort((a,b) => {
-                // console.log(a,b)
-                a  = a.toString();
-                b = b.toString();
-                a = parseInt(a.slice(0,3))
-                b = parseInt(b.slice(0,3))
-                return b - a
-            })
+        let results = await this['api/makeFetch'](req)
+        if (results){ //* do custom sorting below
+            this.refuelingsList = results.names.sort((a,b) => sortRefuelings(a, b))
         }
         // fetch(`${this.refuelDepHost}/refuelingsList`)
         // .then(response => response.json())

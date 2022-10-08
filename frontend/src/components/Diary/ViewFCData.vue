@@ -47,7 +47,8 @@
 <script>
 import ViewWData from "./ViewWData.vue"
 import Button from "./Button.vue"
-import { toggleBlock, saveFile } from "../helpers"
+import { sortRefuelings, toggleBlock, saveFile } from "../../helpers"
+
 export default {
     name: "ViewFCData",
     components: {
@@ -96,7 +97,7 @@ export default {
     created(){
         fetch(`${this.diaryDepHost}/overallData`)
             .then(response => response.json())
-            .then(data => this.refuels = data)
+            .then(data => this.refuels = data.sort((a,b) => sortRefuelings(a.Name, b.Name)))
         
     },
     watch:{

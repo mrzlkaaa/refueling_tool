@@ -50,6 +50,7 @@
     </div>
 </template>
 <script>
+import {mapGetters, mapActions} from "vuex"
 import Button from "./Button.vue"
 import Input from "./Input.vue"
 import Select from "./Select.vue"
@@ -90,6 +91,13 @@ export default {
         }
     },
     methods:{
+        ...mapGetters("auth", [
+            "isAccess"
+        ]),
+        ...mapActions([
+            "api/makeFetch",
+            "alert/alertSuccess"
+        ]),
         changeForm(selected){
             switch(selected){
                 case "new":
@@ -101,6 +109,16 @@ export default {
             }
         },
         record(){
+            // const req = {
+            //     url: `${this.refuelDepHost}/add`,
+            //     method: "POST",
+            //     data: this.finalForm,
+            //     auth: this.isAccess(),
+            // }
+            // let results = this['api/makeFetch'](req)
+            // if (results) {
+            //     this["alert/alertSuccess"]({msg:results})
+            // }
             //*Adding requsets
             console.log(this.finalForm)
             const request = new Request(
@@ -110,21 +128,22 @@ export default {
                 headers: { 
                         // 'Accept': 'application/json',
                         'Content-Type': 'application/json',
+                        "Authorization": this.isAccess(),
                         },
                 body: JSON.stringify(this.finalForm)
             }
             );
             fetch(request)
-            .then(response => 
-                {   console.log(response.status)
-                    return (this.$emit("response", 
-                        {
-                            statusCode: response.status,
-                            status: true,
-                            redirect: response.ok ? true : false
-                        }), response.json())
-                }
-            )
+            .then(response => response.json())
+                // {   console.log(response.status)
+                //     return (this.$emit("response", 
+                //         {
+                //             statusCode: response.status,
+                //             status: true,
+                //             redirect: response.ok ? true : false
+                //         }), response.json())
+                // }
+            // )
             .then(data => this.$emit("alertMsg", data)) //* pass alert msg
             .catch((error) => console.log(`catched errors: ${error}`))
         },
@@ -132,7 +151,8 @@ export default {
     watch:{
         'finalForm.name':{
             handler(){
-                this.finalForm.acts.forEach((e,i) => e.fileName=`${this.finalForm.name}_${i}.PDC`)
+                this.finalForm.acts.forEach((e,i) => e.fileName=i.toString()) //! working here!
+                // this.finalForm.acts.forEach((e,i) => e.fileName=`${this.finalForm.name}_${i}.PDC`)
             }
         }
     }

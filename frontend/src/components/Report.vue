@@ -2,8 +2,7 @@
     <transition name="modal">
         <form ref="mailform" >
             <div class="modal-container">
-                    
-                    <i class="fas fa-times fa-lg" @click="hideForm"></i>
+                    <i class="fas fa-times fa-lg" @click="hideForm()"></i>
                     <h4>Leave your feedback here!</h4> <br>
                     
                     <div class="form-floating mb-3">
@@ -61,7 +60,7 @@ export default {
     data(){
         return {
             form: {
-                "from_name": this.isAuthenticated(),
+                "from_name": this['auth/isAuthenticated'](),
                 "message": "",
             },
             hideBtn:false
@@ -73,8 +72,8 @@ export default {
     },
     methods:{
         ...mapGetters([
-            "isAccess",
-            "isAuthenticated",
+            "auth/isAccess",
+            "auth/isAuthenticated",
             "isDisplayed"
         ]),
         ...mapActions([
