@@ -18,7 +18,7 @@ const api = {
     }),
     actions:{
         async makeFetch({dispatch}, req){ //todo transform into promise
-            console.log(req.data)
+            console.log(req)
             const request = new Request(
             req.url,
             {
@@ -70,7 +70,7 @@ const api = {
                     dispatch("alert/alertError", {msg:msg}, {root:true})
                     break;
                 case "signature is invalid":
-                    router.push({name:"RefreshToken"})
+                    router.push({name:"Login"})
                     break;
                 default:
                     dispatch("alert/modalError", {msg:msg}, {root:true})

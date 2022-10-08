@@ -22,8 +22,6 @@ export default {
                     },
                     body: req.data ? JSON.stringify(req.data) : null
                 });
-            console.log("trrr")
-            // try{
             fetch(request)
                 .then(response => response.json())
                 .then(results => {
