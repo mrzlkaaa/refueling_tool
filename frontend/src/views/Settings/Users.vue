@@ -61,12 +61,12 @@ export default {
         }
     },
     methods:{
-        ...mapGetters([ 
+        ...mapGetters('auth', [ 
             "isAccess"
         ]),
         ...mapActions([
-            "makeFetch",
-            "alertSuccess",
+            "api/makeFetch",
+            "alert/alertSuccess",
         ]),
         isBoolean:(value) => {
             if (typeof(value) == "boolean"){
@@ -108,9 +108,9 @@ export default {
                     data: null,
                     auth: this.isAccess(),
                 }
-                let results = await this.makeFetch(req)
+                let results = await this['api/makeFetch'](req)
                 if (results){
-                    this.alertSuccess({msg:results})
+                    this['alert/alertSuccess']({msg:results})
                     this.content = this.content.filter(e => e.ID != id)
                     this.origin = JSON.parse(JSON.stringify(this.content))
                     this.onChange = []
@@ -126,9 +126,9 @@ export default {
                 auth: this.isAccess(),
             }
             console.log(req)
-            let results = await this.makeFetch(req)
+            let results = await this['api/makeFetch'](req)
             if (results){
-                this.alertSuccess({msg:results})
+                this['alert/alertSuccess']({msg:results})
                 this.origin = JSON.parse(JSON.stringify(this.content))
                 this.onChange = []
             }
@@ -155,7 +155,7 @@ export default {
             data: null,
             auth: this.isAccess(),
         }
-        let results = await this.makeFetch(req)
+        let results = await this['api/makeFetch'](req)
         if (results){
             this.content = results
             this.origin = JSON.parse(JSON.stringify(this.content))

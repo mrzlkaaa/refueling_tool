@@ -124,12 +124,12 @@ export default {
         }
     },
     methods:{
-        ...mapGetters([
+        ...mapGetters('auth', [
             "isAccess",
         ]),
         ...mapActions([
-            "makeFetch",
-            "alertSuccess",
+            "api/makeFetch",
+            "alert/alertSuccess",
         ]),
         async signUp(){ //! must be fixed according to new style
             const req = {
@@ -138,9 +138,9 @@ export default {
                 data: this.credentials,
                 auth: null, //todo access via getter
             }
-            let results = await this.makeFetch(req)
+            let results = await this['api/makeFetch'](req)
             if (results){
-                this.alertSuccess({msg:results})
+                this['alert/alertSuccess']({msg:results})
                 setTimeout(this.$router.push, 1000, {name:"Login"})
             }
         }

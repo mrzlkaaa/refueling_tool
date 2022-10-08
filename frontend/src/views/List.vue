@@ -12,12 +12,12 @@
                 />
                 <br>
                 <router-link v-for="(refuel, i) in refuels" :key="i" :to="{name: 'Detail', 
-                    params: {id: refuel.ID}}">
+                    params: {refuelName: refuel.RefuelName}}">
                     <div class="card text-center">
                         <CardHeader
                         :header="refuel.Date"
                         />
-                        <i @click="onDelete(refuel.ID)" class="fas fa-times"></i>
+                        <i @click="onDelete(refuel.RefuelName)" class="fas fa-times"></i>
                         <CardBody
                         :text="refuel.RefuelName"
                         />
@@ -37,6 +37,8 @@ import Input from "../components/Refueling/Input.vue"
 import CardHeader from "../components/CardHeader.vue"
 import CardBody from "../components/CardBody.vue"
 import AlertBox from "../components/AlertBox.vue"
+import { sortRefuelings } from "../helpers"
+
 export default {
     name: "List",
     components: {
@@ -52,24 +54,24 @@ export default {
                 msg: "",
             },
             refuels: Object,
+            list: Array,
             search: "",
         }
     },
     methods:{
-        ...mapGetters([
+        ...mapGetters("auth", [
             "isAccess"
         ]),
-        ...mapActions([
-            "makeFetch",
-            "alertSuccess",
+        ...mapActions("api", [
+            "makeFetch"
         ]),
-        async onDelete(id){ //! not eddited yet
-            if (confirm(`Are you sure you want to delete ${id}?`)){
+        async onDelete(refuelName){ //! not eddited yet
+            if (confirm(`Are you sure you want to delete ${refuelName}?`)){
                 const req = {
-                    url: `${this.refuelDepHost}/refuelings/${id}/delete`,
+                    url: `${this.refuelDepHost}/refuelings/${refuelName}/delete`,
                     method: "POST",
-                    data: {"token":this.state.refreshToken},
-                    auth: null, //todo access via getter
+                    data: null,
+                    auth: this.isAccess(),
                 }
                 let results = await this.makeFetch(req)
 
@@ -82,6 +84,7 @@ export default {
     },
     //TODO add computed hook to call alert box
     async created(){
+        console.log(this.isAccess())
         const req = {
             url: `${this.refuelDepHost}/refuelings`,
             method: "GET",
@@ -90,7 +93,8 @@ export default {
         }
         let results = await this.makeFetch(req)
         if (results){
-            this.refuels = results.sort((a,b) => b.RefuelName - a.RefuelName)
+            console.log(results)
+            this.refuels = results.sort((a,b) => sortRefuelings(a.RefuelName, b.RefuelName)) //b.RefuelName - a.RefuelName)
             this.backUpRefuels = JSON.parse(JSON.stringify(this.refuels))
         }
     },
@@ -109,9 +113,10 @@ export default {
     }
     #r {
     }
-    #l .fa-times{
+    .fa-times{
+        color: red;
         position: absolute;
-        top: 8px;
+        top: 12px;
         right:8px;
     }
     .container-flex {
@@ -127,15 +132,14 @@ export default {
         margin: auto;
         flex: 0 0 50%;
     }
-    #detail .fa-times {
+    /* #detail .fa-times {
         position: absolute;
         top: 8px;
         right:8px;
-
     }
     #detail .fa-file-export{
         position: absolute;
         top: 8px;
         left:8px;
-    }
+    } */
 </style>

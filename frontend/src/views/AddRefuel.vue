@@ -1,11 +1,5 @@
 <template>
     <div id="addRefuel" class="main-box">
-        <div v-if="alert.status">
-            <AlertBox
-            :code="alert.statusCode"
-            :text="alert.msg"
-            />
-        </div>
         <div class="card text-center">
             <CardHeader
             header="Add new instance" 
@@ -85,6 +79,7 @@
 </template>
 
 <script>
+    import { mapActions, mapGetters } from 'vuex'
     import Input from "../components/Refueling/Input.vue"
     import Button from "../components/Refueling/Button.vue"
     import Table from "../components/Refueling/Table.vue"
@@ -110,11 +105,6 @@
                     status: false,
                 },
                 showRefForm: true,
-                alert: {
-                    status: false,
-                    statusCode: 200,
-                    msg: '',
-                }
             }
         },
         components: {
@@ -131,27 +121,35 @@
             }
         },
         methods: {
-            submitFile() {
+            ...mapActions([
+                "makeFetch",
+                "alertSuccess",
+            ]),
+            async submitFile() { //! cannot style to vuex async request
                 let formData = new FormData()
                 formData.append("file", this.postFile)
                 const request = new Request(
                 `${this.procDepHost}/average`,
-            {
-                method: "POST",
-                headers: { 
-                        // 'Accept': 'application/json',
-                        'Access-Control-Allow-Origin': '*' 
-                },
-                body: formData
-            }
-            );
-            fetch(request)
+                {
+                    method: "POST",
+                    headers: { 
+                            "Authorization": null,
+                            'Accept': 'application/json',
+                            'Access-Control-Allow-Origin': '*' 
+                    },
+                    body: formData
+                });
+                fetch(request)
                 .then(response => response.json())
                 .then(data => (console.log(data), this.initialData=data, 
                     this.finalForm.acts.push(this.initialData)))
                 .catch((error) => console.log(error.message))
+                
             },
-            upload(e) {this.postFile = e.target.files[0]},
+            upload(e) {
+                this.postFile = e.target.files[0]
+                console.log(e)
+                },
             fillFromRefuelForm(obj){
                 this.firstStep = obj
                 this.finalForm.acts.push(this.firstStep)

@@ -1,5 +1,5 @@
 <template>
-    <div id="detail"> 
+    <div> 
         <br>
         <div class="container-flex" >
             <div class="row">
@@ -8,17 +8,22 @@
                         <CardHeader
                         :header="refuelDetail.Description"
                         />
-                        <i @click="onSave(refuelDetail.PDC, refuelDetail.ID, i)" class="fas fa-file-export"></i>
-                        <i @click="onDelete(refuelDetail.ID)" class="fas fa-times"></i>
+                        <!-- <a href="#"></a> -->
+                        <a href="#"> <i @click="onDelete(refuelDetail.Name)" class="fas fa-times"></i> </a>
                         <Table
                         :map="refuelDetail.CoreConfig"
                         />
+                        <div class="card-footer">
+                            Download .PDC
+                        <a href="#"><i @click="onSave(refuelDetail.PDC, refuelDetail.ID, i)" class="fas fa-file-export"></i></a>
+                        </div>
                     </div> <br>
                 </div>
+                
             </div>
         </div>
         <br>
-        <div class="row">
+        <div class="row">  <!-- make it visible on click -->
             <div class="col">
                 <RefuelForm
                 ref="newConfig"
@@ -57,7 +62,7 @@ import RefuelForm from "../components/Refueling/RefuelForm.vue"
 import Button from "../components/Refueling/Button.vue"
 import Input from "../components/Refueling/Input.vue"
 import TextArea from "../components/Refueling/TextArea.vue"
-import { saveFile } from "../components/helpers"
+import { saveFile } from "../helpers"
 // require("downloadjs")(data, strFileName, strMimeType)
 
 export default {
@@ -103,42 +108,44 @@ export default {
         refuelDetails:{
             deep: true,
             handler(){
-                this.finalForm.refuelId = parseInt(this.$route.params.id)
+                this.finalForm.refuelNameRef = parseInt(this.$route.params.refuelName) //!!!!!!
             }
         }
     },
     //TODO use the same methods for update 
     methods: {
-        ...mapGetters([
+        ...mapGetters("auth", [
             "isAccess"
         ]),
         ...mapActions([
-            "makeFetch",
-            "alertSuccess",
-
+            "api/makeFetch",
+            "alert/alertSuccess"
         ]),
         async getDetails(index){
             const req = {
-                url: `${this.refuelDepHost}/refuelings/${this.$route.params.id}/details`,
+                url: `${this.refuelDepHost}/refuelings/${this.$route.params.refuelName}/details`,
                 method: "GET",
                 data: null,
                 auth: this.isAccess(),
             }
-            let results = await this.makeFetch(req)
+            let results = await this['api/makeFetch'](req)
             if (results){
                 this.refuelDetails = results
-                await this.preLoadPDC(this.refuelDetails.at(index).ID, index)
+                console.log(this.refuelDetails)
+                await this.preLoadPDC(this.refuelDetails.at(index).Name, index)
+                
+                
             }
             
         },
-        async preLoadPDC(actId, index) {
+        async preLoadPDC(actName, index) { //
             const req = {
-                url: `${this.refuelDepHost}/refuelings/${this.$route.params.id}/${actId}/PDC`,
+                url: `${this.refuelDepHost}/refuelings/${this.$route.params.refuelName}/${actName}/PDC`,
                 method: "GET",
                 data: null,
                 auth: this.isAccess(),
             }
-            let results = await this.makeFetch(req)
+            let results = await this["api/makeFetch"](req)
             if (results){
                 this.refuelDetails.at(index).PDC = results
             }
@@ -150,7 +157,7 @@ export default {
                 data: this.finalForm,
                 auth: this.isAccess(),
             }
-            let results = await this.makeFetch(req)
+            let results = await this['api/makeFetch'](req)
             if (results){
                 this.alertSuccess({msg:results.msg})
                 this.refuelDetails.at(-1).ID = results.id
@@ -160,7 +167,8 @@ export default {
             this.finalForm.description = this.description
             this.finalForm.map = obj.map
             this.finalForm.pdc = obj.pdc
-            this.finalForm.fileName = `${this.$route.params.id}_${this.refuelDetails.length}.PDC`
+            this.finalForm.fileName = this.refuelDetails.length.toString() //* pass name of new act 
+            // this.finalForm.fileName = `${this.$route.params.id}_${this.refuelDetails.length}.PDC` //! its wrong
             this.refuelDetails.push(
                 {
                     PDC: this.finalForm.pdc,
@@ -170,19 +178,19 @@ export default {
             )
             this.addNewAct()
         },
-        async onDelete(actId){
-            console.log(actId)
-            if (confirm(`Are you sure you want to delete ${actId}?`)){
+        async onDelete(actName){
+            console.log(actName)
+            if (confirm(`Are you sure you want to delete ${actName}?`)){
                 const req = {
-                    url: `${this.refuelDepHost}/refuelings/${this.$route.params.id}/${actId}/delete`,
+                    url: `${this.refuelDepHost}/refuelings/${this.$route.params.refuelName}/${actName}/delete`,
                     method: "POST",
                     data: null,
                     auth: this.isAccess(),
                 }
-                let results = await this.makeFetch(req)
+                let results = await this['api/makeFetch'](req)
                 if (results){
                     this.alertSuccess({msg:results})
-                    this.refuelDetails = this.refuelDetails.filter(e => e.ID !== actId)
+                    this.refuelDetails = this.refuelDetails.filter(e => e.Name !== actName)
                     await this.preLoadPDC(this.refuelDetails.at(-1).ID, -1)
                 }
             }
@@ -194,7 +202,7 @@ export default {
                 } else {
                     console.log("ready")
                     clearInterval(intrv)
-                    this.save(ref.PDC)
+                    this.save(ref.PDC) //! call for download
                 }
             }
             let intrv = setInterval(checkPDC, 100, this.refuelDetails[index])
@@ -202,24 +210,29 @@ export default {
                 pdc ? resolve("ok") : reject("Whoops!")
             })
             download
-            .then(() => this.save(pdc))
+            .then(() => this.save(pdc)) //! call for download
             .catch(() => (this.preLoadPDC(actId, index), intrv))
         },
         save: saveFile
     },
 }
 </script>
-<style>
-    #detail .table {
-        margin: auto;
-        width: 350px;
-    }
-    #detail .table td {
-        height:40px;
-    }
+<style scoped>
     
     .forms-container {
         width:40%; 
         margin:auto;
+    }
+    .fa-file-export{
+        color: black;
+        position: absolute;
+        bottom: 13px;
+        right:8px;
+    }
+    .fa-times {
+        color: red;
+        position: absolute;
+        top: 11px;
+        right:8px;
     }
 </style>

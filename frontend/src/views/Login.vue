@@ -66,14 +66,20 @@ export default {
             
         }
     },
+    created(){
+        //* if autologining seccusseful redirect to previous page
+        this["auth/autologgining"]()
+            .then(() =>this.$router.push({name: "List"}))
+            .catch(err => console.error(err))
+    },
     methods:{
         //todo add mapstate
+        //! rename to nested modules
         ...mapActions(
             [
-                "alertError",
-                "login",
-                "makeFetch",
-                "resetAlert"
+                "auth/login",
+                "auth/autologgining",
+                "api/makeFetch"
             ]
         ),
         async signIn(){
@@ -85,9 +91,9 @@ export default {
                 auth: null,
             }
             console.log(req)
-            let results = await this.makeFetch(req)
+            let results = await this['api/makeFetch'](req)
             if (results){
-                this.login({...results, ...this.credentials})
+                await this["auth/login"]({...results, ...this.credentials})
                 setTimeout(this.$router.push, 500, {name:"List"})
             }
         }
@@ -96,6 +102,7 @@ export default {
 </script>
 
 <style scoped>
+    
     .forms-container {
         
         width:30%; 
