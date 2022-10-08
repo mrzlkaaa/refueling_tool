@@ -78,17 +78,20 @@ const apiData = {
         responseCode: null,
     }),
     actions:{
-        async makeFetch({dispatch}, req){
+        async makeFetch({dispatch}, req, fileObj=false){
+            console.log(req.data)
             const request = new Request(
             req.url,
             {
                 method: req.method,
                 headers: {
-                        "Authorization": req.auth,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        },
-                body: req.data ? JSON.stringify(req.data) : null
+                    "Authorization": req.auth,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: fileObj ? req.data
+                    : req.data ? JSON.stringify(req.data)
+                    : null
             });
             try{
                 const response = await fetch(request)

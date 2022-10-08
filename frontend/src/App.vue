@@ -1,14 +1,14 @@
 <template>
 <div style="position:relative">
   <NavBar
-  v-if="isAccess()"
+  v-if="['auth/isAccess']"
   />
   <Modal/>
   <AlertBox/>
-  <i v-if="isAccess()" class="fa-solid fa-circle-question fa-2xl" @click="showForm"></i>
+  <i v-if="['auth/isAccess']" class="fa-solid fa-circle-question fa-2xl" @click="showForm()"></i>
   <router-view/>
   <Report
-    v-if="isAccess() && isDisplayed()"
+    v-if="['auth/isAccess'] && isDisplayed()"
   />
 </div>
 </template>
@@ -28,13 +28,13 @@
     },
     methods:{
       ...mapGetters([ 
-            "isAccess",
+            "auth/isAccess",
             "isDisplayed"
         ]),
       ...mapActions([
         "showForm"
       ])
-    }
+    },
   }
   
 </script>
@@ -47,6 +47,15 @@
     text-align: center;
     color: #2c3e50;
   }
+  div.form-floating {
+    text-align: left;
+  }
+  /* * { */
+  /* div, button, label, table, select { //* on div navbar crashes
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } */
   .main-box {
       margin: auto;
       margin-top: 60px;
