@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from "vue-router"
-import { mapGetters } from 'vuex'
-import { store } from "../vuex.js" 
+import { store } from "../store"
 import AddRefuel from "../views/AddRefuel.vue"
 import Diary from "../views/Diary.vue"
 import List from "../views/List.vue"
@@ -10,6 +9,7 @@ import Register from "../views/Register.vue"
 import Settings from "../views/Settings.vue"
 import General from "../views/Settings/General.vue"
 import Users from "../views/Settings/Users.vue"
+import RefreshToken from "../views/RefreshToken.vue"
 
 const routes = [
   { path: '/add-refuel',
@@ -28,7 +28,7 @@ const routes = [
     meta:{requiresAuth: true},
     alias: "/",
     children: [{
-      path: ":id/detail",
+      path: ":refuelName/detail",
       name: "Detail",
       component: Detail,
       meta:{requiresAuth: true},
@@ -57,7 +57,13 @@ const routes = [
   { path: "/register",
     name: "Register",
     component: Register,
+  },
+  { path: "/refresh",
+    name: "RefreshToken",
+    component: RefreshToken,
+    meta:{requiresAuth: true}
   }
+
 ]
 
 const router = createRouter({
@@ -65,16 +71,16 @@ const router = createRouter({
   routes,
 })
 
+
 router.beforeEach(async (to, from, next) => {
 
-  store.dispatch('autologgining')
-
-  if (to.name !== 'Login' && to.meta.requiresAuth && !store.state.auth.user){
+  if (to.name !== 'Login' && to.meta.requiresAuth && !store.getters["auth/isAccess"]){
     next({name:"Login"})
   }
-  else if (to.name == "Login" && store.state.auth.user) {
-    store.dispatch("logout")
+  else if (to.name == "Login" && store.getters["auth/isAccess"]) {
+    store.dispatch("auth/logout")
     next({name:"Login"})
+    // next({name:"List"})
   }
   else {
     next()
